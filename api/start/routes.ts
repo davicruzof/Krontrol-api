@@ -1,3 +1,5 @@
+import { AuthController } from 'App/Controllers/Http/AuthController';
+import { LoggerConfig } from '@ioc:Adonis/Core/Logger';
 /*
 |--------------------------------------------------------------------------
 | Routes
@@ -23,3 +25,10 @@ import Route from '@ioc:Adonis/Core/Route'
 Route.get('/', async () => {
   return { hello: 'world' }
 })
+
+Route.group(()=>{
+	Route.post('/login', 'AuthController.login');
+	Route.post('/logout', 'AuthController.logout').middleware('auth');
+  Route.get('/me','AuthController.me').middleware('auth');
+
+}).prefix('/api');
