@@ -19,7 +19,7 @@ export default class AuthController {
         try {
              const payload = await request.validate({schema: loginSchema});
              const { cpf,cd_enterprise,password } = request.all();
-             console.log("aqui");
+
              const user = await User
                .query()
                .where('cpf',cpf)

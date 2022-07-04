@@ -13,6 +13,9 @@ export default class User extends BaseModel {
   public status: string
 
   @column()
+  public date_birth: Date
+
+  @column()
   public cd_enterprise: number
 
   @column({ serializeAs: null })

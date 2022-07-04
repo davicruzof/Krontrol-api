@@ -31,4 +31,9 @@ Route.group(()=>{
 	Route.post('/logout', 'AuthController.logout').middleware('auth');
   Route.get('/me','AuthController.me').middleware('auth');
 
+
+  Route.group(()=>{
+    Route.post('/create','UsersController.create');
+  }).prefix('/user');
+
 }).prefix('/api');
