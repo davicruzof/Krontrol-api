@@ -3,37 +3,43 @@ import Hash from '@ioc:Adonis/Core/Hash'
 import { column, beforeSave, BaseModel } from '@ioc:Adonis/Lucid/Orm'
 
 export default class User extends BaseModel {
+  static get table () {
+    return 'ml_usu_usuario'
+  }
   @column({ isPrimary: true })
-  public id: number
+  public id_usuario: number
 
   @column()
-  public cpf: string
+  public id_empresa: number
 
   @column()
-  public status: string
+  public id_funcionario: number
 
   @column()
-  public date_birth: Date
-
-  @column()
-  public cd_enterprise: number
-
-  @column({ serializeAs: null })
-  public password: string
-
-  @column()
-  public rememberMeToken?: string
+  public senha: string
 
   @column.dateTime({ autoCreate: true })
-  public createdAt: DateTime
+  public dt_cadastro: DateTime
+
+  @column.dateTime({autoUpdate: true })
+  public dt_inativo: DateTime
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updatedAt: DateTime
 
+  @column()
+  public id_status: number
+
+  @column()
+  public id_grupo: number
+
+  @column()
+  public rememberMeToken?: string
+
   @beforeSave()
   public static async hashPassword (user: User) {
-    if (user.$dirty.password) {
-      user.password = await Hash.make(user.password)
+    if (user.$dirty.senha) {
+      user.senha = await Hash.make(user.senha)
     }
   }
 }
