@@ -8,17 +8,12 @@ const loginSchema =  schema.create({
     cd_enterprise: schema.number(),
     password : schema.string()
 });
-
-const logoutSchema =  schema.create({
-    token: schema.string()
-});
-
 export default class AuthController {
 
     public async login({request,response,auth}:HttpContextContract){
         try {
-             const payload = await request.validate({schema: loginSchema});
-             const { cpf,cd_enterprise,password } = request.all();
+             await request.validate({schema: loginSchema});
+             const { cpf,cd_enterprise,password } = request.body();
 
              const user = await User
                .query()
@@ -30,14 +25,14 @@ export default class AuthController {
                //Verify password
                 if(user){
                     if (!(await Hash.verify(user.password, password))) {
-                        return response.unauthorized({error:"Senha incorreta"})
+                        return response.unauthorized({error:"Dados inválidos"})
                       }
                       else{
                         return await auth.use('api').generate(user, { expiresIn:"1 day" })
                       }
                 }
                 else{
-                    response.json({error: "Usuário não encontrado"});
+                    response.json({error: "Dados inválidos"});
                 }
           } catch (error) {
             response.badRequest(error.messages);

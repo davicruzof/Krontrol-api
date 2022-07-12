@@ -13,15 +13,15 @@ export default class UsersController {
 
     public async  create({request,response}:HttpContextContract) {
         try {
-            const payload = await request.validate({schema: userSchema});
-            const {cpf, cd_enterprise, date_birth,password} = request.all();
+            await request.validate({schema: userSchema});
+            const {cpf, cd_enterprise, date_birth,password} = request.body();
             const user_exists = await User.findBy('cpf',cpf);
             if(user_exists){
                 response.badRequest({error: "CPF já cadastrado "});
             }
             else{
-                const user = await User.create({cpf,cd_enterprise,date_birth, password});
-                response.json({user: user.id});
+                await User.create({cpf,cd_enterprise,date_birth, password});
+                response.json({message: "Criado com sucesso"});
             }
 
         } catch (error) {
