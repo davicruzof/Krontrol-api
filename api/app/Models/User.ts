@@ -15,17 +15,17 @@ export default class User extends BaseModel {
   @column()
   public id_funcionario: number
 
-  @column()
+  @column({ serializeAs: null })
   public senha: string
 
   @column.dateTime({ autoCreate: true })
   public dt_cadastro: DateTime
 
-  @column.dateTime({autoUpdate: true })
+  @column.dateTime()
   public dt_inativo: DateTime
 
-  @column.dateTime({ autoCreate: true, autoUpdate: true })
-  public updatedAt: DateTime
+  @column.dateTime({ autoUpdate: true })
+  public updatedat: DateTime
 
   @column()
   public id_status: number
@@ -34,7 +34,7 @@ export default class User extends BaseModel {
   public id_grupo: number
 
   @column()
-  public rememberMeToken?: string
+  public remembermetoken?: string
 
   @beforeSave()
   public static async hashPassword (user: User) {

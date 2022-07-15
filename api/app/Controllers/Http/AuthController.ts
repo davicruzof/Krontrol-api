@@ -2,34 +2,41 @@ import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 import { schema } from '@ioc:Adonis/Core/Validator';
 import Hash from '@ioc:Adonis/Core/Hash';
 import User from 'App/Models/User';
-
+import  Funcionario  from 'App/Models/Funcionario';
 const loginSchema =  schema.create({
     cpf: schema.string(),
-    cd_enterprise: schema.number(),
-    password : schema.string()
+    id_empresa: schema.number(),
+    senha : schema.string()
 });
 export default class AuthController {
 
     public async login({request,response,auth}:HttpContextContract){
         try {
              await request.validate({schema: loginSchema});
-             const { cpf,cd_enterprise,password } = request.body();
+             const { cpf,id_empresa,senha } = request.body();
 
-             const user = await User
+             const funcionario = await Funcionario
                .query()
                .where('cpf',cpf)
-               .where('cd_enterprise',cd_enterprise)
-               .where('status','ATIVO')
+               .where('id_empresa',id_empresa)
                .first()
-   
+            
                //Verify password
-                if(user){
-                    if (!(await Hash.verify(user.password, password))) {
-                        return response.unauthorized({error:"Dados inválidos"})
-                      }
-                      else{
-                        return await auth.use('api').generate(user, { expiresIn:"1 day" })
-                      }
+                if(funcionario){
+                    const usuario = await User
+                    .query()
+                    .where('id_funcionario',funcionario.id_funcionario)
+                    .where('id_empresa',funcionario.id_empresa)
+                    .first()
+                    if(usuario){
+                        if (!(await Hash.verify(usuario.senha, senha))) {
+                            return response.unauthorized({error:"Dados inválidos"})
+                          }
+                          else{
+                            const token =  await auth.use('api').generate(usuario);
+                            return token;
+                          }
+                    }
                 }
                 else{
                     response.json({error: "Dados inválidos"});
@@ -39,14 +46,12 @@ export default class AuthController {
           }
     }
 
-    public async logout({auth,response}:HttpContextContract){
+    public async logout({auth}:HttpContextContract){
 
         if(auth){
             await auth.logout();
         }
-        else{
-            response.json({error:"Token não encontrado"});
-        }
+
     }
     public async me({auth, response}:HttpContextContract){
         return await response.json({user:auth.user});
