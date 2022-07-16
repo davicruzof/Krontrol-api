@@ -26,9 +26,4 @@ export default Env.rules({
 	PG_USER: Env.schema.string(),
 	PG_PASSWORD: Env.schema.string.optional(),
 	PG_DB_NAME: Env.schema.string(),
-	ORACLE_HOST: Env.schema.string({ format: 'host' }),
-	ORACLE_PORT: Env.schema.number(),
-	ORACLE_USER: Env.schema.string(),
-	ORACLE_PASSWORD: Env.schema.string.optional(),
-	ORACLE_DB_NAME: Env.schema.string(),
 })
