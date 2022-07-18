@@ -6,7 +6,7 @@ export default class Empresa extends BaseModel {
     return 'ml_ctr_empresa'
   }
 
-  @column()
+  @column({ isPrimary: true })
   public id_empresa: number
 
   @column()
@@ -60,9 +60,18 @@ export default class Empresa extends BaseModel {
   @column()
   public status: number
 
+  @column()
+  public background: string
+
+  @column()
+  public primary_color: string
+
+  @column()
+  public logo: string
+
   @column.dateTime({ autoCreate: true })
   public dt_cadastro: DateTime
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
-  public updatedAt: DateTime
+  public updatedat: DateTime
 }

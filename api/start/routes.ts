@@ -28,6 +28,7 @@ Route.get('/', async () => {
 
 Route.group(()=>{
   
+  //Rotas Autenticação
   Route.group(()=>{
     Route.post('/login', 'AuthController.login');
 	  Route.post('/logout', 'AuthController.logout').middleware('auth');
@@ -35,8 +36,25 @@ Route.group(()=>{
   }).prefix('/auth');
 
 
+  //Rotas Usuario
   Route.group(()=>{
+
     Route.post('/create','UsersController.create');
+
   }).prefix('/user');
+
+  //Rotas Empresa
+  Route.group(()=>{
+
+    Route.post('/create','EmpresasController.create');
+
+  }).prefix('/enterprise').middleware('auth');
+
+
+  Route.group(()=>{
+    Route.post('/create','FuncionariosController.create');
+
+  }).prefix('/employee');
+
 
 }).prefix('/api');
