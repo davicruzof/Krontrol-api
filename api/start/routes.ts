@@ -22,8 +22,8 @@ import { LoggerConfig } from '@ioc:Adonis/Core/Logger';
 
 import Route from '@ioc:Adonis/Core/Route'
 
-Route.get('/', async () => {
-  return { hello: 'world' }
+Route.get('api/status', async () => {
+  return { status: 'api is only' }
 })
 
 Route.group(()=>{
@@ -50,11 +50,16 @@ Route.group(()=>{
 
   }).prefix('/enterprise').middleware('auth');
 
-
+  //Rotas Funcionario
   Route.group(()=>{
     Route.post('/create','FuncionariosController.create');
 
-  }).prefix('/employee');
+  }).prefix('/employee').middleware('auth');
+
+  //Rotas Veiculos
+  Route.group(()=>{
+    Route.post('/create','VeiculosController.create');
+  }).prefix('/vehicle');
 
 
 }).prefix('/api');
