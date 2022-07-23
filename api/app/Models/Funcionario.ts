@@ -33,7 +33,7 @@ export default class Funcionario extends BaseModel {
   public cpf: string
 
   @column()
-  public celular: number
+  public celular: string
 
   @column()
   public email: number

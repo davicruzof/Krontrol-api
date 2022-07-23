@@ -1,4 +1,4 @@
-import { Empresa } from 'App/Models/Empresa';
+import  Empresa  from 'App/Models/Empresa';
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { schema } from '@ioc:Adonis/Core/Validator';
 import Funcionario from '../../Models/Funcionario';
@@ -43,6 +43,29 @@ export default class FuncionariosController {
 
     public async edit({request,response}:HttpContextContract){
 
+    }
+
+    public async getById({request,response}:HttpContextContract){
+        const  { id_funcionario }    = request.body();
+
+        if(id_funcionario){
+
+            const funcionario = await Funcionario.findBy('id_funcionario',id_funcionario);
+
+            if(funcionario){
+
+                response.json(funcionario);
+
+            }
+            else {
+
+                response.json({error: "Funcionário não encontrada"});
+
+            }
+        }
+        else{
+            response.json({error: "Funcionário não encontrada"});
+        }
     }
 
 

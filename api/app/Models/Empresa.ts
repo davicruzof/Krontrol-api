@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
 
 export default class Empresa extends BaseModel {
   static get table () {
@@ -74,4 +74,6 @@ export default class Empresa extends BaseModel {
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updatedat: DateTime
+
+
 }

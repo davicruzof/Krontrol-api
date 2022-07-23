@@ -2,7 +2,6 @@ import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 import { schema } from '@ioc:Adonis/Core/Validator';
 import User from 'App/Models/User';
 import Funcionario from 'App/Models/Funcionario';
-import Empresa from 'App/Models/Empresa';
 import { UserSchemaInsert } from '../../Schemas/User';
 
 export default class UsersController {
@@ -24,6 +23,7 @@ export default class UsersController {
                     senha : dados.senha,
                     id_grupo : funcionario.id_grupo
                 });
+                response.json({sucess:"Usuário cadastrado"});
 
             }
             else{

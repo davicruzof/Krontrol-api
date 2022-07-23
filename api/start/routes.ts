@@ -1,5 +1,3 @@
-import { AuthController } from 'App/Controllers/Http/AuthController';
-import { LoggerConfig } from '@ioc:Adonis/Core/Logger';
 /*
 |--------------------------------------------------------------------------
 | Routes
@@ -46,19 +44,24 @@ Route.group(()=>{
   //Rotas Empresa
   Route.group(()=>{
 
+    Route.get('/','EmpresasController.getAll');
     Route.post('/create','EmpresasController.create');
+    Route.post('/getById','EmpresasController.getById');
+    Route.post('/getByName','EmpresasController.getByName');
 
-  }).prefix('/enterprise').middleware('auth');
+  }).prefix('/enterprises').middleware('auth');
 
   //Rotas Funcionario
   Route.group(()=>{
     Route.post('/create','FuncionariosController.create');
+    Route.post('/getById','FuncionariosController.getById');
 
   }).prefix('/employee').middleware('auth');
 
   //Rotas Veiculos
   Route.group(()=>{
     Route.post('/create','VeiculosController.create');
+    Route.post('/getById','VeiculosController.getById');
   }).prefix('/vehicle');
 
 

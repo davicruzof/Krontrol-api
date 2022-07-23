@@ -41,6 +41,28 @@ export default class VeiculosController {
         }
     }
 
+    public async getById({request,response}:HttpContextContract){
+        const  { id_veiculo }    = request.body();
+
+        if(id_veiculo){
+
+            const veiculo = await Veiculo.findBy('id_veiculo',id_veiculo);
+
+            if(veiculo){
+
+                response.json(veiculo);
+
+            }
+            else {
+
+                response.json({error: "Veículo não encontrada"});
+
+            }
+        }
+        else{
+            response.json({error: "Veículo não encontrada"});
+        }
+    }
 
 
 }
