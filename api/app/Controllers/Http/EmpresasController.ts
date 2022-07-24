@@ -2,32 +2,41 @@ import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { schema } from '@ioc:Adonis/Core/Validator';
 import Empresa from 'App/Models/Empresa';
 import { EmpresaSchema } from 'App/Schemas/Empresa';
+import crypto from 'crypto';
 import Drive from '@ioc:Adonis/Core/Drive'
-
+const bucket_folder = "logos_enterprise";
 export default class EmpresasController {
 
 
     public async create({request, response}:HttpContextContract){
         try {
-            //await request.validate({schema: schema.create(EmpresaSchema)});
-            const logo = request.file('logo');
-
-            console.log(logo);
-            const image =  await logo?.moveToDisk('logos_enterprise/',{},'s3');
-            console.log(image);
-            return;
+            let filename = "";
+            await request.validate({schema: schema.create(EmpresaSchema)});
+            const fileLogo = request.file('logo');
 
             const dados = request.body();
             let cnpj_aux = dados.cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
             dados.cnpj = cnpj_aux;
 
             const empresa = await Empresa.findBy('cnpj',dados.cnpj);
+
+            if(fileLogo){
+
+                let hashImg =  crypto.randomBytes(10).toString('hex');
+                filename = `${hashImg}-${fileLogo.clientName}`;
+                await fileLogo.moveToDisk('logos_enterprise/',{
+                    name: filename
+                },'s3');
+            }
             if(empresa){
+                
                 response.json({error: "Já existe uma Empresa cadastrada com esse cnpj"});
+
             }
              else{
+
                 await Empresa.create({
-                    nomeempresarial: dados.nome,
+                    nomeempresarial: dados.nomeempresarial,
                     cnpj: dados.cnpj,
                     logradouro: dados.logradouro,
                     numero: dados.numero,
@@ -45,7 +54,7 @@ export default class EmpresasController {
                     status: dados.status,
                     background: dados.background,
                     primary_color: dados.primary_color,
-                    logo : dados.logo
+                    logo : filename
                 });
                 response.json({sucess: "Criado com sucesso"});
             }
@@ -78,7 +87,7 @@ export default class EmpresasController {
             const empresa = await Empresa.findBy('id_empresa',id_empresa);
 
             if(empresa){
-
+                empresa.logo = await Drive.getSignedUrl(bucket_folder+'/'+empresa.logo);
                 response.json(empresa);
 
             }

@@ -10,14 +10,13 @@ export const EmpresaSchema = {
     bairro: schema.string(),
     municipio: schema.string(),
     uf : schema.string(),
-    email: schema.string.nullable(),
-    telefone: schema.string.nullable(),
-    situacaocadastral: schema.string.nullable(),
-    contato: schema.string.nullable(),
+    email: schema.string.nullableAndOptional(),
+    telefone: schema.string.nullableAndOptional(),
+    situacaocadastral: schema.string.nullableAndOptional(),
+    contato: schema.string.nullableAndOptional(),
     id_grupo : schema.number(),
-    id_usuario : schema.number.nullable(),
-    status: schema.number.nullable(),
-    background: schema.string.nullable(),
-    primary_color: schema.string.nullable(),
-    logo : schema.file.nullable()
+    id_usuario : schema.number.nullableAndOptional(),
+    status: schema.number.nullableAndOptional(),
+    background: schema.string.nullableAndOptional(),
+    primary_color: schema.string.nullableAndOptional()
 };
