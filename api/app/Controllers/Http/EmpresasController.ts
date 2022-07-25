@@ -87,7 +87,6 @@ export default class EmpresasController {
             const empresa = await Empresa.findBy('id_empresa',id_empresa);
 
             if(empresa){
-                empresa.logo = await Drive.getSignedUrl(bucket_folder+'/'+empresa.logo);
                 response.json(empresa);
 
             }
