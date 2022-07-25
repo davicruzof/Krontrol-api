@@ -78,6 +78,15 @@ export default class EmpresasController {
         );
 
     }
+
+    public async getEnterprises({response}:HttpContextContract){
+        response.json(
+            await Empresa
+                    .query()
+                    .select('id_empresa','nomeempresarial')
+        );
+    }
+
     public async getById({response, request}:HttpContextContract){
 
         const  { id_empresa }    = request.body();

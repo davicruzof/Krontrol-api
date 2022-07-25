@@ -28,6 +28,7 @@ Route.group(()=>{
   
   //Rotas Autenticação
   Route.group(()=>{
+    Route.get('/getEnterprises','EmpresasController.getEnterprises');
     Route.post('/login', 'AuthController.login');
 	  Route.post('/logout', 'AuthController.logout').middleware('auth');
     Route.get('/me','AuthController.me').middleware('auth');
