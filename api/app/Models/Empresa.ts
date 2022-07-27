@@ -74,6 +74,9 @@ export default class Empresa extends BaseModel {
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updatedat: DateTime
+  
+  @column()
+  public bucket: string
 
 
 }

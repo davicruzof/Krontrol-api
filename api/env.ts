@@ -27,9 +27,8 @@ export default Env.rules({
 	PG_PASSWORD: Env.schema.string.optional(),
 	PG_DB_NAME: Env.schema.string(),
 
-	S3_KEY: Env.schema.string(),
-	S3_SECRET: Env.schema.string(),
-	S3_BUCKET: Env.schema.string(),
-	S3_REGION: Env.schema.string(),
-	S3_ENDPOINT: Env.schema.string.optional(),
+	AWS_ACCESS_KEY_ID: Env.schema.string(),
+	AWS_SECRET_ACCESS_KEY: Env.schema.string(),
+	AWS_S3_BUCKET: Env.schema.string(),
+	AWS_REGION: Env.schema.string()
 })

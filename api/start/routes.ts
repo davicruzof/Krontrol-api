@@ -25,7 +25,7 @@ Route.get('api/status', async () => {
 })
 
 Route.group(()=>{
-  
+  Route.post('/teste','TestesController.criarbucket');
   //Rotas Autenticação
   Route.group(()=>{
     Route.get('/getEnterprises','EmpresasController.getEnterprises');
@@ -49,6 +49,7 @@ Route.group(()=>{
     Route.post('/create','EmpresasController.create');
     Route.post('/getById','EmpresasController.getById');
     Route.post('/getByName','EmpresasController.getByName');
+    Route.patch('/update','EmpresaController.update')
 
   }).prefix('/enterprises').middleware('auth');
 

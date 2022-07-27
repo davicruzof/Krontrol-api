@@ -2,17 +2,19 @@ import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { schema } from '@ioc:Adonis/Core/Validator';
 import Empresa from 'App/Models/Empresa';
 import { EmpresaSchema } from 'App/Schemas/Empresa';
+import { createBucket, upload } from 'App/Controllers/Http/S3';
 import crypto from 'crypto';
-import Drive from '@ioc:Adonis/Core/Drive'
-const bucket_folder = "logos_enterprise";
 export default class EmpresasController {
 
 
     public async create({request, response}:HttpContextContract){
         try {
             let filename = "";
+            let data ;
             await request.validate({schema: schema.create(EmpresaSchema)});
+            
             const fileLogo = request.file('logo');
+            console.log(fileLogo);
 
             const dados = request.body();
             let cnpj_aux = dados.cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
@@ -20,20 +22,32 @@ export default class EmpresasController {
 
             const empresa = await Empresa.findBy('cnpj',dados.cnpj);
 
-            if(fileLogo){
-
-                let hashImg =  crypto.randomBytes(10).toString('hex');
-                filename = `${hashImg}-${fileLogo.clientName}`;
-                await fileLogo.moveToDisk('logos_enterprise/',{
-                    name: filename
-                },'s3');
-            }
             if(empresa){
                 
                 response.json({error: "Já existe uma Empresa cadastrada com esse cnpj"});
 
             }
              else{
+                let nome_bucket = dados.nomeempresarial.replace(' ','-').replace(/\s/g, '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+
+                await createBucket({Bucket : nome_bucket});
+
+                if(fileLogo){
+
+                    let hashImg =  crypto.randomBytes(10).toString('hex');
+                    filename = `${hashImg}-${fileLogo.clientName}`;
+
+                    data = await upload({
+                        folder : 'logo',
+                        filename : filename,
+                        bucket: nome_bucket,
+                        path: filename,
+                        file: fileLogo,
+                        type: fileLogo.extname
+                    });
+
+
+                }
 
                 await Empresa.create({
                     nomeempresarial: dados.nomeempresarial,
@@ -54,7 +68,8 @@ export default class EmpresasController {
                     status: dados.status,
                     background: dados.background,
                     primary_color: dados.primary_color,
-                    logo : filename
+                    logo : filename,
+                    bucket: nome_bucket
                 });
                 response.json({sucess: "Criado com sucesso"});
             }
@@ -96,6 +111,7 @@ export default class EmpresasController {
             const empresa = await Empresa.findBy('id_empresa',id_empresa);
 
             if(empresa){
+                empresa.logo = empresa.bucket+'/logo/'+empresa.logo
                 response.json(empresa);
 
             }
@@ -116,7 +132,7 @@ export default class EmpresasController {
             let empresa = await Empresa
                         .query()
                         .select('id_empresa','nomeempresarial','cnpj','telefone','situacaocadastral','status')
-                        .where('nomeempresarial','LIKE','%'+nomeempresarial)
+                        .where('nomeempresarial','LIKE','%'+nomeempresarial+'%')
             if(empresa){
                 response.json(empresa);
             }
@@ -127,5 +143,9 @@ export default class EmpresasController {
         else{
             response.json({error: "Empresa não encontrada"});
         }
+    }
+
+    public async update ({request,response}:HttpContextContract){
+        
     }
 }   
