@@ -5,6 +5,7 @@ import Empresa from 'App/Models/Empresa';
 import { EmpresaSchema, EmpresaSchemaUpdate } from 'App/Schemas/Empresa';
 import { createBucket, upload } from 'App/Controllers/Http/S3';
 import crypto from 'crypto';
+import fs from 'fs';
 export default class EmpresasController {
 
 
@@ -51,6 +52,7 @@ export default class EmpresasController {
                                 }
                                 else {
                                     resolve(data.Location)
+                                    fs.unlinkSync('tmp/uploads/files/'+filename);
                                   }
                               });
                       });
@@ -184,7 +186,8 @@ export default class EmpresasController {
                               reject(error);
                             }
                             else {
-                                resolve(data.Location)
+                                resolve(data.Location);
+                                fs.unlinkSync('tmp/uploads/files/'+filename);
                               }
                           });
                   });
