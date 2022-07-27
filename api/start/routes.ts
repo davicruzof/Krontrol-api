@@ -49,7 +49,7 @@ Route.group(()=>{
     Route.post('/create','EmpresasController.create');
     Route.post('/getById','EmpresasController.getById');
     Route.post('/getByName','EmpresasController.getByName');
-    Route.patch('/update','EmpresaController.update')
+    Route.put('/update','EmpresasController.update')
 
   }).prefix('/enterprises').middleware('auth');
 

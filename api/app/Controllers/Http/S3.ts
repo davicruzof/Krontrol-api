@@ -14,14 +14,14 @@ export  const createBucket = async (params) =>{
     }
 }
 
-export const upload = async (params) =>{
-
+export const upload = async (params, callback) =>{
+    var infoFile;
     await params.file.moveToDisk('files',{
       name: params.filename
     });
       const buffer = fs.createReadStream('tmp/uploads/files/'+params.filename);
 
-        s3connection.upload({
+       const data = s3connection.upload({
 
         Bucket : params.bucket,
         Key : params.folder+'/'+params.path,
@@ -29,16 +29,6 @@ export const upload = async (params) =>{
         Body : buffer,
         ContentType: params.type
 
-      },(error,data)=>{
-      if(error){
-        console.log(error);
-      }
-      else {
-         //console.log(data);
-         fs.unlinkSync('tmp/uploads/files/'+params.filename);
-         //const infoFile = data;
-        }
-    })
-
-
+      },callback)
+    
 }

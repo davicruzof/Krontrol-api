@@ -55,6 +55,13 @@ export default class AuthController {
 
     }
     public async me({auth, response}:HttpContextContract){
-        return await response.json({user:auth.user});
+
+        const funcionario = await Funcionario.findBy('id_funcionario',auth.user?.id_funcionario);
+
+        return  response.json({
+            user:auth.user,
+            funcionario
+        });
+
     }
 }
