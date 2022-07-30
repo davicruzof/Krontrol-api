@@ -1,5 +1,5 @@
 import { s3Client, s3connection } from '../../../libs/aws-sdk';
-import { PutObjectCommand, CreateBucketCommand } from "@aws-sdk/client-s3";
+import { CreateBucketCommand } from "@aws-sdk/client-s3";
 import fs from 'fs';
 export  const createBucket = async (params) =>{
     try{
@@ -15,13 +15,13 @@ export  const createBucket = async (params) =>{
 }
 
 export const upload = async (params, callback) =>{
-    var infoFile;
+
     await params.file.moveToDisk('files',{
       name: params.filename
     });
       const buffer = fs.createReadStream('tmp/uploads/files/'+params.filename);
 
-       const data = s3connection.upload({
+       await s3connection.upload({
 
         Bucket : params.bucket,
         Key : params.folder+'/'+params.path,

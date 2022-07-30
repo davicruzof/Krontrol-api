@@ -1,3 +1,4 @@
+
 import { VeiculoSchemaInsert } from './../../Schemas/Veiculo';
 import { schema } from '@ioc:Adonis/Core/Validator';
 
@@ -62,6 +63,9 @@ export default class VeiculosController {
         else{
             response.json({error: "Veículo não encontrada"});
         }
+    }
+    public async getAll({response}:HttpContextContract){
+        response.json( await Veiculo.all() );
     }
 
 

@@ -67,6 +67,9 @@ export default class FuncionariosController {
             response.json({error: "Funcionário não encontrada"});
         }
     }
+    public async getAll ({response}:HttpContextContract){
+        response.json( await Funcionario.all());
+    }
 
 
 }

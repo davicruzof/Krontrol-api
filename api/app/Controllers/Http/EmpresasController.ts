@@ -39,7 +39,7 @@ export default class EmpresasController {
                     filename = `${hashImg}-${fileLogo.clientName}`;
 
                         host_img = new Promise( (resolve,reject) => {
-                            upload({
+                           await upload({
                                 folder : 'logo',
                                 filename : filename,
                                 bucket: nome_bucket,
@@ -56,7 +56,6 @@ export default class EmpresasController {
                                   }
                               });
                       });
-                      //console.log(await host_img);
                 }
 
                 await Empresa.create({
