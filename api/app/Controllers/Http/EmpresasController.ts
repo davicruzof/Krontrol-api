@@ -90,7 +90,6 @@ export default class EmpresasController {
         }
     }
 
-
     public async getAll({response}:HttpContextContract){
 
         response.json( 

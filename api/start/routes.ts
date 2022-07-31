@@ -55,15 +55,20 @@ Route.group(()=>{
 
   //Rotas Funcionario
   Route.group(()=>{
+
     Route.post('/create','FuncionariosController.create');
     Route.post('/getById','FuncionariosController.getById');
+    Route.get('/getAll','FuncionariosController.getAll');
 
   }).prefix('/employee').middleware('auth');
 
   //Rotas Veiculos
   Route.group(()=>{
+
     Route.post('/create','VeiculosController.create');
     Route.post('/getById','VeiculosController.getById');
+    Route.get('/getAll','VeiculosController.getAll');
+
   }).prefix('/vehicle');
 
 

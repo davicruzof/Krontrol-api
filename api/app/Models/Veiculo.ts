@@ -1,5 +1,6 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, BelongsTo,belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
+import Garagem from './Garagem'
 
 export default class Veiculo extends BaseModel {
   static get table () {
@@ -58,4 +59,7 @@ export default class Veiculo extends BaseModel {
 
   @column()
   public id_funcionario_cadastro : number
+
+  @belongsTo(() => Garagem { foreignKey : 'id_garagem'})
+  public garagem : BelongsTo <typeof Garagem> 
 }

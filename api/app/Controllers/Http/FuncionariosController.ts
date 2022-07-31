@@ -41,16 +41,18 @@ export default class FuncionariosController {
         }
     }
 
-    public async edit({request,response}:HttpContextContract){
-
-    }
-
     public async getById({request,response}:HttpContextContract){
         const  { id_funcionario }    = request.body();
 
         if(id_funcionario){
 
-            const funcionario = await Funcionario.findBy('id_funcionario',id_funcionario);
+            const funcionario = await Funcionario
+                                    .query()
+                                    .preload('cnh')
+                                    .preload('funcao')
+                                    .preload('sexo')
+                                    .preload('situacao')
+                                    .where('id_funcionario',id_funcionario);
 
             if(funcionario){
 
@@ -67,8 +69,17 @@ export default class FuncionariosController {
             response.json({error: "Funcionário não encontrada"});
         }
     }
+
     public async getAll ({response}:HttpContextContract){
-        response.json( await Funcionario.all());
+
+        let funcionarios = await Funcionario
+            .query()
+            .preload('situacao')
+            .preload('sexo')
+            .preload('cnh')
+            .preload('funcao');
+
+        response.json( funcionarios);
     }
 
 

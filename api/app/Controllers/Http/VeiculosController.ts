@@ -47,7 +47,9 @@ export default class VeiculosController {
 
         if(id_veiculo){
 
-            const veiculo = await Veiculo.findBy('id_veiculo',id_veiculo);
+            const veiculo = await Veiculo
+                                .query()
+                                .where('id_veiculo',id_veiculo);
 
             if(veiculo){
 
@@ -65,7 +67,11 @@ export default class VeiculosController {
         }
     }
     public async getAll({response}:HttpContextContract){
-        response.json( await Veiculo.all() );
+
+        let veiculos = Veiculo
+                       .query()
+                       .preload('garagem');
+        response.json( veiculos );
     }
 
 
