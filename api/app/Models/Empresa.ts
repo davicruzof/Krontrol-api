@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/explicit-member-accessibility */
 import { DateTime } from 'luxon'
 import { BaseModel, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
 
 export default class Empresa extends BaseModel {
   static get table () {
-    return 'ml_ctr_empresa'
+    return 'ml_ctr_empresa';
   }
 
   @column({ isPrimary: true })

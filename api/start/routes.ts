@@ -25,7 +25,7 @@ Route.get('api/status', async () => {
 })
 
 Route.group(()=>{
-  Route.post('/teste','TestesController.criarbucket');
+  //Route.post('/teste','TestesController.criarbucket');
   //Rotas Autenticação
   Route.group(()=>{
     Route.get('/getEnterprises','EmpresasController.getEnterprises');
@@ -37,39 +37,54 @@ Route.group(()=>{
 
   //Rotas Usuario
   Route.group(()=>{
-
     Route.post('/create','UsersController.create');
-
   }).prefix('/user');
 
   //Rotas Empresa
   Route.group(()=>{
-
     Route.get('/','EmpresasController.getAll');
     Route.post('/create','EmpresasController.create');
     Route.post('/getById','EmpresasController.getById');
     Route.post('/getByName','EmpresasController.getByName');
     Route.put('/update','EmpresasController.update')
-
   }).prefix('/enterprises').middleware('auth');
 
   //Rotas Funcionario
   Route.group(()=>{
-
     Route.post('/create','FuncionariosController.create');
     Route.post('/getById','FuncionariosController.getById');
     Route.get('/getAll','FuncionariosController.getAll');
-
   }).prefix('/employee').middleware('auth');
 
   //Rotas Veiculos
   Route.group(()=>{
-
     Route.post('/create','VeiculosController.create');
     Route.post('/getById','VeiculosController.getById');
     Route.get('/getAll','VeiculosController.getAll');
+  }).prefix('/vehicle').middleware('auth');
 
-  }).prefix('/vehicle');
+  //Rotas Eventos
+  Route.group(()=>{
+    Route.post('/create','EventosController.create');
+    Route.get('/getAll','EventosController.getAll');
+    Route.get('/getById','EventosController.getById');
+  }).prefix('/event').middleware('auth');
+
+  //Rotas Grupos
+  Route.group(()=>{
+    Route.post('/create','GruposController.create');
+    Route.get('/getAll','GruposController.getAll');
+    //Route.post('/getById','GruposController.getById');
+    Route.post('/getByName','GruposController.getByName');
+  }).prefix('/group');
+
+  // Rotas Grupos Eventos
+  Route.group(()=>{
+
+    Route.post('/getById','GrupoEventosController.getById');
+    Route.post('/getAll','GrupoEventosController.getAll');
+
+  }).prefix('/group_event');
 
 
 }).prefix('/api');

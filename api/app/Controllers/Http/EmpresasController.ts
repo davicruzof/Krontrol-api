@@ -192,5 +192,5 @@ export default class EmpresasController {
             }
             empresa?.merge(dados);
             response.json({sucess: 'Atualizado com sucesso'});
-        }
+    }
 }   

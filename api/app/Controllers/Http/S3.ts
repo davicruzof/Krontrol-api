@@ -29,6 +29,6 @@ export const upload = async (params, callback) =>{
         Body : buffer,
         ContentType: params.type
 
-      },callback)
+      },callback).promise();
     
 }
