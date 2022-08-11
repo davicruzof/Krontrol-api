@@ -67,7 +67,7 @@ Route.group(()=>{
   Route.group(()=>{
     Route.post('/create','EventosController.create');
     Route.get('/getAll','EventosController.getAll');
-    Route.get('/getById','EventosController.getById');
+    //Route.get('/getById','EventosController.getById');
   }).prefix('/event').middleware('auth');
 
   //Rotas Grupos
@@ -82,7 +82,7 @@ Route.group(()=>{
   Route.group(()=>{
 
     Route.post('/getById','GrupoEventosController.getById');
-    Route.post('/getAll','GrupoEventosController.getAll');
+    Route.get('/getAll','GrupoEventosController.getAll');
 
   }).prefix('/group_event').middleware('auth');;
 
