@@ -56,7 +56,7 @@ export default class GruposController {
         }
     }
 
-    public async update({request,response}:HttpContextContract){
+    public async update({request,response,auth}:HttpContextContract){
 
         try {
 
@@ -65,7 +65,13 @@ export default class GruposController {
             const dados = request.body();
             const grupo = await Grupo.findBy('id_grupo',dados.id_grupo);
             if(grupo){
-                grupo.merge(dados);
+                grupo.merge({
+                    id_empresa_grupo : dados.id_empresa_grupo,
+                    id_empresa : dados.id_empresa,
+                    grupo : dados.grupo,
+                    id_status : dados.id_status,
+                    id_funcionario_alteracao : auth.user?.id_funcionario
+                }).save();
                 response.json({sucess: 'Atualizado com sucesso'});
             }
 

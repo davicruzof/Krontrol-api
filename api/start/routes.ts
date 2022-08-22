@@ -67,24 +67,31 @@ Route.group(()=>{
   Route.group(()=>{
     Route.post('/create','EventosController.create');
     Route.get('/getAll','EventosController.getAll');
-    //Route.get('/getById','EventosController.getById');
+    Route.put('/update','EventosController.update');
   }).prefix('/event').middleware('auth');
 
   //Rotas Grupos
   Route.group(()=>{
     Route.post('/create','GruposController.create');
     Route.get('/getAll','GruposController.getAll');
-    //Route.post('/getById','GruposController.getById');
+    Route.put('/update','GruposController.update');
     Route.post('/getByName','GruposController.getByName');
-  }).prefix('/group').middleware('auth');;
+  }).prefix('/group').middleware('auth');
 
   // Rotas Grupos Eventos
   Route.group(()=>{
-
+    Route.post('/create','GrupoEventosController.create');
     Route.post('/getById','GrupoEventosController.getById');
     Route.get('/getAll','GrupoEventosController.getAll');
+    Route.put('/update','GrupoEventosController.update');
+  }).prefix('/group_event').middleware('auth');
 
-  }).prefix('/group_event').middleware('auth');;
+  
+  Route.group(()=>{
+
+    Route.get('/get_list','TelemetriasController.list');
+
+  }).prefix('/telemetria').middleware('auth');
 
 
 }).prefix('/api');
