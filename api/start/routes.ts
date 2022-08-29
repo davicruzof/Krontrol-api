@@ -89,7 +89,7 @@ Route.group(()=>{
   
   Route.group(()=>{
 
-    Route.get('/get_list','TelemetriasController.list');
+    Route.post('/get_list','TelemetriasController.list');
 
   }).prefix('/telemetria').middleware('auth');
 
