@@ -21,7 +21,7 @@ export default class TelemetriasController {
                                 ml_man_frota.media_consumo as media_consumo_veiculo,
                                 (ml_int_telemetria_kontrow_trips.total_mileage / ml_int_telemetria_kontrow_trips.fuel_used) as media_consumo_viagem
                             `)).where(Database.raw(`ml_int_telemetria_kontrow_trips.fuel_used != 0 `))
-                            .where('ml_int_telemetria_kontrow_trips.date','>=',dados['data'])
+                            .where('ml_int_telemetria_kontrow_trips.date','>=',dados.data)
                             .where('ml_int_telemetria_kontrow_drivers.worker_id','=',`${auth.user?.id_funcionario}`)
                             .orderBy('media_consumo_viagem','desc');
         response.json(query);

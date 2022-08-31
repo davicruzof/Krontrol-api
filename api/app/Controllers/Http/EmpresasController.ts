@@ -110,7 +110,6 @@ export default class EmpresasController {
             const empresa = await Empresa.findBy('id_empresa',id_empresa);
 
             if(empresa){
-                empresa.logo = empresa.bucket+'/logo/'+empresa.logo
                 response.json(empresa);
 
             }
