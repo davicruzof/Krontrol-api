@@ -12,11 +12,10 @@ export default class EmpresasController {
     public async create({request, response}:HttpContextContract){
         try {
             let filename = "";
-            let data ;
+
             await request.validate({schema: schema.create(EmpresaSchema)});
             
             const fileLogo = request.file('logo');
-            console.log(fileLogo);
 
             const dados = request.body();
             let cnpj_aux = dados.cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
@@ -31,14 +30,14 @@ export default class EmpresasController {
             }
              else{
                 let nome_bucket = dados.nomeempresarial.replace(' ','-').replace(/\s/g, '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-                let host_img;
+                let s3Object;
                 await createBucket({Bucket : nome_bucket});
 
                 if(fileLogo){
                     let hashImg =  crypto.randomBytes(10).toString('hex');
                     filename = `${hashImg}-${fileLogo.clientName}`;
 
-                        host_img = new Promise( (resolve,reject) => {
+                          s3Object = 
                            await upload({
                                 folder : 'logo',
                                 filename : filename,
@@ -46,18 +45,10 @@ export default class EmpresasController {
                                 path: filename,
                                 file: fileLogo,
                                 type: fileLogo.extname
-                            }, async (error,data)=>{
-                                if(error){
-                                  reject(error);
-                                }
-                                else {
-                                    resolve(data.Location)
-                                    fs.unlinkSync('tmp/uploads/files/'+filename);
-                                  }
-                              });
-                      });
+                            });
                 }
 
+                //console.log(s3Object);
                 await Empresa.create({
                     nomeempresarial: dados.nomeempresarial,
                     cnpj: dados.cnpj,
@@ -77,7 +68,7 @@ export default class EmpresasController {
                     status: dados.status,
                     background: dados.background,
                     primary_color: dados.primary_color,
-                    logo : host_img,
+                    logo : s3Object.Location,
                     bucket: nome_bucket
                 });
                 response.json({sucess: "Criado com sucesso"});
@@ -155,41 +146,32 @@ export default class EmpresasController {
 
     public async update ({request,response}:HttpContextContract){
         let filename = "";
-            let host_img ;
             await request.validate({schema: schema.create(EmpresaSchemaUpdate)});
             
             const fileLogo = request.file('logo');
-            console.log(fileLogo);
 
-            const dados = request.body();
+
+            let dados = request.body();
             let cnpj_aux = dados.cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
             dados.cnpj = cnpj_aux;
-
+            let s3Object;
             const empresa = await Empresa.findBy('cnpj',dados.cnpj);
-
+            
             if(fileLogo){
                 let hashImg =  crypto.randomBytes(10).toString('hex');
                 filename = `${hashImg}-${fileLogo.clientName}`;
 
-                    host_img = new Promise( (resolve,reject) => {
-                        upload({
+                      s3Object = 
+                       await upload({
                             folder : 'logo',
                             filename : filename,
                             bucket: empresa?.bucket,
                             path: filename,
                             file: fileLogo,
                             type: fileLogo.extname
-                        }, async (error,data)=>{
-                            if(error){
-                              reject(error);
-                            }
-                            else {
-                                resolve(data.Location);
-                                fs.unlinkSync('tmp/uploads/files/'+filename);
-                              }
-                          });
-                  });
+                        });
             }
+            dados.logo = s3Object.Location;
             empresa?.merge(dados);
             response.json({sucess: 'Atualizado com sucesso'});
     }
