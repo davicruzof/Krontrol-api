@@ -6,8 +6,8 @@ export const GrupoEventoSchemaInsert = {
     id_empresa : schema.number(),
     id_telemetria_grupo : schema.number(),
     id_telemetria_evento : schema.number(),
-    id_status : schema.number.nullableAndOptional()
-    
+    id_status : schema.number.nullableAndOptional(),
+    id_telemetria_trip : schema.number()
 }
 
 export const GrupoEventoSchemaUpdate = {
@@ -17,6 +17,6 @@ export const GrupoEventoSchemaUpdate = {
     id_empresa : schema.number(),
     id_telemetria_grupo : schema.number(),
     id_telemetria_evento : schema.number(),
-    id_status : schema.number.nullableAndOptional()
-    
+    id_status : schema.number.nullableAndOptional(),
+    id_telemetria_trip : schema.number()
 }

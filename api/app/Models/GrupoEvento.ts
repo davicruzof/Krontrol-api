@@ -1,3 +1,4 @@
+
 import { DateTime } from 'luxon'
 import { BaseModel, column } from '@ioc:Adonis/Lucid/Orm'
 
@@ -30,6 +31,9 @@ export default class GrupoEvento extends BaseModel {
 
   @column()
   public id_status : number
+
+  @column()
+  public id_telemetria_trip : number
 
   @column.dateTime({ autoCreate: true })
   public dt_cadastro: DateTime
