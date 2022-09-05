@@ -59,7 +59,8 @@ export default class TelemetriasController {
                             ml_man_frota.placa,
                             ml_man_frota.prefixo
                             `))
-                            .where('ml_int_telemetria_kontrow_trips.worker_id','=',`${auth.user?.id_funcionario}`);
+                            .where('ml_int_telemetria_kontrow_trips.worker_id','=',`${auth.user?.id_funcionario}`)
+                            .where('ml_int_telemetria_kontrow_trips.date','=',`${dados.data}`);
 
         response.json(query);
     }
