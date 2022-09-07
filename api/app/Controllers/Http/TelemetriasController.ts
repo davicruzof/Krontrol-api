@@ -40,10 +40,12 @@ export default class TelemetriasController {
     {
         await request.validate({schema: schema.create({ data : schema.date() })});
         let dados = request.body();
+        dados.data+= " 00:00:00";
         const query = await Database.from('ml_int_telemetria_evento_grupo_associa')
                             .join('ml_int_telemetria_evento_grupo','ml_int_telemetria_evento_grupo_associa.id_telemetria_grupo','=','ml_int_telemetria_evento_grupo.id_grupo')
                             .join('ml_int_telemetria_kontrow_evento','ml_int_telemetria_evento_grupo_associa.id_telemetria_evento','=','ml_int_telemetria_kontrow_evento.id_evento')
                             .join('ml_int_telemetria_kontrow_trips','ml_int_telemetria_evento_grupo_associa.id_telemetria_trip','=','ml_int_telemetria_kontrow_trips.id_viagem')
+                            .join('ml_int_telemetria_kontrow_drivers','ml_int_telemetria_kontrow_drivers.driver_id','=','ml_int_telemetria_kontrow_trips.drive_id')
                             .join('ml_int_telemetria_kontrow_assets','ml_int_telemetria_kontrow_trips.asset_id','=','ml_int_telemetria_kontrow_assets.asset_id')
                             .join('ml_man_frota','ml_int_telemetria_kontrow_assets.id_veiculo','=','ml_man_frota.id_veiculo')
                             .select(Database.raw(`
@@ -59,8 +61,8 @@ export default class TelemetriasController {
                             ml_man_frota.placa,
                             ml_man_frota.prefixo
                             `))
-                            .where('ml_int_telemetria_kontrow_trips.worker_id','=',`${auth.user?.id_funcionario}`)
-                            .where('ml_int_telemetria_kontrow_trips.date','=',`${dados.data}`);
+                            .where('ml_int_telemetria_kontrow_drivers.worker_id','=',`${auth.user?.id_funcionario}`)
+                            .where('ml_int_telemetria_kontrow_trips.date','>=',`${dados.data}`);
 
         response.json(query);
     }
