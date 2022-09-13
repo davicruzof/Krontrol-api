@@ -94,5 +94,10 @@ Route.group(()=>{
 
   }).prefix('/telemetria').middleware('auth');
 
+  Route.group(()=>{
+
+    Route.post('/list','EscalasController.list');
+
+  }).prefix('/scale');
 
 }).prefix('/api');

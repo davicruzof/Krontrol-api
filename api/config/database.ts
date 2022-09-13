@@ -46,7 +46,7 @@ const databaseConfig: DatabaseConfig = {
         naturalSort: true,
       },
       healthCheck: false,
-      debug: true,
+      debug: false,
     },
 
     /*
@@ -63,10 +63,10 @@ const databaseConfig: DatabaseConfig = {
     oracle: {
       client: 'oracledb',
       connection: {
+        user: Env.get('ORACLE_USER'),
+        password: Env.get('ORACLE_PASSWORD'),
         host: Env.get('ORACLE_HOST'),
         port: Env.get('ORACLE_PORT'),
-        user: Env.get('ORACLE_USER'),
-        password: Env.get('ORACLE_PASSWORD', ''),
         database: Env.get('ORACLE_DB_NAME'),
       },
       migrations: {

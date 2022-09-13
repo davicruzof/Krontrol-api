@@ -30,5 +30,11 @@ export default Env.rules({
 	AWS_ACCESS_KEY_ID: Env.schema.string(),
 	AWS_SECRET_ACCESS_KEY: Env.schema.string(),
 	AWS_S3_BUCKET: Env.schema.string(),
-	AWS_REGION: Env.schema.string()
+	AWS_REGION: Env.schema.string(),
+
+	ORACLE_HOST: Env.schema.string({ format: 'host' }),
+	ORACLE_PORT: Env.schema.number(),
+	ORACLE_USER: Env.schema.string(),
+	ORACLE_PASSWORD: Env.schema.string.optional(),
+	ORACLE_DB_NAME: Env.schema.string(),
 })
