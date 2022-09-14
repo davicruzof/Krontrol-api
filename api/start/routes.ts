@@ -98,6 +98,6 @@ Route.group(()=>{
 
     Route.post('/list','EscalasController.list');
 
-  }).prefix('/scale');
+  }).prefix('/scale').middleware('auth');
 
 }).prefix('/api');

@@ -12,16 +12,17 @@ export default class EscalasController {
     public async list({request,response, auth}:HttpContextContract){
 
         await request.validate({schema: schema.create({ data : schema.date() })});
-
+      
         let dados = request.body();
+
         let funcionario = await Funcionario.findBy('id_funcionario',auth.user?.id_funcionario);
-        let query;
-        let where;
+        let query:string;
+        let where:string;
         await funcionario?.preload('funcao');
 
         query = ` SELECT PREFIXO,LINHA,TABELA,JORNADA_INICIO,JORNADA_FIM `;
 
-        if(funcionario?.id_funcao == 29){
+        if(funcionario?.id_funcao_erp == 29){
 
           query += `,MOTORISTA_PEGADA,MOTORISTA_CHAPA,MOTORISTA_INICIO,MOTORISTA_FIM `;
           where = " ID_ERP_MOTORISTA ";
@@ -33,9 +34,11 @@ export default class EscalasController {
           where = " ID_ERP_COBRADOR ";
           
         }
-          query += ` FROM globus.vw_ml_ope_escalaservico WHERE DATA_SERVICO = '${dados.data}' AND ${where} = ${funcionario?.id_funcionario_erp}`;
+          query += ` FROM globus.vw_ml_ope_escalaservico WHERE DATA_SERVICO = To_Date('${dados.data}','YYYY-MM-DD') AND ${where} = ${funcionario?.id_funcionario_erp}`;
 
-        response.json(query);
+          let result = await Database.connection('oracle').rawQuery(query);
+
+        response.json(result);
 
     }
 

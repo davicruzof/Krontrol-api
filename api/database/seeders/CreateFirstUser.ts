@@ -10,7 +10,6 @@ export default class extends BaseSeeder {
       nome : "Administrador",
       id_sexo : 1,
       celular : "7981002233",
-      id_funcao : 1
     });
 
     await User.create({

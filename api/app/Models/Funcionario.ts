@@ -28,7 +28,7 @@ export default class Funcionario extends BaseModel {
   public id_funcionario_erp: number
 
   @column({ serializeAs : null })
-  public id_funcao: number
+  public id_funcao_erp: number
 
   @column({ serializeAs : null })
   public id_cnh: number
@@ -75,16 +75,16 @@ export default class Funcionario extends BaseModel {
   @column( { serializeAs: null })
   public id_situacao : number
 
-  @belongsTo(() => Situacao {foreignKey : 'id_situacao'})
+  @belongsTo(() => Situacao ,{foreignKey : 'id_situacao'})
   public situacao : BelongsTo <typeof Situacao>
 
-  @belongsTo(()=> Sexo {foreignKey : 'id_sexo'})
+  @belongsTo(()=> Sexo ,{foreignKey : 'id_sexo'})
   public sexo : BelongsTo <typeof Sexo>
 
-  @belongsTo(() => Cnh { foreignKey : 'id_cnh'})
+  @belongsTo(() => Cnh ,{ foreignKey : 'id_cnh'})
   public cnh : BelongsTo <typeof Cnh> 
 
-  @belongsTo(() => Funcao { foreignKey : 'id_funcao'})
+  @belongsTo(() => Funcao ,{ foreignKey : 'id_funcao_erp'})
   public funcao : BelongsTo <typeof Funcao> 
 
 }
