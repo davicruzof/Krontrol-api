@@ -20,17 +20,17 @@ export default class EscalasController {
         let where:string;
         await funcionario?.preload('funcao');
 
-        query = ` SELECT PREFIXO,LINHA,TABELA,JORNADA_INICIO,JORNADA_FIM `;
+        query = ` SELECT PREFIXO AS prefixo,LINHA AS linha,TABELA AS tabela `;
 
         if(funcionario?.id_funcao_erp == 29){
 
-          query += `,MOTORISTA_PEGADA,MOTORISTA_CHAPA,MOTORISTA_INICIO,MOTORISTA_FIM `;
+          query += `,MOTORISTA_PEGADA AS pegada, to_char(MOTORISTA_INICIO, 'HH24:MI:SS') AS inicio, to_char(MOTORISTA_FIM, 'HH24:MI:SS') AS fim`;
           where = " ID_ERP_MOTORISTA ";
 
         }
         else{
 
-          query += `,COBRADOR_PEGADA,COBRADOR_CHAPA,COBRADOR_INICIO,COBRADOR_FIM `;
+          query += `,COBRADOR_PEGADA AS pegada, to_char(COBRADOR_INICIO, 'HH24:MI:SS') AS inicio, to_char(COBRADOR_FIM, 'HH24:MI:SS') AS fim `;
           where = " ID_ERP_COBRADOR ";
           
         }
