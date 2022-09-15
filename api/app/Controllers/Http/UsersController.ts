@@ -19,7 +19,12 @@ export default class UsersController {
                 return;
             }
 
-            const funcionario = await Funcionario.findBy('cpf',dados.cpf);
+            const funcionario = await Funcionario
+            .query()
+            .where('cpf',dados.cpf)
+            .where('id_empresa',dados.id_empresa)
+            .where('id_situacao',1)
+            .first()
             if(funcionario){
                 const usuario = await User.findBy('id_funcionario',funcionario.id_funcionario)
                 if(usuario){
