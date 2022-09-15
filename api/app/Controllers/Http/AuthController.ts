@@ -20,6 +20,7 @@ export default class AuthController {
                .query()
                .where('cpf',cpf)
                .where('id_empresa',id_empresa)
+               .where('id_situacao',1)
                .first()
             
                //Verify password
