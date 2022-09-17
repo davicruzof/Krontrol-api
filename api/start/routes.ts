@@ -32,7 +32,7 @@ Route.group(()=>{
     Route.post('/login', 'AuthController.login');
 	  Route.post('/logout', 'AuthController.logout').middleware('auth');
     Route.get('/me','AuthController.me').middleware('auth');
-  }).prefix('/auth');
+  }).prefix('/auth').middleware('auth');
 
 
   //Rotas Usuario
