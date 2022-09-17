@@ -28,11 +28,11 @@ Route.group(()=>{
   //Route.post('/teste','TestesController.criarbucket');
   //Rotas Autenticação
   Route.group(()=>{
-    Route.get('/getEnterprises','EmpresasController.getEnterprises');
+    Route.get('/getEnterprises','EmpresasController.getEnterprises').middleware('auth');
     Route.post('/login', 'AuthController.login');
 	  Route.post('/logout', 'AuthController.logout').middleware('auth');
     Route.get('/me','AuthController.me').middleware('auth');
-  }).prefix('/auth').middleware('auth');
+  }).prefix('/auth');
 
 
   //Rotas Usuario
@@ -99,5 +99,12 @@ Route.group(()=>{
     Route.post('/list','EscalasController.list');
 
   }).prefix('/scale').middleware('auth');
+
+  Route.group(()=>{
+
+    Route.get('/list','DepartamentosController.list');
+    Route.post('/list_area_departamento','DepartamentosController.list_area_departamento');
+  
+  }).prefix('/departaments').middleware('auth');
 
 }).prefix('/api');

@@ -5,7 +5,6 @@ import Empresa from 'App/Models/Empresa';
 import { EmpresaSchema, EmpresaSchemaUpdate } from 'App/Schemas/Empresa';
 import { createBucket, upload } from 'App/Controllers/Http/S3';
 import crypto from 'crypto';
-import fs from 'fs';
 export default class EmpresasController {
 
 
