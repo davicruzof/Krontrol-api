@@ -170,7 +170,7 @@ export default class EmpresasController {
                         });
             }
             dados.logo = s3Object.Location;
-            empresa?.merge(dados);
+            empresa?.merge(dados).save();
             response.json({sucess: 'Atualizado com sucesso'});
     }
 }   

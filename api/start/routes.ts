@@ -107,4 +107,17 @@ Route.group(()=>{
   
   }).prefix('/departaments').middleware('auth');
 
+
+
+  Route.group(()=>{
+
+    Route.post('/create','SolicitacoesController.create');
+    Route.post('/getById','SolicitacoesController.getById');
+    Route.get('/list','SolicitacoesController.list');
+    Route.put('/update','SolicitacoesController.update');
+
+  }).prefix('/requests');
+
+
+
 }).prefix('/api');
