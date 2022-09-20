@@ -113,10 +113,11 @@ Route.group(()=>{
 
     Route.post('/create','SolicitacoesController.create');
     Route.post('/getById','SolicitacoesController.getById');
-    Route.get('/list','SolicitacoesController.list');
+    Route.post('/list','SolicitacoesController.list');
+    Route.post('/listByUser','SolicitacoesController.listByUser')
     Route.put('/update','SolicitacoesController.update');
 
-  }).prefix('/requests');
+  }).prefix('/requests').middleware('auth');
 
 
 

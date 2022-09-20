@@ -22,21 +22,28 @@ export default class EscalasController {
         await funcionario?.preload('funcao');
 
         let funcao = await Funcao.findBy('id_funcao_erp',funcionario?.id_funcao_erp);
-        query = ` SELECT PREFIXO AS prefixo,LINHA AS linha,TABELA AS tabela `;
+        query = ` SELECT pre.prefixoveic AS prefixo,lin.CODIGOLINHA AS linha,esc.cod_servdiaria AS tabela,to_char(esc.dat_escala, 'YYYY-MM-DD') as data `;
 
         if(funcao?.funcao == 'MOTORISTA'){
 
-          query += `,MOTORISTA_PEGADA AS pegada, to_char(MOTORISTA_INICIO, 'HH24:MI:SS') AS inicio, to_char(MOTORISTA_FIM, 'HH24:MI:SS') AS fim`;
-          where = " ID_ERP_MOTORISTA ";
+          query += `,locm.DESC_LOCALIDADE AS pegada, to_char(esc.hor_inicio_motorista, 'HH24:MI:SS') AS inicio, to_char(esc.hor_fim_motorista, 'HH24:MI:SS') AS fim`;
+          where = " esc.cod_motorista ";
 
         }
         else{
 
-          query += `,COBRADOR_PEGADA AS pegada, to_char(COBRADOR_INICIO, 'HH24:MI:SS') AS inicio, to_char(COBRADOR_FIM, 'HH24:MI:SS') AS fim `;
-          where = " ID_ERP_COBRADOR ";
+          query += `,locc.DESC_LOCALIDADE AS pegada, to_char(esc.hor_inicio_cobrador, 'HH24:MI:SS') AS inicio, to_char(esc.hor_fim_cobrador, 'HH24:MI:SS') AS fim `;
+          where = " esc.cod_cobrador  ";
           
         }
-          query += ` FROM globus.vw_ml_ope_escalaservico WHERE to_char(DATA_SERVICO,'YYYY-MM-DD')  = '${dados.data}' AND ${where} = ${funcionario?.id_funcionario_erp}`;
+          query += ` from globus.t_esc_servicodiaria esc inner join globus.t_esc_escaladiaria escd on esc.COD_INTESCALA = escd.COD_INTESCALA and esc.dat_escala = escd.dat_escala
+                  inner join globus.frt_cadveiculos pre on esc.cod_veic = pre.codigoveic
+                  inner join globus.bgm_cadlinhas lin on escd.COD_INTLINHA = lin.CODINTLINHA
+                  inner join globus.vw_funcionarios funm on esc.cod_motorista = funm.CODINTFUNC
+                  inner join globus.vw_funcionarios func on esc.cod_cobrador = func.CODINTFUNC
+                  left  join globus.t_esc_localidade locm on esc.COD_PEG_MOT = locm.COD_LOCALIDADE
+                  left  join globus.t_esc_localidade locc on esc.COD_PEG_COB = locc.COD_LOCALIDADE 
+                  WHERE to_char(esc.dat_escala, 'YYYY-MM-DD') = '${dados.data}' and ${where} = '${funcionario?.id_funcionario_erp}'`;
 
           let result = await Database.connection('oracle').rawQuery(query);
 

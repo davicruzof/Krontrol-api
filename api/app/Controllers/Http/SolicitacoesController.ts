@@ -51,7 +51,17 @@ export default class SolicitacoesController {
 
     }
 
-    public async list({response}:HttpContextContract){
+    public async list({request,response,auth}:HttpContextContract){
+
+        let dados = request.body();
+        let condicoes:string = "";
+
+        if(dados.status){
+            condicoes += ` AND sol.status = '${dados.status}' `;
+        }
+        if(dados.departamento){
+            condicoes+= ` AND sol.id_area = ${dados.departamento} `;
+        }
 
         let solicitacoes = await Database.connection('pg').rawQuery(`
             SELECT 
@@ -75,11 +85,53 @@ export default class SolicitacoesController {
             FROM ml_sac_solicitacao sol 
             INNER JOIN ml_ctr_programa_area area ON (sol.id_area = area.id_area)
             INNER JOIN ml_ctr_programa_area_modulo mod ON (sol.id_modulo = mod.id_modulo)
+            WHERE sol.id_empresa = ${auth.user?.id_empresa}
+            ${condicoes}
             ORDER BY dt_cadastro 
         `);
 
         response.json(solicitacoes.rows);
 
+    }
+
+    public async listByUser({request,response,auth}){
+
+        let dados = request.body();
+        let condicoes:string = "";
+
+        if(dados.status){
+            condicoes += ` AND sol.status = '${dados.status}' `;
+        }
+
+        let solicitacoes = await Database.connection('pg').rawQuery(`
+            SELECT 
+            sol.id_solicitacao,
+            sol.id_empresa,
+            sol.id_funcionario,
+            sol.id_area,
+            sol.id_modulo,
+            sol.id_evento,
+            sol.status,
+            sol.parecer,
+            sol.justificativa,
+            sol.dt_analise,
+            sol.id_funcionario_analise,
+            sol.dt_finalizada,
+            sol.id_funcionario_finalizada,
+            sol.dt_cadastro,
+            area.area,
+            mod.modulo,
+            NOW() - sol.dt_cadastro AS cadastrado_a
+            FROM ml_sac_solicitacao sol 
+            INNER JOIN ml_ctr_programa_area area ON (sol.id_area = area.id_area)
+            INNER JOIN ml_ctr_programa_area_modulo mod ON (sol.id_modulo = mod.id_modulo)
+            WHERE sol.id_empresa = '${auth.user?.id_empresa}'
+            AND sol.id_funcionario = '${auth.user?.id_funcionario}'
+            ${condicoes}
+            ORDER BY dt_cadastro 
+        `);
+
+        response.json(solicitacoes.rows);
     }
 
     public async update({request,response,auth}:HttpContextContract){
