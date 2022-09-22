@@ -42,11 +42,34 @@ export default class SolicitacoesController {
     public async getById({request,response}:HttpContextContract){
 
         let dados = request.body();
-
+        let solicitacao;
         if(dados.id_solicitacao){   
             
-            let solicitacao = await Solicitacao.findBy('id_solicitacao',dados.id_solicitacao);
-            response.json(solicitacao);
+            let solicitacao = await Database.connection('pg').rawQuery(`
+            SELECT 
+            sol.id_solicitacao,
+            sol.id_empresa,
+            sol.id_funcionario,
+            sol.id_area,
+            sol.id_modulo,
+            sol.id_evento,
+            sol.status,
+            sol.parecer,
+            sol.justificativa,
+            sol.dt_analise,
+            sol.id_funcionario_analise,
+            sol.dt_finalizada,
+            sol.id_funcionario_finalizada,
+            sol.dt_cadastro,
+            area.area,
+            mod.modulo,
+            NOW() - sol.dt_cadastro AS cadastrado_a
+            FROM ml_sac_solicitacao sol 
+            INNER JOIN ml_ctr_programa_area area ON (sol.id_area = area.id_area)
+            INNER JOIN ml_ctr_programa_area_modulo mod ON (sol.id_modulo = mod.id_modulo)
+            WHERE id_solicitacao = ${dados.id_solicitacao}
+        `);
+            response.json(solicitacao.rows);
         }
 
     }

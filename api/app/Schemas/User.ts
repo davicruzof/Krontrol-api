@@ -7,5 +7,7 @@ export const UserSchemaInsert = {
     id_empresa: schema.number(),
     dt_nascimento: schema.date(),
     id_grupo: schema.number.nullable(),
-    senha : schema.string()
+    senha : schema.string(),
+    email : schema.string.nullableAndOptional(),
+    telefone: schema.string()
 }

@@ -35,7 +35,9 @@ export default class UsersController {
                         id_empresa : dados.id_empresa,
                         id_funcionario : funcionario.id_funcionario,
                         senha : dados.senha,
-                        id_grupo : funcionario.id_grupo
+                        id_grupo : funcionario.id_grupo,
+                        email : dados.email,
+                        telefone : dados.telefone
                     });
                     response.json({sucess:"Usuário cadastrado"});
                 }

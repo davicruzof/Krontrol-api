@@ -34,6 +34,12 @@ export default class User extends BaseModel {
   public id_grupo: number
 
   @column()
+  public telefone: string
+
+  @column()
+  public email : string
+
+  @column()
   public remembermetoken?: string
 
   @beforeSave()
