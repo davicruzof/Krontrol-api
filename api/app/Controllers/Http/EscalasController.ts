@@ -3,7 +3,6 @@ import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { schema } from '@ioc:Adonis/Core/Validator';
 import Database from '@ioc:Adonis/Lucid/Database';
 import Funcionario from 'App/Models/Funcionario';
-import Env from '@ioc:Adonis/Core/Env';
 import Funcao from 'App/Models/Funcao';
 
 

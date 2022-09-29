@@ -2,7 +2,9 @@ import  Empresa  from 'App/Models/Empresa';
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { schema } from '@ioc:Adonis/Core/Validator';
 import Funcionario from '../../Models/Funcionario';
+import FuncionarioArea from 'App/Models/FuncionarioArea';
 import { FuncionarioSchemaInsert } from 'App/Schemas/Funcionario';
+import Database from '@ioc:Adonis/Lucid/Database';
 
 export default class FuncionariosController {
 
@@ -70,7 +72,7 @@ export default class FuncionariosController {
         }
     }
 
-    public async getAll ({response}:HttpContextContract){
+    public async getAll ({response,auth}:HttpContextContract){
 
         let funcionarios = await Funcionario
             .query()
@@ -80,7 +82,29 @@ export default class FuncionariosController {
             .preload('funcao');
 
         response.json( funcionarios);
+    }   
+
+    public async addArea ({request,response}:HttpContextContract){
+
+        const arrayArea = request.body().area;
+        const id_funcionario = request.body().id_funcionario;
+        const funcionario_dados = await Funcionario.findBy('id_funcionario',id_funcionario); 
+        if(id_funcionario && arrayArea){
+
+            arrayArea.forEach( async element =>  {
+                await FuncionarioArea.create({
+                    id_funcionario : id_funcionario,
+                    id_empresa : funcionario_dados?.id_empresa,
+                    id_area : element,
+                });
+            });
+            response.json({sucess: "Cadastro Realizado"});
+        }
     }
+    public async getDepartamentsbyFuncionario(id_funcionario:number){
+        const areas = await FuncionarioArea.query().select('')
+    }
+
 
 
 }

@@ -54,6 +54,7 @@ Route.group(()=>{
     Route.post('/create','FuncionariosController.create');
     Route.post('/getById','FuncionariosController.getById');
     Route.get('/getAll','FuncionariosController.getAll');
+    Route.post('/add-area','FuncionariosController.addArea');
   }).prefix('/employee').middleware('auth');
 
   //Rotas Veiculos

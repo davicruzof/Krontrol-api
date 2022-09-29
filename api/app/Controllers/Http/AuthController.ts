@@ -4,6 +4,7 @@ import { schema } from '@ioc:Adonis/Core/Validator';
 import Hash from '@ioc:Adonis/Core/Hash';
 import User from 'App/Models/User';
 import  Funcionario  from 'App/Models/Funcionario';
+import Database from '@ioc:Adonis/Lucid/Database';
 const loginSchema =  schema.create({
     cpf: schema.string(),
     id_empresa: schema.number(),
@@ -58,10 +59,15 @@ export default class AuthController {
     public async me({auth, response}:HttpContextContract){
 
         const funcionario = await Funcionario.findBy('id_funcionario',auth.user?.id_funcionario);
-
+        const query = await Database.connection('pg').rawQuery(`
+            SELECT fa.id_area,ar.area 
+            FROM ml_ctr_funcionario_area fa INNER JOIN ml_ctr_programa_area ar ON (fa.id_area = ar.id_area)
+            WHERE fa.id_funcionario = ${auth.user?.id_funcionario}
+        `);
         return  response.json({
             user:auth.user,
-            funcionario
+            funcionario,
+            departamentos: query.rows
         });
 
     }

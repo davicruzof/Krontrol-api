@@ -83,7 +83,7 @@ export default class SolicitacoesController {
             condicoes += ` AND sol.status = '${dados.status}' `;
         }
         if(dados.departamento){
-            condicoes+= ` AND sol.id_area = ${dados.departamento} `;
+            condicoes+= ` AND sol.id_area = ${dados.departamento.toString()} `;
         }
 
         let solicitacoes = await Database.connection('pg').rawQuery(`
