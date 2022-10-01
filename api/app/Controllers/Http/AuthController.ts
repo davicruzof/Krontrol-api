@@ -58,16 +58,33 @@ export default class AuthController {
     }
     public async me({auth, response}:HttpContextContract){
 
-        const funcionario = await Funcionario.findBy('id_funcionario',auth.user?.id_funcionario);
-        const query = await Database.connection('pg').rawQuery(`
+        let dadosFuncionario = await Database
+                    .connection('pg')
+                    .rawQuery(`
+                        SELECT
+                        usu.id_usuario,
+                        usu.id_status,
+                        func.id_funcionario,
+                        func.id_grupo,
+                        func.id_empresa,
+                        func.nome,
+                        func.cpf,
+                        func.celular,
+                        func.email,
+                        func.cnh_validade,
+                        func.dt_nascimento
+                        FROM ml_fol_funcionario func
+                            INNER JOIN ml_usu_usuario usu ON (usu.id_funcionario = func.id_funcionario)
+                        WHERE func.id_funcionario = ${auth.user?.id_funcionario}`);
+        let departamentos = await Database.connection('pg').rawQuery(`
             SELECT fa.id_area,ar.area 
             FROM ml_ctr_funcionario_area fa INNER JOIN ml_ctr_programa_area ar ON (fa.id_area = ar.id_area)
             WHERE fa.id_funcionario = ${auth.user?.id_funcionario}
         `);
+        let user = dadosFuncionario.rows[0];
         return  response.json({
-            user:auth.user,
-            funcionario,
-            departamentos: query.rows
+            user,
+            departamentos: departamentos.rows
         });
 
     }

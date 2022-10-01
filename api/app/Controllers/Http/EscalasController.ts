@@ -21,7 +21,7 @@ export default class EscalasController {
         await funcionario?.preload('funcao');
 
         let funcao = await Funcao.findBy('id_funcao_erp',funcionario?.id_funcao_erp);
-        query = ` SELECT pre.prefixoveic AS prefixo,lin.CODIGOLINHA AS linha,esc.cod_servdiaria AS tabela`;
+        query = ` SELECT pre.prefixoveic AS prefixo,lin.CODIGOLINHA AS linha,esc.cod_servdiaria AS tabela,to_char(esc.dat_escala, 'YYYY-MM-DD') as data_escala`;
 
         if(funcao?.funcao == 'MOTORISTA'){
 

@@ -76,10 +76,12 @@ export default class FuncionariosController {
 
         let funcionarios = await Funcionario
             .query()
-            .preload('situacao')
-            .preload('sexo')
-            .preload('cnh')
-            .preload('funcao');
+            .select('id_funcionario')
+            .select('nome')
+            .select('ml_fol_funcionario_funcao.funcao')
+            .where('ml_fol_funcionario.id_empresa','=',auth.user?.id_empresa)
+            .where('ml_fol_funcionario.id_situacao','=',1)
+            .leftJoin('ml_fol_funcionario_funcao','ml_fol_funcionario_funcao.id_funcao_erp','=','ml_fol_funcionario.id_funcao_erp')
 
         response.json( funcionarios);
     }   
