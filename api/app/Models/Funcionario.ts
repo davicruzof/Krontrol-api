@@ -40,7 +40,7 @@ export default class Funcionario extends BaseModel {
   public celular: string
 
   @column()
-  public email: number
+  public email: string
 
   @column()
   public rfid: string

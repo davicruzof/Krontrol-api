@@ -48,13 +48,12 @@ export default class FuncionariosController {
 
         if(id_funcionario){
 
-            const funcionario = await Funcionario
-                                    .query()
-                                    .preload('cnh')
-                                    .preload('funcao')
-                                    .preload('sexo')
-                                    .preload('situacao')
-                                    .where('id_funcionario',id_funcionario);
+            const funcionario = await Database.connection('pg').query()
+                                    .from("ml_fol_funcionario")
+                                    .select("*")
+                                    .innerJoin("ml_fol_funcionario_situacao","ml_fol_funcionario_situacao.id_situacao","=","ml_fol_funcionario.id_situacao")
+                                    .innerJoin("ml_fol_funcionario_funcao","ml_fol_funcionario_funcao.id_funcao_erp","=","ml_fol_funcionario.id_funcao_erp")
+                                    .where("ml_fol_funcionario.id_funcionario",id_funcionario);
 
             if(funcionario){
 
