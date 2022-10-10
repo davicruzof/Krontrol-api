@@ -60,4 +60,7 @@ export default class Solicitacao extends BaseModel {
   @column.dateTime({ autoCreate: true })
   public dt_cadastro: DateTime
 
+  @column.dateTime({autoUpdate: true, autoCreate : true})
+  public dt_atualizacao : DateTime
+
 }

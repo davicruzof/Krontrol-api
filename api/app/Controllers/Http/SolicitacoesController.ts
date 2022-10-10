@@ -50,6 +50,7 @@ export default class SolicitacoesController {
             sol.id_solicitacao,
             sol.id_empresa,
             sol.id_funcionario,
+            func.nome,
             sol.id_area,
             sol.id_modulo,
             sol.id_evento,
@@ -63,10 +64,12 @@ export default class SolicitacoesController {
             sol.dt_cadastro,
             area.area,
             mod.modulo,
-            NOW() - sol.dt_cadastro AS cadastrado_a
+            NOW() - sol.dt_cadastro AS cadastrado_a,
+            NOW() - sol.dt_atualizacao AS atualizado_a
             FROM ml_sac_solicitacao sol 
             INNER JOIN ml_ctr_programa_area area ON (sol.id_area = area.id_area)
             INNER JOIN ml_ctr_programa_area_modulo mod ON (sol.id_modulo = mod.id_modulo)
+            INNER JOIN ml_fol_funcionario func ON (func.id_funcionario = sol.id_funcionario)
             WHERE id_solicitacao = ${dados.id_solicitacao}
         `);
             response.json(solicitacao.rows);
@@ -91,6 +94,7 @@ export default class SolicitacoesController {
             sol.id_solicitacao,
             sol.id_empresa,
             sol.id_funcionario,
+            func.nome,
             sol.id_area,
             sol.id_modulo,
             sol.id_evento,
@@ -104,10 +108,12 @@ export default class SolicitacoesController {
             sol.dt_cadastro,
             area.area,
             mod.modulo,
-            NOW() - sol.dt_cadastro AS cadastrado_a
+            NOW() - sol.dt_cadastro AS cadastrado_a,
+            NOW() - sol.dt_atualizacao AS atualizado_a
             FROM ml_sac_solicitacao sol 
             INNER JOIN ml_ctr_programa_area area ON (sol.id_area = area.id_area)
             INNER JOIN ml_ctr_programa_area_modulo mod ON (sol.id_modulo = mod.id_modulo)
+            INNER JOIN ml_fol_funcionario func ON (func.id_funcionario = sol.id_funcionario)
             WHERE sol.id_empresa = ${auth.user?.id_empresa}
             ${condicoes}
             ORDER BY dt_cadastro 
@@ -144,7 +150,8 @@ export default class SolicitacoesController {
             sol.dt_cadastro,
             area.area,
             mod.modulo,
-            NOW() - sol.dt_cadastro AS cadastrado_a
+            NOW() - sol.dt_cadastro AS cadastrado_a,
+            NOW() - sol.dt_atualizacao AS atualizado_a
             FROM ml_sac_solicitacao sol 
             INNER JOIN ml_ctr_programa_area area ON (sol.id_area = area.id_area)
             INNER JOIN ml_ctr_programa_area_modulo mod ON (sol.id_modulo = mod.id_modulo)
