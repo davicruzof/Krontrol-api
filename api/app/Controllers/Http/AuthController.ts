@@ -1,35 +1,45 @@
+
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 import { schema } from '@ioc:Adonis/Core/Validator';
 import Hash from '@ioc:Adonis/Core/Hash';
 import User from 'App/Models/User';
-
+import  Funcionario  from 'App/Models/Funcionario';
+import Database from '@ioc:Adonis/Lucid/Database';
 const loginSchema =  schema.create({
     cpf: schema.string(),
-    cd_enterprise: schema.number(),
-    password : schema.string()
+    id_empresa: schema.number(),
+    senha : schema.string()
 });
 export default class AuthController {
 
     public async login({request,response,auth}:HttpContextContract){
         try {
              await request.validate({schema: loginSchema});
-             const { cpf,cd_enterprise,password } = request.body();
+             const { cpf,id_empresa,senha } = request.body();
 
-             const user = await User
+             const funcionario = await Funcionario
                .query()
                .where('cpf',cpf)
-               .where('cd_enterprise',cd_enterprise)
-               .where('status','ATIVO')
+               .where('id_empresa',id_empresa)
+               .where('id_situacao',1)
                .first()
-   
+            
                //Verify password
-                if(user){
-                    if (!(await Hash.verify(user.password, password))) {
-                        return response.unauthorized({error:"Dados inválidos"})
-                      }
-                      else{
-                        return await auth.use('api').generate(user, { expiresIn:"1 day" })
-                      }
+                if(funcionario){
+                    const usuario = await User
+                    .query()
+                    .where('id_funcionario',funcionario.id_funcionario)
+                    .where('id_empresa',funcionario.id_empresa)
+                    .first()
+                    if(usuario){
+                        if (!(await Hash.verify(usuario.senha, senha))) {
+                            return response.unauthorized({error:"Dados inválidos"})
+                          }
+                          else{
+                            const token =  await auth.use('api').generate(usuario);
+                            return token;
+                          }
+                    }
                 }
                 else{
                     response.json({error: "Dados inválidos"});
@@ -39,16 +49,43 @@ export default class AuthController {
           }
     }
 
-    public async logout({auth,response}:HttpContextContract){
+    public async logout({auth}:HttpContextContract){
 
         if(auth){
             await auth.logout();
         }
-        else{
-            response.json({error:"Token não encontrado"});
-        }
+
     }
     public async me({auth, response}:HttpContextContract){
-        return await response.json({user:auth.user});
+
+        let dadosFuncionario = await Database
+                    .connection('pg')
+                    .rawQuery(`
+                        SELECT
+                        usu.id_usuario,
+                        usu.id_status,
+                        func.id_funcionario,
+                        func.id_grupo,
+                        func.id_empresa,
+                        func.nome,
+                        func.cpf,
+                        func.celular,
+                        func.email,
+                        func.cnh_validade,
+                        func.dt_nascimento
+                        FROM ml_fol_funcionario func
+                            INNER JOIN ml_usu_usuario usu ON (usu.id_funcionario = func.id_funcionario)
+                        WHERE func.id_funcionario = ${auth.user?.id_funcionario}`);
+        let departamentos = await Database.connection('pg').rawQuery(`
+            SELECT fa.id_area,ar.area 
+            FROM ml_ctr_funcionario_area fa INNER JOIN ml_ctr_programa_area ar ON (fa.id_area = ar.id_area)
+            WHERE fa.id_funcionario = ${auth.user?.id_funcionario}
+        `);
+        let user = dadosFuncionario.rows[0];
+        return  response.json({
+            user,
+            departamentos: departamentos.rows
+        });
+
     }
 }

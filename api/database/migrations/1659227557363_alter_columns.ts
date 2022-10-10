@@ -1,17 +1,16 @@
 import BaseSchema from '@ioc:Adonis/Lucid/Schema'
 
 export default class extends BaseSchema {
-  protected tableName = 'users'
+  protected tableName = 'ml_fol_funcionario'
 
   public async up () {
     this.schema.alterTable(this.tableName, (table) => {
-      table.date('date_birth').notNullable;
+      table.integer('id_situacao').defaultTo(1).alter();
     })
   }
 
   public async down () {
     this.schema.alterTable(this.tableName, (table) => {
-      table.dropColumn('date_birth');
     })
   }
 }

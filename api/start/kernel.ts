@@ -10,7 +10,7 @@
 */
 
 import Server from '@ioc:Adonis/Core/Server'
-
+import Event from '@ioc:Adonis/Core/Event'
 /*
 |--------------------------------------------------------------------------
 | Global middleware
@@ -42,4 +42,12 @@ Server.middleware.register([
 */
 Server.middleware.registerNamed({
   auth:'App/Middleware/Auth'
+})
+
+/*Server.middleware.registerNamed({
+  multer : 'App/Middleware/Multer'
+})*/
+
+Event.on('db:query', function ({ sql, bindings }) {
+  console.log(sql, bindings)
 })
