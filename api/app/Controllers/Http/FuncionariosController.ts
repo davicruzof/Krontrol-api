@@ -73,14 +73,16 @@ export default class FuncionariosController {
 
     public async getAll ({response,auth}:HttpContextContract){
 
-        let funcionarios = await Funcionario
-            .query()
+        let funcionarios = await Database.from('ml_fol_funcionario')
             .select('id_funcionario')
+            .select('cpf')
             .select('nome')
+            .select('registro')
             .select('ml_fol_funcionario_funcao.funcao')
             .where('ml_fol_funcionario.id_empresa','=',auth.user?.id_empresa)
             .where('ml_fol_funcionario.id_situacao','=',1)
             .leftJoin('ml_fol_funcionario_funcao','ml_fol_funcionario_funcao.id_funcao_erp','=','ml_fol_funcionario.id_funcao_erp')
+            .limit(10)
 
         response.json( funcionarios);
     }   
@@ -100,6 +102,7 @@ export default class FuncionariosController {
                 });
             });
             response.json({sucess: "Cadastro Realizado"});
+
         }
     }
     public async getDepartamentsbyFuncionario(id_funcionario:number){
