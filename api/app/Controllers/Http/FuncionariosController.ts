@@ -82,7 +82,6 @@ export default class FuncionariosController {
             .where('ml_fol_funcionario.id_empresa','=',auth.user?.id_empresa)
             .where('ml_fol_funcionario.id_situacao','=',1)
             .leftJoin('ml_fol_funcionario_funcao','ml_fol_funcionario_funcao.id_funcao_erp','=','ml_fol_funcionario.id_funcao_erp')
-            .limit(10)
 
         response.json( funcionarios);
     }   
