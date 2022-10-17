@@ -147,13 +147,14 @@ export default class EmpresasController {
             await request.validate({schema: schema.create(EmpresaSchemaUpdate)});
             
             const fileLogo = request.file('logo');
-
-
-            let dados = request.body();
-            let cnpj_aux = dados.cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
-            dados.cnpj = cnpj_aux;
             let s3Object;
+            let dados = request.body();
             const empresa = await Empresa.findBy('id_empresa',dados.id_empresa);
+
+            if(dados.cnpj){
+                let cnpj_aux = dados.cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
+                dados.cnpj = cnpj_aux;
+            }
 
             if(empresa && !empresa?.bucket){
 
