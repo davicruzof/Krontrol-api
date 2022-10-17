@@ -153,8 +153,15 @@ export default class EmpresasController {
             let cnpj_aux = dados.cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
             dados.cnpj = cnpj_aux;
             let s3Object;
-            const empresa = await Empresa.findBy('cnpj',dados.cnpj);
-            
+            const empresa = await Empresa.findBy('id_empresa',dados.id_empresa);
+
+            if(empresa && !empresa?.bucket){
+
+                let nome_bucket = dados.nomeempresarial.replace(' ','-').replace(/\s/g, '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+                await createBucket({Bucket : nome_bucket});
+                empresa.bucket = nome_bucket;
+
+            }
             if(fileLogo){
                 let hashImg =  crypto.randomBytes(10).toString('hex');
                 filename = `${hashImg}-${fileLogo.clientName}`;
@@ -168,8 +175,8 @@ export default class EmpresasController {
                             file: fileLogo,
                             type: fileLogo.extname
                         });
+                dados.logo = s3Object.Location;
             }
-            dados.logo = s3Object.Location;
             empresa?.merge(dados).save();
             response.json({sucess: 'Atualizado com sucesso'});
     }

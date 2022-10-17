@@ -23,6 +23,7 @@ export const EmpresaSchema = {
 
 
 export const EmpresaSchemaUpdate = {
+    id_empresa : schema.number(),
     nomeempresarial: schema.string.nullableAndOptional(),
     cnpj: schema.string(),
     logradouro: schema.string.nullableAndOptional(),
