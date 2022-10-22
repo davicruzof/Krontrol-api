@@ -5,10 +5,16 @@ import Hash from '@ioc:Adonis/Core/Hash';
 import User from 'App/Models/User';
 import  Funcionario  from 'App/Models/Funcionario';
 import Database from '@ioc:Adonis/Lucid/Database';
+import { afterUpdate } from '@ioc:Adonis/Lucid/Orm';
 const loginSchema =  schema.create({
     cpf: schema.string(),
     id_empresa: schema.number(),
     senha : schema.string()
+});
+
+const changePassword =  schema.create({
+    senha_atual : schema.string(),
+    senha_nova : schema.string()
 });
 export default class AuthController {
 
@@ -56,6 +62,7 @@ export default class AuthController {
         }
 
     }
+
     public async me({auth, response}:HttpContextContract){
 
         let dadosFuncionario = await Database
@@ -87,5 +94,27 @@ export default class AuthController {
             departamentos: departamentos.rows
         });
 
+    }
+
+    public async change({auth,request,response}:HttpContextContract){
+
+        try {
+            
+            await request.validate({schema : changePassword});
+            let dados = request.body();
+
+            if ( await Hash.verify(auth.user?.senha, dados.senha_atual)){
+                auth.user.senha = dados.senha_nova;
+                auth.user.save();
+
+                response.json({sucess: 'Senha Atualizada com sucesso'});
+            } else {
+                response.badRequest({error:'Dados inválidos'});
+            }
+            
+            
+        } catch (error) {
+            response.json(error);
+        }
     }
 }

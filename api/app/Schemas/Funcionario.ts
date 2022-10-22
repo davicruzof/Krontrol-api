@@ -37,3 +37,10 @@ export const FuncionarioSchemaInsert = {
     
     pis : schema.string()
 }
+
+export const updateProfileFuncionario = {
+    nome: schema.string.nullableAndOptional(),
+    dt_nascimento: schema.date.nullableAndOptional(),
+    email: schema.string.nullableAndOptional(),
+    celular: schema.string.nullableAndOptional()
+}

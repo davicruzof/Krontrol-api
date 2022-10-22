@@ -3,7 +3,7 @@ import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { schema } from '@ioc:Adonis/Core/Validator';
 import Funcionario from '../../Models/Funcionario';
 import FuncionarioArea from 'App/Models/FuncionarioArea';
-import { FuncionarioSchemaInsert } from 'App/Schemas/Funcionario';
+import { FuncionarioSchemaInsert, updateProfileFuncionario } from 'App/Schemas/Funcionario';
 import Database from '@ioc:Adonis/Lucid/Database';
 
 export default class FuncionariosController {
@@ -31,7 +31,7 @@ export default class FuncionariosController {
                     nome : dados.nome,
                     id_sexo : dados.id_sexo,
                     celular : dados.celular,
-                    id_funcao : dados.id_funcao
+                    id_funcao_erp : dados.id_funcao
                 });
                 response.json({sucess: "Criado com sucesso"});
             }
@@ -104,8 +104,30 @@ export default class FuncionariosController {
 
         }
     }
+
     public async getDepartamentsbyFuncionario(id_funcionario:number){
         const areas = await FuncionarioArea.query().select('')
+    }
+
+    public async updateProfile({request,response,auth}:HttpContextContract){
+
+        try {
+            await request.validate({schema: schema.create(updateProfileFuncionario)});
+            
+            let dados = request.body();
+
+            let funcionario = await Funcionario.findBy('id_funcionario',auth.user?.id_funcionario);
+
+            if(funcionario){
+                funcionario.merge(dados);
+                funcionario.save();
+
+                response.json({sucess: "Atualizado com sucesso"});
+            }
+
+        } catch (error) {
+            response.badRequest(error);
+        }
     }
 
 

@@ -55,6 +55,7 @@ Route.group(()=>{
     Route.post('/getById','FuncionariosController.getById');
     Route.get('/getAll','FuncionariosController.getAll');
     Route.post('/add-area','FuncionariosController.addArea');
+    Route.post('/updateProfile','FuncionariosController.updateProfile');
   }).prefix('/employee').middleware('auth');
 
   //Rotas Veiculos
@@ -87,7 +88,7 @@ Route.group(()=>{
     Route.put('/update','GrupoEventosController.update');
   }).prefix('/group_event').middleware('auth');
 
-  
+  // Rotas telemetria
   Route.group(()=>{
 
     Route.post('/get_list','TelemetriasController.list');
@@ -95,12 +96,14 @@ Route.group(()=>{
 
   }).prefix('/telemetria').middleware('auth');
 
+  //Rotas da escala
   Route.group(()=>{
 
     Route.post('/list','EscalasController.list');
 
   }).prefix('/scale').middleware('auth');
 
+  //Rotas departamentos
   Route.group(()=>{
 
     Route.get('/list','DepartamentosController.list');
@@ -108,8 +111,7 @@ Route.group(()=>{
   
   }).prefix('/departaments').middleware('auth');
 
-
-
+  //Rotas Solicitações
   Route.group(()=>{
 
     Route.post('/create','SolicitacoesController.create');
@@ -120,6 +122,11 @@ Route.group(()=>{
 
   }).prefix('/requests').middleware('auth');
 
+  //Rotas de atualização e recuperação de senha
+  Route.group(()=>{
 
+    Route.post('/change','AuthController.change');
+
+  }).prefix('/password').middleware('auth')
 
 }).prefix('/api');
