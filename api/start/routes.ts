@@ -51,14 +51,14 @@ Route.group(()=>{
 
   //Rotas Funcionario
   Route.group(()=>{
-    Route.post('/create','FuncionariosController.create');
-    Route.post('/getById','FuncionariosController.getById');
-    Route.get('/getAll','FuncionariosController.getAll');
-    Route.post('/add-area','FuncionariosController.addArea');
-    Route.post('/updateProfile','FuncionariosController.updateProfile');
+    Route.post('/create','FuncionariosController.create').middleware('auth');
+    Route.post('/getById','FuncionariosController.getById').middleware('auth');
+    Route.get('/getAll','FuncionariosController.getAll').middleware('auth');
+    Route.post('/add-area','FuncionariosController.addArea').middleware('auth');
+    Route.post('/updateProfile','FuncionariosController.updateProfile').middleware('auth');
     Route.post('checkByCpf','FuncionariosController.checkByCpf');
-    Route.get('EventsReceiptForm','FuncionariosController.EventsReceiptFormByFuncionario');
-  }).prefix('/employee').middleware('auth');
+    Route.get('EventsReceiptForm','FuncionariosController.EventsReceiptFormByFuncionario').middleware('auth');
+  }).prefix('/employee');
 
   //Rotas Veiculos
   Route.group(()=>{
