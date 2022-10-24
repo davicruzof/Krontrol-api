@@ -29,10 +29,15 @@ export default class FuncionariosController {
                     id_grupo: dados.id_grupo,
                     cpf: dados.cpf,
                     id_empresa: dados.id_empresa,
+                    registro : dados.registro,
                     nome : dados.nome,
                     id_sexo : dados.id_sexo,
                     celular : dados.celular,
-                    id_funcao_erp : dados.id_funcao
+                    id_funcao_erp : dados.id_funcao,
+                    dt_nascimento : dados.dt_nascimento,
+                    email : dados.email,
+                    cnh_emissao : dados.cnh_emissao,
+                    id_cnh : dados.id_cnh
                 });
                 response.json({sucess: "Criado com sucesso"});
             }
