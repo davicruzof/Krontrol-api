@@ -5,6 +5,7 @@ import Funcionario from '../../Models/Funcionario';
 import FuncionarioArea from 'App/Models/FuncionarioArea';
 import { FuncionarioSchemaInsert, updateProfileFuncionario } from 'App/Schemas/Funcionario';
 import Database from '@ioc:Adonis/Lucid/Database';
+import User from 'App/Models/User';
 
 export default class FuncionariosController {
 
@@ -136,13 +137,25 @@ export default class FuncionariosController {
 
         let dados = request.body();
 
-        let funcionario = await Funcionario.query().where('cpf','=',dados.cpf).where('id_empresa','=',dados.id_empresa);
+        let funcionario = await Funcionario
+                                .query()
+                                .select('id_funcionario')
+                                .select('cpf')
+                                .select('nome')
+                                .select('celular')
+                                .select('dt_nascimento')
+                                .where('cpf','=',dados.cpf)
+                                .where('id_empresa','=',dados.id_empresa).first();
 
-        if(funcionario.length > 0){
-            response.json({return : true});
+        if(funcionario){
+            let usuario = await User.findBy('id_funcionario',funcionario.id_funcionario);
+            if(!usuario){
+                response.json({error: 'Usuário não encontrado'});
+            }
+            response.json(funcionario);
         }
         else {
-            response.json({return : false});
+            response.json({return : 'CPF não encontrado'});
         }
 
     }

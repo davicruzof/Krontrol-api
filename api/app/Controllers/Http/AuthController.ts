@@ -117,4 +117,50 @@ export default class AuthController {
             response.json(error);
         }
     }
+
+    public async recovery({auth,request,response}:HttpContextContract){
+        
+        try {
+            await request.validate({schema : schema.create({
+                cpf: schema.string(),
+                id_empresa: schema.number(),
+                senha : schema.string() 
+            })});    
+
+            let dados = request.body();
+
+            let funcionario = await Funcionario
+                .query()
+                .select('id_funcionario')
+                .select('cpf')
+                .select('nome')
+                .select('celular')
+                .select('dt_nascimento')
+                .where('cpf','=',dados.cpf)
+                .where('id_empresa','=',dados.id_empresa)
+                .where('ml_fol_funcionario.id_situacao','=',1)
+                .first();
+
+            if(funcionario){
+
+                let usuario = await User.findBy('id_funcionario',funcionario.id_funcionario);
+                
+                if(usuario){
+                    usuario.senha = dados.senha;
+                    usuario.save();
+                    response.json({sucess :  'Senha alterada com sucesso'});
+
+                } else{
+                    response.json({error: 'Usuário não encontrado'});
+                }
+                
+            }
+            else{
+                response.json({error: 'Dados inválidos'});
+            }
+
+        } catch (error) {
+            response.json(error.messages);
+        }
+    }
 }

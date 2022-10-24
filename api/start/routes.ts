@@ -127,8 +127,9 @@ Route.group(()=>{
   //Rotas de atualização e recuperação de senha
   Route.group(()=>{
 
-    Route.post('/change','AuthController.change');
+    Route.post('/change','AuthController.change').middleware('auth');
+    Route.post('/recovery','AuthController.recovery');
 
-  }).prefix('/password').middleware('auth');
+  }).prefix('/password');
 
 }).prefix('/api');
