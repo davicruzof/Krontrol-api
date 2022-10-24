@@ -130,6 +130,48 @@ export default class FuncionariosController {
         }
     }
 
+    public async checkByCpf({request,response}){
+
+        await request.validate({schema: schema.create({ cpf: schema.string(), id_empresa : schema.number() })});
+
+        let dados = request.body();
+
+        let funcionario = await Funcionario.query().where('cpf','=',dados.cpf).where('id_empresa','=',dados.id_empresa);
+
+        if(funcionario.length > 0){
+            response.json({return : true});
+        }
+        else {
+            response.json({return : false});
+        }
+
+    }
+
+    public async EventsReceiptFormByFuncionario({request,auth,response}:HttpContextContract){
+
+        try {
+            let dados = request.all();
+
+            if(dados.data){
+    
+                let funcionario = await Funcionario.findBy('id_funcionario',auth.user?.id_funcionario);
+
+                let query = await Database
+                                    .connection('oracle')
+                                    .rawQuery(`
+                                    SELECT * FROM  globus.vw_flp_fichaeventosrecibo 
+                                    WHERE codintfunc = ${funcionario?.id_funcionario_erp} and to_char(competficha, 'YYYY-MM-DD') = '${dados.data}' `);
+        
+                response.json(query);
+    
+            } else{
+                response.json({error: 'data is required'});
+            }
+
+        } catch (error) {
+            response.json(error);
+        }
+    }
 
 
 }
