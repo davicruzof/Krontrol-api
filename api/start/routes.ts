@@ -57,7 +57,8 @@ Route.group(()=>{
     Route.post('/add-area','FuncionariosController.addArea').middleware('auth');
     Route.post('/updateProfile','FuncionariosController.updateProfile').middleware('auth');
     Route.post('checkByCpf','FuncionariosController.checkByCpf');
-    Route.get('EventsReceiptForm','FuncionariosController.EventsReceiptFormByFuncionario').middleware('auth');
+    Route.post('eventsReceiptForm','FuncionariosController.EventsReceiptFormByFuncionario').middleware('auth');
+    Route.post('dotCard','FuncionariosController.dotCard').middleware('auth');
   }).prefix('/employee');
 
   //Rotas Veiculos

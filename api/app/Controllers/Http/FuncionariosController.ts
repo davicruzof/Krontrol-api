@@ -191,5 +191,31 @@ export default class FuncionariosController {
         }
     }
 
+    public async dotCard({request,auth,response}:HttpContextContract){
+
+        try {
+            let dados = request.body();
+
+            if(dados.data){
+    
+                let funcionario = await Funcionario.findBy('id_funcionario',auth.user?.id_funcionario);
+
+                let query = await Database
+                                    .connection('oracle')
+                                    .rawQuery(`
+                                    SELECT * FROM  globus.vw_ml_frq_fichaponto 
+                                    WHERE id_funcionario_erp = ${funcionario?.id_funcionario_erp} and to_char(data_digitacao, 'YYYY-MM-DD') = '${dados.data}' `);
+        
+                response.json(query);
+    
+            } else{
+                response.json({error: 'data is required'});
+            }
+
+        } catch (error) {
+            response.json(error);
+        }
+    }
+
 
 }
