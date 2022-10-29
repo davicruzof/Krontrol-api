@@ -203,10 +203,12 @@ export default class FuncionariosController {
                 let query = await Database
                                     .connection('oracle')
                                     .rawQuery(`
-                                    SELECT DISTINCT
-                                    * FROM  globus.vw_ml_frq_fichaponto 
-                                    WHERE id_funcionario_erp = ${funcionario?.id_funcionario_erp} and to_char(data_operacao, 'YYYY-MM') = '${dados.data}' 
-                                    ORDER BY data_operacao
+                                    SELECT
+                                    DISTINCT pon.*
+                                    FROM 
+                                    VW_ML_FRQ_FICHAPONTO pon
+                                    WHERE pon.id_funcionario_erp = ${funcionario?.id_funcionario_erp} and to_char(pon.data_operacao, 'YYYY-MM') = '${dados.data}' 
+                                    ORDER BY pon.data_operacao
                                     `);
                 
                 response.json(query);
