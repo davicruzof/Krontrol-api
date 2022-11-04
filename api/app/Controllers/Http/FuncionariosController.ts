@@ -6,6 +6,7 @@ import FuncionarioArea from 'App/Models/FuncionarioArea';
 import { FuncionarioSchemaInsert, updateProfileFuncionario } from 'App/Schemas/Funcionario';
 import Database from '@ioc:Adonis/Lucid/Database';
 import User from 'App/Models/User';
+import ConfirmaFichaPonto from 'App/Models/ConfirmaFichaPonto';
 
 export default class FuncionariosController {
 
@@ -222,5 +223,61 @@ export default class FuncionariosController {
         }
     }
 
+    private async getFuncionario( id: number , campos = "*"){
+
+        let query = await Database
+                    .connection('pg')
+                    .rawQuery(`
+                        SELECT ${campos} 
+                        FROM ml_fol_funcionario
+                        WHERE id_funcionario = ${id}
+                        LIMIT 1
+                    `);
+        return query.rows[0];
+    }
+
+    private async getConfirmaFichaPonto(data,id_funcionario){
+
+        let query = await Database
+                    .connection('pg')
+                    .rawQuery(`
+                        SELECT id 
+                        FROM ml_usu_confirma_ficha_ponto
+                        WHERE id_funcionario = ${id_funcionario} and to_char(dt_referencia,'YYYY-MM-DD') = '${data}'
+                    `);
+
+            if(query.rows.length > 0 ){
+                return true;
+            }
+            else return false;
+    }
+
+    public async confirmDotCard({request,auth,response}:HttpContextContract){
+
+        try {
+            await request.validate({schema: schema.create({ data: schema.date() })});
+            let data = request.body().data;
+
+            if( ! await this.getConfirmaFichaPonto(data,auth.user?.id_funcionario)){
+                if(auth.user){
+                    let funcionario = await this.getFuncionario(auth.user?.id_funcionario,'id_funcionario_erp');
+    
+                     await ConfirmaFichaPonto.create({
+                        id_funcionario : auth.user?.id_funcionario,
+                        id_funcionario_erp : funcionario.id_funcionario_erp,
+                        dt_referencia : data
+                    });
+    
+                    response.json({sucess : "Confirmado com sucesso "});
+                }
+            }
+            else{
+                response.json({error : " Data já confirmada"});
+            }
+
+        } catch (error) {
+            response.json(error);
+        }
+    }
 
 }
