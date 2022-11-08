@@ -197,7 +197,7 @@ export default class FuncionariosController {
         try {
             let dados = request.body();
 
-            if(dados.data){
+            if(dados.data){ 
     
                 let funcionario = await Funcionario.findBy('id_funcionario',auth.user?.id_funcionario);
 
@@ -205,12 +205,37 @@ export default class FuncionariosController {
                                     .connection('oracle')
                                     .rawQuery(`
                                     SELECT
-                                    DISTINCT pon.*
+                                    DISTINCT
+                                    pon.ID_FUNCIONARIO_ERP,
+                                    pon.LINHA,
+                                    pon.PREFIXO,
+                                    pon.DESCOCORR,
+                                    TO_CHAR (pon.DATA_OPERACAO + 3/24, 'YYYY-MM-DD HH24:MI:SS') AS DATA_OPERACAO,
+                                    TO_CHAR (pon.JORNADA_INICIO + 3/24, 'YYYY-MM-DD HH24:MI:SS') AS JORNADA_INICIO,
+                                    TO_CHAR (pon.REFEICAO_INICIO + 3/24, 'YYYY-MM-DD HH24:MI:SS') AS REFEICAO_INICIO,
+                                    TO_CHAR (pon.REFEICAO_FIM + 3/24, 'YYYY-MM-DD HH24:MI:SS') AS REFEICAO_FIM,
+                                    TO_CHAR (pon.JORNADA_FIM + 3/24, 'YYYY-MM-DD HH24:MI:SS') AS JORNADA_FIM,
+                                    TO_CHAR (pon.COMPETENCIA , 'YYYY-MM-DD HH24:MI:SS') AS COMPETENCIA,
+                                    TO_CHAR (pon.DATA_DIGITACAO , 'YYYY-MM-DD HH24:MI:SS') AS DATA_DIGITACAO,
+                                    pon.DIGITADO_POR
                                     FROM 
                                     VW_ML_FRQ_FICHAPONTO pon
                                     WHERE pon.id_funcionario_erp = ${funcionario?.id_funcionario_erp} and to_char(pon.data_operacao, 'YYYY-MM') = '${dados.data}' 
-                                    ORDER BY pon.data_operacao
+                                    ORDER BY DATA_OPERACAO
                                     `);
+
+
+
+                await Promise.all(
+                    query.map( async element => {
+                        element["CONFIRMADO"] = "";
+                        const confirma =  await this.getConfirmaFichaPonto(element.DATA_OPERACAO,auth.user?.id_funcionario).then(function(data) {
+                            return data;
+                        });
+                        element.CONFIRMADO = confirma;
+                    })
+                );
+                
                 
                 response.json(query);
     
@@ -243,7 +268,7 @@ export default class FuncionariosController {
                     .rawQuery(`
                         SELECT id 
                         FROM ml_usu_confirma_ficha_ponto
-                        WHERE id_funcionario = ${id_funcionario} and to_char(dt_referencia,'YYYY-MM-DD') = '${data}'
+                        WHERE id_funcionario = ${id_funcionario} and to_char(dt_referencia, 'YYYY-MM-DD HH24:MI:SS') = '${data}'
                     `);
 
             if(query.rows.length > 0 ){
@@ -255,7 +280,9 @@ export default class FuncionariosController {
     public async confirmDotCard({request,auth,response}:HttpContextContract){
 
         try {
-            await request.validate({schema: schema.create({ data: schema.date() })});
+            await request.validate({schema: schema.create({ data: schema.date({
+                format: 'yyyy-MM-dd HH:mm:ss',
+              }) })});
             let data = request.body().data;
 
             if( ! await this.getConfirmaFichaPonto(data,auth.user?.id_funcionario)){
