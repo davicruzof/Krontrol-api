@@ -307,4 +307,47 @@ export default class FuncionariosController {
         }
     }
 
+    public async inactivate({auth,response}:HttpContextContract){
+
+        try {
+
+            let funcionario = await Funcionario.findBy('id_funcionario',auth.user?.id_funcionario);
+            if(funcionario){
+                funcionario.id_situacao = 5;
+                await funcionario.save();
+                response.json({sucess : true});
+            }
+
+        } catch (error) {
+            response.json(error);
+        }
+    }
+
+    public async deleteAccount({request,response}){
+        
+        try {
+            await request.validate({schema: schema.create({ id_funcionario : schema.number() })});
+            let dados = request.body();
+            let funcionario = await Funcionario.findBy('id_funcionario',dados.id_funcionario);
+            if(funcionario){
+                if(funcionario.id_situacao == 5){
+
+                    await funcionario.delete();
+                    let user = await User.findBy('id_funcionario',dados.id_funcionario);
+                    if(user){
+                        await user.delete();
+                    }
+                    response.json({sucess: "true"});
+                } else{
+                    response.json({error:"Exclusão não permitida"});
+                }
+            } else{
+                response.json({error:"Funcionário não encontrado"});
+            }
+        } catch (error) {
+            response.json(error);
+        }
+
+    }
+
 }

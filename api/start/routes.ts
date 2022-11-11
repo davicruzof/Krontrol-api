@@ -60,6 +60,8 @@ Route.group(()=>{
     Route.post('/eventsReceiptForm','FuncionariosController.EventsReceiptFormByFuncionario').middleware('auth');
     Route.post('/dotCard','FuncionariosController.dotCard').middleware('auth');
     Route.post('/confirmDotCard','FuncionariosController.confirmDotCard').middleware('auth');
+    Route.post('/inactivate','FuncionariosController.inactivate').middleware('auth');
+    Route.post('/deleteAccount','FuncionariosController.deleteAccount').middleware('auth');
   }).prefix('/employee');
 
   //Rotas Veiculos
