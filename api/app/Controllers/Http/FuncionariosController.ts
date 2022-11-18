@@ -210,13 +210,13 @@ export default class FuncionariosController {
                                     pon.LINHA,
                                     pon.PREFIXO,
                                     pon.DESCOCORR,
-                                    TO_CHAR (pon.DATA_OPERACAO + 3/24, 'YYYY-MM-DD HH24:MI:SS') AS DATA_OPERACAO,
-                                    TO_CHAR (pon.JORNADA_INICIO + 3/24, 'YYYY-MM-DD HH24:MI:SS') AS JORNADA_INICIO,
-                                    TO_CHAR (pon.REFEICAO_INICIO + 3/24, 'YYYY-MM-DD HH24:MI:SS') AS REFEICAO_INICIO,
-                                    TO_CHAR (pon.REFEICAO_FIM + 3/24, 'YYYY-MM-DD HH24:MI:SS') AS REFEICAO_FIM,
-                                    TO_CHAR (pon.JORNADA_FIM + 3/24, 'YYYY-MM-DD HH24:MI:SS') AS JORNADA_FIM,
-                                    TO_CHAR (pon.COMPETENCIA , 'YYYY-MM-DD HH24:MI:SS') AS COMPETENCIA,
-                                    TO_CHAR (pon.DATA_DIGITACAO , 'YYYY-MM-DD HH24:MI:SS') AS DATA_DIGITACAO,
+                                    TO_CHAR (pon.DATA_OPERACAO + 3/24, 'DD-MM-YYYY HH24:MI:SS') AS DATA_OPERACAO,
+                                    TO_CHAR (pon.JORNADA_INICIO + 3/24, 'DD-MM-YYYY HH24:MI:SS') AS JORNADA_INICIO,
+                                    TO_CHAR (pon.REFEICAO_INICIO + 3/24, 'DD-MM-YYYY HH24:MI:SS') AS REFEICAO_INICIO,
+                                    TO_CHAR (pon.REFEICAO_FIM + 3/24, 'DD-MM-YYYY HH24:MI:SS') AS REFEICAO_FIM,
+                                    TO_CHAR (pon.JORNADA_FIM + 3/24, 'DD-MM-YYYY HH24:MI:SS') AS JORNADA_FIM,
+                                    TO_CHAR (pon.COMPETENCIA , 'DD-MM-YYYY HH24:MI:SS') AS COMPETENCIA,
+                                    TO_CHAR (pon.DATA_DIGITACAO  , 'DD-MM-YYYY HH24:MI:SS') AS DATA_DIGITACAO,
                                     pon.DIGITADO_POR
                                     FROM 
                                     VW_ML_FRQ_FICHAPONTO pon
