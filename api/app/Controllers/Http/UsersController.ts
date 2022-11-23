@@ -36,8 +36,6 @@ export default class UsersController {
                         id_funcionario : funcionario.id_funcionario,
                         senha : dados.senha,
                         id_grupo : funcionario.id_grupo,
-                        email : dados.email,
-                        telefone : dados.telefone
                     });
                     response.json({sucess:"Usuário cadastrado"});
                 }
@@ -48,8 +46,7 @@ export default class UsersController {
             }
 
         } catch (error) {
-
-            response.badRequest(error.messages);
+            response.badRequest(error);
 
         }
     }
