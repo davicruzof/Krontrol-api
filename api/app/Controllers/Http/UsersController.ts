@@ -31,7 +31,7 @@ export default class UsersController {
                     response.json({sucess:"Usuário já cadastrado"});
                 }
                 else{
-                    User.create({
+                    await User.create({
                         id_empresa : dados.id_empresa,
                         id_funcionario : funcionario.id_funcionario,
                         senha : dados.senha,
