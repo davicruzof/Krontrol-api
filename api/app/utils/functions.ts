@@ -19,3 +19,9 @@ export default function TestaCPF(strCPF) {
     if (Resto != parseInt(strCPF.substring(10, 11) ) ) return false;
     return true;
 }
+
+export function sleep(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}

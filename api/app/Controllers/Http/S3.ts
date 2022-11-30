@@ -21,7 +21,7 @@ export const upload = async (params) =>{
     });
     const buffer = fs.createReadStream('tmp/uploads/files/'+params.filename);
 
-    var putObjectPromise = s3connection.upload({
+    let putObjectPromise = s3connection.upload({
 
         Bucket : params.bucket,
         Key : params.folder+'/'+params.path,

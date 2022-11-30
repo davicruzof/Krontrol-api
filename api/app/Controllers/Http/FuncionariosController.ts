@@ -2,12 +2,15 @@ import  Empresa  from 'App/Models/Empresa';
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { schema } from '@ioc:Adonis/Core/Validator';
 import Funcionario from '../../Models/Funcionario';
+import pdf from 'pdf-creator-node';
+import fs,{ unlink } from 'fs';
+import {sleep } from '../../utils/functions';
 import FuncionarioArea from 'App/Models/FuncionarioArea';
 import { FuncionarioSchemaInsert, updateProfileFuncionario } from 'App/Schemas/Funcionario';
 import Database from '@ioc:Adonis/Lucid/Database';
 import User from 'App/Models/User';
 import ConfirmaFichaPonto from 'App/Models/ConfirmaFichaPonto';
-
+const BASE_TEMPLATE_URL = "app/templates/pdf/template-pdf.html";
 export default class FuncionariosController {
 
     public async create({request,response}:HttpContextContract){
@@ -178,10 +181,31 @@ export default class FuncionariosController {
                 let query = await Database
                                     .connection('oracle')
                                     .rawQuery(`
-                                    SELECT * FROM  globus.vw_flp_fichaeventosrecibo 
-                                    WHERE codintfunc = ${funcionario?.id_funcionario_erp} and to_char(competficha, 'YYYY-MM-DD') = '${dados.data}' `);
-        
-                response.json(query);
+                                    SELECT DISTINCT 
+                                    to_char(competficha, 'DD-MM-YYYY') as COMPETFICHA,
+                                    CODINTFUNC,
+                                    VALORFICHA,
+                                    REFERENCIA,
+                                    NOMEFUNC,
+                                    DESCEVEN,
+                                    RSOCIALEMPRESA,
+                                    INSCRICAOEMPRESA,
+                                    DESCFUNCAO,
+                                    CIDADEFL,
+                                    IESTADUALFL,
+                                    ENDERECOFL,
+                                    NUMEROENDFL,
+                                    COMPLENDFL,
+                                    TIPOEVEN
+                                    FROM  globus.vw_flp_fichaeventosrecibo hol 
+                                WHERE 
+                                hol.codintfunc = ${funcionario?.id_funcionario_erp} and to_char(competficha, 'YYYY-MM-DD') = '${dados.data}'
+                                order by hol.tipoeven desc,hol.desceven 
+                                `);
+                
+                let file = await this.generatePdf(this.tratarDados(query));
+
+                response.download(file.filename);
     
             } else{
                 response.json({error: 'data is required'});
@@ -348,6 +372,66 @@ export default class FuncionariosController {
             response.json(error);
         }
 
+    }
+
+    private async generatePdf(dados){
+        
+        var html = fs.readFileSync(BASE_TEMPLATE_URL, "utf8");  
+        var options = {
+            format: "A3",
+            orientation: "portrait",
+            border: "10mm"
+        };
+        const filename = Math.random() + '_doc' + '.pdf';
+        var document = {
+            html: html,
+            data: {
+              dados: dados,
+            },
+            path: "./pdfsTemp/" + filename,
+            
+          };
+
+        let file = pdf
+                .create(document, options)
+                .then((res) => {
+                    return res;
+                })
+                .catch((error) => {
+                    return error;
+                });
+        return await file;
+
+    }
+
+    private tratarDados(dados){
+        let dadosTemp = {
+                cabecalho : {
+                    nomeEmpresa : dados[0].RSOCIALEMPRESA,
+                    inscricaoEmpresa : dados[0].INSCRICAOEMPRESA,
+                    matricula : dados[0].CODINTFUNC,
+                    nome : dados[0].NOMEFUNC,
+                    funcao : dados[0].DESCFUNCAO,
+                    competencia : dados[0].COMPETFICHA,
+                    endereco : {
+                        rua : dados[0].ENDERECOFL,
+                        cidade: dados[0].CIDADEFL,
+                        estado: dados[0].IESTADUALFL,
+                        numero: dados[0].NUMEROENDFL,
+                        complemento: dados[0].COMPLENDFL
+                    }
+                },
+                totais : {
+                    VALORFICHA : 0,
+                    REFERENCIA : 0
+                },
+                descricao : dados
+            }
+        dados.forEach(element => {
+            dadosTemp.totais.VALORFICHA += element.VALORFICHA;
+            dadosTemp.totais.REFERENCIA += element.REFERENCIA; 
+        });
+        return dadosTemp;
     }
 
 }

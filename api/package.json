@@ -35,6 +35,7 @@
     "aws-sdk": "^2.1181.0",
     "luxon": "^2.4.0",
     "oracledb": "^5.5.0",
+    "pdf-creator-node": "^2.3.5",
     "pg": "^8.8.0",
     "phc-argon2": "^1.1.3",
     "proxy-addr": "^2.0.7",
