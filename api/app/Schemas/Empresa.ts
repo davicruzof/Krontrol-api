@@ -12,7 +12,7 @@ export const EmpresaSchema = {
     uf : schema.string(),
     email: schema.string.nullableAndOptional(),
     telefone: schema.string.nullableAndOptional(),
-    situacaocadastral: schema.string.nullableAndOptional(),
+    situacaocadastral: schema.string(),
     contato: schema.string.nullableAndOptional(),
     id_grupo : schema.number(),
     id_usuario : schema.number.nullableAndOptional(),
