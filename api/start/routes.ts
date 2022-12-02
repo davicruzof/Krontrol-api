@@ -136,4 +136,13 @@ Route.group(()=>{
 
   }).prefix('/password');
 
+  Route.group(()=>{
+
+    Route.post('/create','SecurityController.create');
+    Route.get('/getAll','SecurityController.getAll');
+    Route.post('/getById','SecurityController.getById');
+    Route.put('/update','SecurityController.update');
+
+  }).prefix('/security').middleware('auth');
+
 }).prefix('/api');

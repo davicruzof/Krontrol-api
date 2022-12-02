@@ -10,7 +10,7 @@ import { FuncionarioSchemaInsert, updateProfileFuncionario } from 'App/Schemas/F
 import Database from '@ioc:Adonis/Lucid/Database';
 import User from 'App/Models/User';
 import ConfirmaFichaPonto from 'App/Models/ConfirmaFichaPonto';
-const BASE_TEMPLATE_URL = "app/templates/pdf/template-pdf.html";
+const BASE_TEMPLATE_URL = "app/template-pdf.html";
 export default class FuncionariosController {
 
     public async create({request,response}:HttpContextContract){
