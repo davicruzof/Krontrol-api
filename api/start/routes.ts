@@ -138,11 +138,26 @@ Route.group(()=>{
 
   Route.group(()=>{
 
-    Route.post('/create','SecurityController.create');
-    Route.get('/getAll','SecurityController.getAll');
-    Route.post('/getById','SecurityController.getById');
-    Route.put('/update','SecurityController.update');
+    Route.group(()=>{
+      Route.post('/create','SecuritiesController.createGroup');
+      Route.get('/getAll','SecuritiesController.getAllGroups');
+      Route.post('/getById','SecuritiesController.getGroupById');
+      Route.put('/update','SecuritiesController.updateGroup');
+
+    }).prefix('/group');
+
+    Route.group(()=>{
+
+      Route.post('/create','SecuritiesController.createGroupUser');
+      Route.get('/getAll','SecuritiesController.getAllGroupsUser');
+      Route.post('/getById','SecuritiesController.getGroupUserById');
+      Route.get('/getByUser','SecuritiesController.getGroupUserByIdUser');
+      Route.put('/update','SecuritiesController.updateGroupUser');
+
+    }).prefix('groupUser');
 
   }).prefix('/security').middleware('auth');
+
+
 
 }).prefix('/api');

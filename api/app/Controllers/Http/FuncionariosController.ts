@@ -4,7 +4,6 @@ import { schema } from '@ioc:Adonis/Core/Validator';
 import Funcionario from '../../Models/Funcionario';
 import pdf from 'pdf-creator-node';
 import fs,{ unlink } from 'fs';
-import {sleep } from '../../utils/functions';
 import FuncionarioArea from 'App/Models/FuncionarioArea';
 import { FuncionarioSchemaInsert, updateProfileFuncionario } from 'App/Schemas/Funcionario';
 import Database from '@ioc:Adonis/Lucid/Database';
@@ -204,7 +203,7 @@ export default class FuncionariosController {
                                 `);
                 
                 let file = await this.generatePdf(this.tratarDados(query));
-
+                
                 response.download(file.filename);
     
             } else{
