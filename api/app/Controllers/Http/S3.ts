@@ -1,6 +1,7 @@
 import { s3Client, s3connection } from '../../../libs/aws-sdk';
 import { CreateBucketCommand } from "@aws-sdk/client-s3";
 import fs from 'fs';
+import Empresa from 'App/Models/Empresa';
 export  const createBucket = async (params) =>{
     try{
         
@@ -34,4 +35,24 @@ export const upload = async (params) =>{
       });
 
       return await putObjectPromise;
+}
+
+export const uploadPdfEmpresa = async (filepath,id_empresa) => {
+
+    let buffer = fs.createReadStream(filepath);
+    let empresa = await Empresa.findBy('id_empresa',id_empresa);
+    if(empresa){
+      let putObjectPromise = s3connection.upload({
+
+        Bucket : empresa.bucket,
+        Key : 'pdfs/'+ Math.random() + '_doc' + '.pdf',
+        ACL : 'public-read',
+        Body : buffer,
+        ContentType: '.pdf'
+  
+      }).promise().then(function(data) {
+        return data;
+      }); 
+      return await putObjectPromise;
+    }
 }

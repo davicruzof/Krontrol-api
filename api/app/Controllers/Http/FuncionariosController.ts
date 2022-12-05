@@ -4,6 +4,7 @@ import { schema } from '@ioc:Adonis/Core/Validator';
 import Funcionario from '../../Models/Funcionario';
 import pdf from 'pdf-creator-node';
 import fs,{ unlink } from 'fs';
+import {uploadPdfEmpresa } from 'App/Controllers/Http/S3';
 import FuncionarioArea from 'App/Models/FuncionarioArea';
 import { FuncionarioSchemaInsert, updateProfileFuncionario } from 'App/Schemas/Funcionario';
 import Database from '@ioc:Adonis/Lucid/Database';
@@ -198,13 +199,18 @@ export default class FuncionariosController {
                                     TIPOEVEN
                                     FROM  globus.vw_flp_fichaeventosrecibo hol 
                                 WHERE 
-                                hol.codintfunc = ${funcionario?.id_funcionario_erp} and to_char(competficha, 'YYYY-MM-DD') = '${dados.data}'
+                                hol.codintfunc = ${funcionario?.id_funcionario_erp} and to_char(competficha, 'YYYY-MM') = '${dados.data}'
                                 order by hol.tipoeven desc,hol.desceven 
                                 `);
                 
-                let file = await this.generatePdf(this.tratarDados(query));
-                
-                response.download(file.filename);
+                let pdfTemp = await this.generatePdf(this.tratarDados(query));
+
+                let file =  await uploadPdfEmpresa(pdfTemp.filename, auth.user?.id_empresa);
+
+                if(file){
+                    fs.unlink(pdfTemp.filename,()=>{});
+                    response.json({pdf : file.Location});
+                }
     
             } else{
                 response.json({error: 'data is required'});
