@@ -10,7 +10,7 @@ import { FuncionarioSchemaInsert, updateProfileFuncionario } from 'App/Schemas/F
 import Database from '@ioc:Adonis/Lucid/Database';
 import User from 'App/Models/User';
 import ConfirmaFichaPonto from 'App/Models/ConfirmaFichaPonto';
-const BASE_TEMPLATE_URL = "app/template-pdf.html";
+const BASE_TEMPLATE_URL = "app/template.html";
 export default class FuncionariosController {
 
     public async create({request,response}:HttpContextContract){
@@ -203,7 +203,9 @@ export default class FuncionariosController {
                                 order by hol.tipoeven desc,hol.desceven 
                                 `);
                 
-                let pdfTemp = await this.generatePdf(this.tratarDados(query));
+                let empresa = await Empresa.findBy('id_empresa',auth.user?.id_empresa);
+
+                let pdfTemp = await this.generatePdf(this.tratarDados(query,empresa.logo));
 
                 let file =  await uploadPdfEmpresa(pdfTemp.filename, auth.user?.id_empresa);
 
@@ -385,7 +387,8 @@ export default class FuncionariosController {
         var options = {
             format: "A3",
             orientation: "portrait",
-            border: "10mm"
+            border: "10mm",
+            type : "pdf"
         };
         const filename = Math.random() + '_doc' + '.pdf';
         var document = {
@@ -409,9 +412,11 @@ export default class FuncionariosController {
 
     }
 
-    private tratarDados(dados){
+    private tratarDados(dados,logo_empresa){
+
         let dadosTemp = {
                 cabecalho : {
+                    logo: logo_empresa,
                     nomeEmpresa : dados[0].RSOCIALEMPRESA,
                     inscricaoEmpresa : dados[0].INSCRICAOEMPRESA,
                     matricula : dados[0].CODINTFUNC,
@@ -427,14 +432,40 @@ export default class FuncionariosController {
                     }
                 },
                 totais : {
-                    VALORFICHA : 0,
-                    REFERENCIA : 0
+                    DESCONTOS : 0,
+                    PROVENTOS : 0
                 },
-                descricao : dados
+                bases : {
+                    BASE_FGTS_FOLHA : 0,
+                    BASE_INSS_FOLHA : 0,
+                    FGTS_FOLHA : 0,
+                    BASE_IRRF_FOLHA : 0,
+                },
+                descricao : [Object]
             }
         dados.forEach(element => {
-            dadosTemp.totais.VALORFICHA += element.VALORFICHA;
-            dadosTemp.totais.REFERENCIA += element.REFERENCIA; 
+
+            if(element.DESCEVEN == 'BASE FGTS FOLHA'){
+                dadosTemp.bases.BASE_FGTS_FOLHA = element.VALORFICHA;
+            }
+            else if(element.DESCEVEN == 'FGTS FOLHA'){
+                dadosTemp.bases.FGTS_FOLHA = element.VALORFICHA;
+            }
+            else if(element.DESCEVEN == 'BASE IRRF FOLHA'){
+                dadosTemp.bases.BASE_IRRF_FOLHA = element.VALORFICHA;
+            }
+            else if(element.DESCEVEN == 'BASE INSS FOLHA'){
+                dadosTemp.bases.BASE_IRRF_FOLHA = element.VALORFICHA;
+            }
+            else if(element.DESCEVEN == 'TOTAL DE DESCONTOS'){
+                dadosTemp.totais.DESCONTOS = element.VALORFICHA;
+            }
+            else if(element.DESCEVEN == 'TOTAL DE PROVENTOS'){
+                dadosTemp.totais.PROVENTOS = element.VALORFICHA;
+            }
+            else{
+                dadosTemp.descricao.push(element);
+            }
         });
         return dadosTemp;
     }
