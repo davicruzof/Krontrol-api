@@ -32,7 +32,7 @@
             <th></th>
             <th>
                 <span>
-                    ENDEREÇO: {{dados.cabecalho.endereco.rua}} - Nº {{dados.cabecalho.endereco.numero}}
+                    ENDEREÇO: {{dados.cabecalho.endereco.rua}} - Nº {{dados.cabecalho.endereco.numero}} - {{dados.cabecalho.endereco.cidade}}
                 </span>
             </th>
             <th></th>
@@ -41,7 +41,9 @@
             <th></th>
             <th>
                 <span>
-                    ESTADO: {{dados.cabecalho.endereco.estado}}
+                    {{#ifCond dados.cabecalho.endereco.estado "!=" 'ISENTO'}}
+                        ESTADO: {{ dados.cabecalho.endereco.estado }}
+                    {{/ifCond}}
                 </span>
             </th>
             <th></th>
@@ -50,7 +52,7 @@
             <th></th>
             <th>
                 <span>
-                    FONE: [PHONE] - CNPJ: CNPJ: {{dados.cabecalho.inscricaoEmpresa}}
+                    FONE: {{dados.cabecalho.telefone}} - CNPJ: CNPJ: {{dados.cabecalho.inscricaoEmpresa}}
                 </span>
             </th>
             <th></th>
@@ -162,20 +164,25 @@
                         width: 20%;">
                         <span>
                         {{#ifCond this.TIPOEVEN "!=" 'D'}}
-                            {{this.VALORFICHA}}
+                            R${{this.VALORFICHA}}
                         {{/ifCond}}
                         </span>
                 </td>
                 <td style="
                         border: 1px solid black; 
-                        width: 20%;"><span>{{this.REFERENCIA}}</span>
+                        width: 20%;">
+                        <span>
+                        {{#ifCond this.REFERENCIA "!=" '0'}}
+                            R${{this.REFERENCIA}}
+                        {{/ifCond}}
+                        </span>
                 </td>
                 <td style="
                         border: 1px solid black; 
                         width: 20%;">
                         <span>
                         {{#ifCond this.TIPOEVEN "==" 'D' }}
-                            {{this.VALORFICHA}}
+                            R${{this.VALORFICHA}}
                         {{/ifCond}}
                         </span>
                 </td>
@@ -189,7 +196,7 @@
             <td style="
                     border: 1px solid black; 
                     width: 20%;">
-                {{dados.totais.PROVENTOS}}
+                R${{dados.totais.PROVENTOS}}
             </td>
             <td style="
                     border: 1px solid black; 
@@ -199,7 +206,7 @@
             <td style="
                     border: 1px solid black; 
                     width: 20%;">
-                {{dados.totais.DESCONTOS}}
+                R${{dados.totais.DESCONTOS}}
             </td>
         </tr>
 
@@ -232,22 +239,22 @@
             <td style="
                         border: 1px solid black; 
                         width: 25%;">
-                {{ dados.bases.BASE_FGTS_FOLHA }}
+                R${{ dados.bases.BASE_FGTS_FOLHA }}
             </td>
             <td style="
                         border: 1px solid black; 
                         width: 25%;">
-                {{dados.bases.FGTS_FOLHA}}
+                R${{dados.bases.FGTS_FOLHA}}
             </td>
             <td style="
                         border: 1px solid black; 
                         width: 25%;">
-                {{dados.bases.BASE_IRRF_FOLHA}}
+                R${{dados.bases.BASE_IRRF_FOLHA}}
             </td>
             <td style="
                         border: 1px solid black; 
                         width: 25%;">
-                {{dados.bases.BASE_INSS_FOLHA}}
+                R${{dados.bases.BASE_INSS_FOLHA}}
             </td>
         </tr>
     </table>

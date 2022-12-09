@@ -184,7 +184,7 @@ export default class FuncionariosController {
                                     SELECT DISTINCT 
                                     to_char(competficha, 'DD-MM-YYYY') as COMPETFICHA,
                                     CODINTFUNC,
-                                    VALORFICHA,
+                                    to_char(VALORFICHA, 'FM999G999G999D90', 'nls_numeric_characters='',.''') AS VALORFICHA,
                                     REFERENCIA,
                                     NOMEFUNC,
                                     DESCEVEN,
@@ -204,8 +204,8 @@ export default class FuncionariosController {
                                 `);
                 
                 let empresa = await Empresa.findBy('id_empresa',auth.user?.id_empresa);
-
-                let pdfTemp = await this.generatePdf(this.tratarDados(query,empresa.logo));
+                
+                let pdfTemp = await this.generatePdf(this.tratarDados(query,empresa));
 
                 let file =  await uploadPdfEmpresa(pdfTemp.filename, auth.user?.id_empresa);
 
@@ -412,11 +412,12 @@ export default class FuncionariosController {
 
     }
 
-    private tratarDados(dados,logo_empresa){
+    private tratarDados(dados,dados_empresa){
 
         let dadosTemp = {
                 cabecalho : {
-                    logo: logo_empresa,
+                    logo: dados_empresa.logo,
+                    telefone: dados_empresa.telefone,
                     nomeEmpresa : dados[0].RSOCIALEMPRESA,
                     inscricaoEmpresa : dados[0].INSCRICAOEMPRESA,
                     matricula : dados[0].CODINTFUNC,
@@ -441,7 +442,7 @@ export default class FuncionariosController {
                     FGTS_FOLHA : 0,
                     BASE_IRRF_FOLHA : 0,
                 },
-                descricao : [Object]
+                descricao : new Array()
             }
         dados.forEach(element => {
 
@@ -455,7 +456,7 @@ export default class FuncionariosController {
                 dadosTemp.bases.BASE_IRRF_FOLHA = element.VALORFICHA;
             }
             else if(element.DESCEVEN == 'BASE INSS FOLHA'){
-                dadosTemp.bases.BASE_IRRF_FOLHA = element.VALORFICHA;
+                dadosTemp.bases.BASE_INSS_FOLHA = element.VALORFICHA;
             }
             else if(element.DESCEVEN == 'TOTAL DE DESCONTOS'){
                 dadosTemp.totais.DESCONTOS = element.VALORFICHA;
@@ -463,10 +464,14 @@ export default class FuncionariosController {
             else if(element.DESCEVEN == 'TOTAL DE PROVENTOS'){
                 dadosTemp.totais.PROVENTOS = element.VALORFICHA;
             }
-            else{
+            else if(element.TIPOEVEN != 'B' ){
+                if(element.VALORFICHA[0] == ','){
+                    element.VALORFICHA = '0'+ element.VALORFICHA;
+                }
                 dadosTemp.descricao.push(element);
             }
         });
+        console.log(dadosTemp);
         return dadosTemp;
     }
 
