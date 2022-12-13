@@ -69,6 +69,7 @@ Route.group(()=>{
     Route.post('/create','VeiculosController.create');
     Route.post('/getById','VeiculosController.getById');
     Route.get('/getAll','VeiculosController.getAll');
+    Route.put('/update','VeiculosController.update');
   }).prefix('/vehicle').middleware('auth');
 
   //Rotas Eventos

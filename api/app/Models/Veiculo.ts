@@ -48,6 +48,9 @@ export default class Veiculo extends BaseModel {
   @column()
   public modelo : string
 
+  @column()
+  public foto : string
+
   @column.dateTime({ autoUpdate: true})
   public dt_alteracao : DateTime
   
@@ -60,6 +63,6 @@ export default class Veiculo extends BaseModel {
   @column()
   public id_funcionario_cadastro : number
 
-  @belongsTo(() => Garagem { foreignKey : 'id_garagem'})
+  @belongsTo(() => Garagem ,{ foreignKey : 'id_garagem'})
   public garagem : BelongsTo <typeof Garagem> 
 }
