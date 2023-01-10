@@ -72,6 +72,9 @@ export default class Funcionario extends BaseModel {
   @column()
   public pis: string
 
+  @column()
+  public foto_url: string
+
   @column( { serializeAs: null })
   public id_situacao : number
 

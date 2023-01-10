@@ -4,21 +4,24 @@ import { schema } from '@ioc:Adonis/Core/Validator';
 import Funcionario from '../../Models/Funcionario';
 import pdf from 'pdf-creator-node';
 import fs,{ unlink } from 'fs';
-import {uploadPdfEmpresa } from 'App/Controllers/Http/S3';
+import {uploadPdfEmpresa,upload } from 'App/Controllers/Http/S3';
 import FuncionarioArea from 'App/Models/FuncionarioArea';
 import { FuncionarioSchemaInsert, updateProfileFuncionario } from 'App/Schemas/Funcionario';
 import Database from '@ioc:Adonis/Lucid/Database';
 import User from 'App/Models/User';
 import ConfirmaFichaPonto from 'App/Models/ConfirmaFichaPonto';
-const BASE_TEMPLATE_URL = "app/template.html";
+import crypto from 'crypto';
+import { templateDotCard } from 'App/templates/pdf/template';
 export default class FuncionariosController {
 
     public async create({request,response}:HttpContextContract){
         try {
             await request.validate({schema: schema.create(FuncionarioSchemaInsert)});
-
+            const fotoPerfil = request.file('foto_perfil');
             const dados = request.body();
-            if(!(await Empresa.findBy('id_empresa',dados.id_empresa))){
+            let s3Object;
+            let empresa = await Empresa.findBy('id_empresa',dados.id_empresa);
+            if(!empresa){
                 return response.badRequest({error: "Empresa não encontrada"});
             }
             let funcionario = await Funcionario.findBy('cpf',dados.cpf);
@@ -29,6 +32,21 @@ export default class FuncionariosController {
             
             }
             else{
+
+                if(fotoPerfil){
+                    let hashImg =  crypto.randomBytes(10).toString('hex');
+                    let filename = `${hashImg}-${fotoPerfil.clientName}`;
+
+                          s3Object = 
+                           await upload({
+                                folder : 'logo',
+                                filename : filename,
+                                bucket: empresa.bucket,
+                                path: filename,
+                                file: fotoPerfil,
+                                type: fotoPerfil.extname
+                            });
+                }
                 await Funcionario.create({
                     id_grupo: dados.id_grupo,
                     cpf: dados.cpf,
@@ -41,7 +59,8 @@ export default class FuncionariosController {
                     dt_nascimento : dados.dt_nascimento,
                     email : dados.email,
                     cnh_emissao : dados.cnh_emissao,
-                    id_cnh : dados.id_cnh
+                    id_cnh : dados.id_cnh,
+                    foto_url : s3Object.Location
                 });
                 response.json({sucess: "Criado com sucesso"});
             }
@@ -113,6 +132,24 @@ export default class FuncionariosController {
             response.json({sucess: "Cadastro Realizado"});
 
         }
+    }
+
+    public async removeArea ({request,response}:HttpContextContract){
+        const arrayArea = request.body().area;
+        const id_funcionario = request.body().id_funcionario;
+
+
+        await Promise.all(
+
+            arrayArea.forEach( async (element) => {
+             let areaFunc = await FuncionarioArea.query().select('*').where('id_funcionario','=',id_funcionario).andWhere('id_area','=',element).limit(1);
+             console.log(areaFunc);
+                if(areaFunc[0]){
+                    await areaFunc[0].delete();
+                }
+            })
+        );
+        response.json({sucess: 'Area(s) removidas com sucesso'});
     }
 
     public async getDepartamentsbyFuncionario(id_funcionario:number){
@@ -205,7 +242,7 @@ export default class FuncionariosController {
                 
                 let empresa = await Empresa.findBy('id_empresa',auth.user?.id_empresa);
                 
-                let pdfTemp = await this.generatePdf(this.tratarDados(query,empresa));
+                let pdfTemp = await this.generatePdf(this.tratarDados(query,empresa),templateDotCard);
 
                 let file =  await uploadPdfEmpresa(pdfTemp.filename, auth.user?.id_empresa);
 
@@ -215,7 +252,7 @@ export default class FuncionariosController {
                 }
     
             } else{
-                response.json({error: 'data is required'});
+                response.badRequest({error: 'data is required'});
             }
 
         } catch (error) {
@@ -250,7 +287,7 @@ export default class FuncionariosController {
                                     TO_CHAR (pon.DATA_DIGITACAO  , 'DD-MM-YYYY HH24:MI:SS') AS DATA_DIGITACAO,
                                     pon.DIGITADO_POR
                                     FROM 
-                                    VW_ML_FRQ_FICHAPONTO pon
+                                    GLOBUS.VW_ML_FRQ_FICHAPONTO pon
                                     WHERE pon.id_funcionario_erp = ${funcionario?.id_funcionario_erp} and to_char(pon.data_operacao, 'YYYY-MM') = '${dados.data}' 
                                     ORDER BY DATA_OPERACAO
                                     `);
@@ -381,9 +418,8 @@ export default class FuncionariosController {
 
     }
 
-    private async generatePdf(dados){
+    private async generatePdf(dados,template){
         
-        var html = fs.readFileSync(BASE_TEMPLATE_URL, "utf8");  
         var options = {
             format: "A3",
             orientation: "portrait",
@@ -392,7 +428,7 @@ export default class FuncionariosController {
         };
         const filename = Math.random() + '_doc' + '.pdf';
         var document = {
-            html: html,
+            html: template,
             data: {
               dados: dados,
             },
@@ -471,8 +507,34 @@ export default class FuncionariosController {
                 dadosTemp.descricao.push(element);
             }
         });
-        console.log(dadosTemp);
+        //console.log(dadosTemp);
         return dadosTemp;
+    }
+
+    public async dotCardPdf({request,response,auth}:HttpContextContract){
+        try {
+            let dados = request.body();
+            if(dados.data){
+
+                let funcionario = await Funcionario.findBy('id_funcionario',auth.user?.id_funcionario);
+
+                let query = await Database
+                                    .connection('oracle')
+                                    .rawQuery(`
+                                    SELECT DISTINCT *
+                                    FROM  GUDMA.VW_ML_FRQ_ESPELHODEHORAS esp
+                                WHERE 
+                                esp.chapa = ${funcionario?.id_funcionario_erp} and to_char(competficha, 'YYYY-MM') = '${dados.data}'
+                                order by hol.tipoeven desc,hol.desceven 
+                                `);
+                response.json(query);
+
+            } else{
+                response.badRequest({error: "data is required"});
+            }
+        } catch (error) {
+            response.badRequest(error.messages);
+        }
     }
 
 }

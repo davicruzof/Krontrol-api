@@ -58,7 +58,6 @@ export default class VeiculosController {
             response.badRequest(error.messages);
         }
     }
-
     public async update({request,response,auth}){
         
         try {

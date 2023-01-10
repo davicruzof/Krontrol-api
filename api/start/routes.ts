@@ -55,9 +55,11 @@ Route.group(()=>{
     Route.post('/getById','FuncionariosController.getById').middleware('auth');
     Route.get('/getAll','FuncionariosController.getAll').middleware('auth');
     Route.post('/add-area','FuncionariosController.addArea').middleware('auth');
+    Route.post('/remove-area','FuncionariosController.removeArea').middleware('auth');
     Route.post('/updateProfile','FuncionariosController.updateProfile').middleware('auth');
     Route.post('/checkByCpf','FuncionariosController.checkByCpf');
     Route.post('/eventsReceiptForm','FuncionariosController.EventsReceiptFormByFuncionario').middleware('auth');
+    Route.post('/dotCardPdf','FuncionariosController.dotCardPdf').middleware('auth');
     Route.post('/dotCard','FuncionariosController.dotCard').middleware('auth');
     Route.post('/confirmDotCard','FuncionariosController.confirmDotCard').middleware('auth');
     Route.post('/inactivate','FuncionariosController.inactivate').middleware('auth');
@@ -98,10 +100,15 @@ Route.group(()=>{
   // Rotas telemetria
   Route.group(()=>{
 
-    Route.post('/get_list','TelemetriasController.list');
-    Route.post('/list_events','TelemetriasController.list_events');
+    //Route.post('/get_list','TelemetriasController.list');
+    //Route.post('/list_events','TelemetriasController.list_events');
 
   }).prefix('/telemetria').middleware('auth');
+
+  // Rotas PDF
+  Route.group(()=>{
+    Route.post('/upload','PdfsController.upload');
+  }).prefix('/pdfs').middleware('auth');
 
   //Rotas da escala
   Route.group(()=>{
@@ -137,6 +144,8 @@ Route.group(()=>{
 
   }).prefix('/password');
 
+
+  //Rotas de Grupos de segurança
   Route.group(()=>{
 
     Route.group(()=>{
