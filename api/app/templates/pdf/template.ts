@@ -323,24 +323,24 @@ export const fichaPonto = `
 <span>
     <hr size="1" style="border:1px dashed #000;">
     <span>
-        LISTAGEM DE MOVIMENTOS DA FREQUÊNCIA REFERENTE AO PERÍODO DE: 01/MM/AAAA a 30/MM/AAAA
+        LISTAGEM DE MOVIMENTOS DA FREQUÊNCIA REFERENTE A {{dados.periodo}}
     </span>
     <hr size="1" style="border:1px dashed #000;">
     <div>
-        <span>EMPRESA: </span><span>[Nome da empresa]</span>
+        <span>EMPRESA: </span><span>{{dados.nomeEmpresa}}</span>
     </div>
     <div>
-        <span>ENDEREÇO: </span><span>[Endereço da empresa]</span>
+        <span>ENDEREÇO: </span><span>{{dados.endereco}}</span>
     </div>
     <div>
-        <span>CNPJ: </span><span>[CNPJ da empresa]</span>
+        <span>CNPJ: </span><span>{{dados.cabecalho.cnpj}}</span>
     </div>
     <hr size="1" style="border:1px dashed #000;">
     <div>
-        <span>FUNCIONÁRIO: </span><span>[Chapa funcionário] - [Nome do funcionário]</span>
+        <span>FUNCIONÁRIO: </span><span>{{dados.cabecalho.ID_FUNCIONARIO_ERP}} - {{dados.cabecalho.nome}}</span>
     </div>
     <div>
-        <span>FUNÇÃO: </span><span>[Função do funcionário]</span>
+        <span>FUNÇÃO: </span><span>{{dados.cabecalho.funcao}}</span>
     </div>
     <hr size="1" style="border:1px dashed #000;">
     <table style="margin-bottom: 20px;">
@@ -358,77 +358,21 @@ export const fichaPonto = `
             <td>Total</td>
         </tr>
 
-
-
-        <tr>
-            <td>01/11/2022 TER</td>
-            <td>05:32</td>
-            <td>05:32</td>
-            <td>05:32</td>
-            <td>05:32</td>
-            <td>0532</td>
-            <td>Normal</td>
-            <td>Extra</td>
-            <td>Excess</td>
-            <td>Outra</td>
-            <td>Total</td>
-        </tr>
-
-        <tr>
-            <td>02/11/2022 QUA</td>
-            <td>Folga</td>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-        </tr>
-
-        <tr>
-            <td>03/11/2022 QUI</td>
-            <td>05:32</td>
-            <td>05:32</td>
-            <td>05:32</td>
-            <td>05:32</td>
-            <td>0532</td>
-            <td>Normal</td>
-            <td>Extra</td>
-            <td>Excess</td>
-            <td>Outra</td>
-            <td>Total</td>
-        </tr>
-        <tr>
-            <td>04/11/2022 SEX</td>
-            <td>05:32</td>
-            <td>05:32</td>
-            <td>05:32</td>
-            <td>05:32</td>
-            <td>0532</td>
-            <td>Normal</td>
-            <td>Extra</td>
-            <td>Excess</td>
-            <td>Outra</td>
-            <td>Total</td>
-        </tr>
-
-        <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td>Total</td>
-            <td>Total</td>
-            <td>Total</td>
-            <td>Total</td>
-            <td>Total</td>
-        </tr>
-
+        {{#each dados.dadosDias}}
+            <tr>
+                <td>{{this.DATA_MOVIMENTO}}</td>
+                <td>{{this.ENTRADA}}</td>
+                <td>{{this.I_INI}}</td>
+                <td>{{this.I_FIM}}</td>
+                <td>{{this.SAIDA}}</td>
+                <td>{{this.LINHA}}</td>
+                <td>{{this.NORMAL}}</td>
+                <td>{{this.EXTRANOTDM}}</td>
+                <td>{{this.EXCES}}</td>
+                <td>{{this.OUTRA}}</td>
+                <td>{{this.TOTALF}}</td>
+            </tr>
+        {{/each}}
     </table>
 
     <hr size="1" style="border:1px dashed #000;">
@@ -437,20 +381,17 @@ export const fichaPonto = `
         <tr style="border: none; display: table-row;">
             <td style="width: 25%;"><b>*** BANCO DE HORAS ***</b></td>
             <td style="width: 25%;">
-                COMPETÊNCIA: 11/2022
+                COMPETÊNCIA: {{dados.cabecalho.data}}
             </td>
             <td style="width: 25%;">
-                SALDO ANTERIOR: 0,00
-            </td>
-            <td style="width: 25%;">
-                SALDO ATUAL: 0,00
+                SALDO ANTERIOR: {{dados.rodape.saldoAnterior}}
             </td>
         </tr>
         <tr style="border: none;display: table-row">
             <td style="width: 25%;"><span><b></b></span></td>
-            <td style="width: 25%;">CREDITO: 1,44</td>
-            <td style="width: 25%;">DEBITO: 0,00</td>
-            <td style="width: 25%;">VALOR PAGO: 0,00</td>
+            <td style="width: 25%;">CREDITO: {{dados.rodape.credito}}</td>
+            <td style="width: 25%;">DEBITO: {{dados.rodape.debito}}</td>
+            <td style="width: 25%;">VALOR PAGO: {{dados.rodape.valorPago}}</td>
         </tr>
     </table>
     <hr size="1" style="border:1px dashed #000;">

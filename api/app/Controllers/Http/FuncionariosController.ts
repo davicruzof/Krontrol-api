@@ -11,7 +11,7 @@ import Database from '@ioc:Adonis/Lucid/Database';
 import User from 'App/Models/User';
 import ConfirmaFichaPonto from 'App/Models/ConfirmaFichaPonto';
 import crypto from 'crypto';
-import { templateDotCard } from 'App/templates/pdf/template';
+import { fichaPonto, templateDotCard } from 'App/templates/pdf/template';
 export default class FuncionariosController {
 
     public async create({request,response}:HttpContextContract){
@@ -242,7 +242,7 @@ export default class FuncionariosController {
                 
                 let empresa = await Empresa.findBy('id_empresa',auth.user?.id_empresa);
                 
-                let pdfTemp = await this.generatePdf(this.tratarDados(query,empresa),templateDotCard);
+                let pdfTemp = await this.generatePdf(this.tratarDadosEvents(query,empresa),templateDotCard);
 
                 let file =  await uploadPdfEmpresa(pdfTemp.filename, auth.user?.id_empresa);
 
@@ -419,36 +419,41 @@ export default class FuncionariosController {
     }
 
     private async generatePdf(dados,template){
-        
-        var options = {
-            format: "A3",
-            orientation: "portrait",
-            border: "10mm",
-            type : "pdf"
-        };
-        const filename = Math.random() + '_doc' + '.pdf';
-        var document = {
-            html: template,
-            data: {
-              dados: dados,
-            },
-            path: "./pdfsTemp/" + filename,
-            
-          };
 
-        let file = pdf
-                .create(document, options)
-                .then((res) => {
-                    return res;
-                })
-                .catch((error) => {
-                    return error;
-                });
-        return await file;
+        try {
+            var options = {
+                format: "A3",
+                orientation: "portrait",
+                border: "10mm",
+                type : "pdf"
+            };
+            const filename = Math.random() + '_doc' + '.pdf';
+            var document = {
+                html: template,
+                data: {
+                  dados: dados,
+                },
+                path: "./pdfsTemp/" + filename,
+                
+              };
+    
+            let file = pdf
+                    .create(document, options)
+                    .then((res) => {
+                        return res;
+                    })
+                    .catch((error) => {
+                        return error;
+                    });
+            return await file;
+
+        } catch (error) {
+            console.log(error);
+        }
 
     }
 
-    private tratarDados(dados,dados_empresa){
+    private tratarDadosEvents(dados,dados_empresa){
 
         let dadosTemp = {
                 cabecalho : {
@@ -521,20 +526,77 @@ export default class FuncionariosController {
                 let query = await Database
                                     .connection('oracle')
                                     .rawQuery(`
-                                    SELECT DISTINCT *
+                                    SELECT DISTINCT 
+                                    ID_FUNCIONARIO_ERP,
+                                    CHAPA,
+                                    to_char(DATA_MOVIMENTO,'DD/MM/YYYY') AS DATA_MOVIMENTO,
+                                    OCORRENCIA,
+                                    ENTRADA,
+                                    I_INI,
+                                    I_FIM,
+                                    SAIDA,
+                                    LINHA,
+                                    TABELA,
+                                    CODOCORR,
+                                    NORMAL,
+                                    EXCES,
+                                    OUTRA,
+                                    A_NOT,
+                                    EXTRANOTDM,
+                                    CREDITO,
+                                    DEBITO,
+                                    SALDOANTERIOR,
+                                    VALORPAGO,
+                                    to_char(TOTAL, 'FM999G999G999D90') AS TOTALF
                                     FROM  GUDMA.VW_ML_FRQ_ESPELHODEHORAS esp
                                 WHERE 
-                                esp.chapa = ${funcionario?.id_funcionario_erp} and to_char(competficha, 'YYYY-MM') = '${dados.data}'
-                                order by hol.tipoeven desc,hol.desceven 
+                                esp.id_funcionario_erp = ${auth.user?.id_funcionario}  and to_char(esp.data_movimento, 'YYYY-MM') = '${dados.data}'
+                                order by DATA_MOVIMENTO
                                 `);
-                response.json(query);
+//${funcionario?.id_funcionario_erp}
+                let empresa = await Empresa.findBy('id_empresa',auth.user?.id_empresa);
+                let pdfTemp = await this.generatePdf(this.tratarDadosDotCard(query,empresa,funcionario,dados.data),fichaPonto);
+
+                let file =  await uploadPdfEmpresa(pdfTemp.filename, auth.user?.id_empresa);
+
+                if(file){
+                    fs.unlink(pdfTemp.filename,()=>{});
+                    response.json({pdf : file.Location});
+                }
 
             } else{
                 response.badRequest({error: "data is required"});
             }
         } catch (error) {
-            response.badRequest(error.messages);
+            response.badRequest(error);
         }
+    }
+    private tratarDadosDotCard(dados,dados_empresa,funcionario,data){
+
+        let dadosTemp = {
+                cabecalho : {
+                    logo: dados_empresa.logo,
+                    nomeEmpresa : dados_empresa.nome,
+                    cnpj : dados_empresa.cnpj,
+                    nome :funcionario.nome,
+                    funcao : funcionario.funcao,
+                    competencia : data,
+                    endereco : dados_empresa.endereco,
+                    data : data
+                },
+                rodape : {
+                    saldoAnterior : dados[0].SALDOANTERIOR,
+                    credito : dados[0].CREDITO,
+                    debito : dados[0].DEBITO,
+                    valorPago : dados[0].VALORPAGO
+                },
+                dadosDias : new Array()
+            }
+        dados.forEach(element => {
+                dadosTemp.dadosDias.push(element);
+        });
+        //console.log(dadosTemp);
+        return dadosTemp;
     }
 
 }
