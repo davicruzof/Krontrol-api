@@ -80,12 +80,17 @@ export default class FuncionariosController {
             const funcionario = await Database.connection('pg').query()
                                     .from("ml_fol_funcionario")
                                     .select("*")
-                                    .innerJoin("ml_fol_funcionario_situacao","ml_fol_funcionario_situacao.id_situacao","=","ml_fol_funcionario.id_situacao")
-                                    .innerJoin("ml_fol_funcionario_funcao","ml_fol_funcionario_funcao.id_funcao_erp","=","ml_fol_funcionario.id_funcao_erp")
+                                    .leftJoin("ml_fol_funcionario_situacao","ml_fol_funcionario_situacao.id_situacao","=","ml_fol_funcionario.id_situacao")
+                                    .leftJoin("ml_fol_funcionario_funcao","ml_fol_funcionario_funcao.id_funcao_erp","=","ml_fol_funcionario.id_funcao_erp")
                                     .where("ml_fol_funcionario.id_funcionario",id_funcionario);
 
-            if(funcionario){
-
+            if(funcionario[0]){
+                let funcionario_erp = await Database.connection('oracle')
+                        .rawQuery(`
+                            SELECT CODFUNC FROM globus.vw_ml_flp_funcionario 
+                            WHERE id_funcionario_erp = '${funcionario[0].id_funcionario_erp}'
+                        `);
+                funcionario[0].codfunc = funcionario_erp[0].CODFUNC;
                 response.json(funcionario);
 
             }
@@ -271,28 +276,33 @@ export default class FuncionariosController {
 
                 let query = await Database
                                     .connection('oracle')
-                                    .rawQuery(`
-                                    SELECT
-                                    DISTINCT
-                                    pon.ID_FUNCIONARIO_ERP,
-                                    pon.LINHA,
-                                    pon.PREFIXO,
-                                    pon.DESCOCORR,
-                                    TO_CHAR (pon.DATA_OPERACAO + 3/24, 'DD-MM-YYYY HH24:MI:SS') AS DATA_OPERACAO,
-                                    TO_CHAR (pon.JORNADA_INICIO + 3/24, 'DD-MM-YYYY HH24:MI:SS') AS JORNADA_INICIO,
-                                    TO_CHAR (pon.REFEICAO_INICIO + 3/24, 'DD-MM-YYYY HH24:MI:SS') AS REFEICAO_INICIO,
-                                    TO_CHAR (pon.REFEICAO_FIM + 3/24, 'DD-MM-YYYY HH24:MI:SS') AS REFEICAO_FIM,
-                                    TO_CHAR (pon.JORNADA_FIM + 3/24, 'DD-MM-YYYY HH24:MI:SS') AS JORNADA_FIM,
-                                    TO_CHAR (pon.COMPETENCIA , 'DD-MM-YYYY HH24:MI:SS') AS COMPETENCIA,
-                                    TO_CHAR (pon.DATA_DIGITACAO  , 'DD-MM-YYYY HH24:MI:SS') AS DATA_DIGITACAO,
-                                    pon.DIGITADO_POR
-                                    FROM 
-                                    GLOBUS.VW_ML_FRQ_FICHAPONTO pon
-                                    WHERE pon.id_funcionario_erp = ${funcionario?.id_funcionario_erp} and to_char(pon.data_operacao, 'YYYY-MM') = '${dados.data}' 
-                                    ORDER BY DATA_OPERACAO
+                                    .rawQuery(`                                    
+                                  select distinct
+                                    func.id_funcionario_erp,
+                                    func.chapafunc CHAPA,
+                                    func.codfunc CODFUNC,
+                                    lin.codigolinhamin LINHA,
+                                    car.prefixoveic prefixo,
+                                    oco.descocorr,
+                                    replace(to_char(pon.entradigit,'DD/MM/YYYY'),'30/12/1899','FOLGA') DATA_OPERACAO,
+                                    replace(to_char(pon.entradigit,'DD/MM/YYYY HH24:MI'),'30/12/1899 00:00','FOLGA') JORNADA_INICIO,
+                                    replace(to_char(pon.intidigit,'DD/MM/YYYY HH24:MI'),'30/12/1899 00:00','FOLGA') REFEICAO_INICIO,
+                                    replace(to_char(pon.intfdigit,'DD/MM/YYYY HH24:MI'),'30/12/1899 00:00','FOLGA') REFEICAO_FIM,
+                                    replace(to_char(pon.saidadigit,'DD/MM/YYYY HH24:MI'),'30/12/1899 00:00','FOLGA') JORNADA_FIM,
+                                    to_char(pon.competdigit,'DD/MM/YYYY') COMPETENCIA,
+                                    pon.usudigit DIGITADO_POR,
+                                    to_char(pon.dtdigit,'DD/MM/YYYY') DATA_DIGITACAO
+                                from
+                                    globus.frq_digitacaomovimento pon
+                                    inner join globus.vw_ml_flp_funcionario func on pon.codintfunc = func.id_funcionario_erp
+                                    inner join globus.frq_ocorrencia oco on pon.codocorr = oco.codocorr
+                                    left join globus.frt_cadveiculos car on pon.codigoveic = car.codigoveic
+                                    left join globus.bgm_cadlinhas lin on pon.codintlinha = lin.codintlinha
+                                    WHERE 
+                                        pon.dtdigit BETWEEN to_date('01/${dados.data}','DD/MM/YYYY') and to_date('31/${dados.data}','DD/MM/YYYY')
+                                        and func.codfunc= ${funcionario?.id_funcionario_erp}
+                                    order by DATA_DIGITACAO ASC
                                     `);
-
-
 
                 await Promise.all(
                     query.map( async element => {
@@ -550,13 +560,13 @@ export default class FuncionariosController {
                                     to_char(TOTAL, 'FM999G999G999D90') AS TOTALF
                                     FROM  GUDMA.VW_ML_FRQ_ESPELHODEHORAS esp
                                 WHERE 
-                                esp.id_funcionario_erp = ${auth.user?.id_funcionario}  and to_char(esp.data_movimento, 'YYYY-MM') = '${dados.data}'
+                                esp.id_funcionario_erp = 23210  and to_char(esp.data_movimento, 'YYYY-MM') = '${dados.data}'
                                 order by DATA_MOVIMENTO
                                 `);
-//${funcionario?.id_funcionario_erp}
+                
                 let empresa = await Empresa.findBy('id_empresa',auth.user?.id_empresa);
                 let pdfTemp = await this.generatePdf(this.tratarDadosDotCard(query,empresa,funcionario,dados.data),fichaPonto);
-
+                return pdfTemp;
                 let file =  await uploadPdfEmpresa(pdfTemp.filename, auth.user?.id_empresa);
 
                 if(file){
@@ -592,10 +602,17 @@ export default class FuncionariosController {
                 },
                 dadosDias : new Array()
             }
-        dados.forEach(element => {
-                dadosTemp.dadosDias.push(element);
+        dados.forEach(element => {  
+
+            if (element.ENTRADA == "FOLGA" || element.ENTRADA == "ATESTADO"){
+                console.log(element.ENTRADA);
+            } else{
+                element.ENTRADA = element.ENTRADA.split(' ')[1];
+                console.log(element.ENTRADA);
+            }
+            dadosTemp.dadosDias.push(element);
         });
-        //console.log(dadosTemp);
+        console.log(dadosTemp);
         return dadosTemp;
     }
 
