@@ -1,4 +1,5 @@
-import  Empresa  from 'App/Models/Empresa';
+import Empresa from 'App/Models/Empresa';
+import ConfirmarVideo from 'App/Models/ConfirmarVideo';
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { schema } from '@ioc:Adonis/Core/Validator';
 import Funcionario from '../../Models/Funcionario';
@@ -300,7 +301,7 @@ export default class FuncionariosController {
                                     left join globus.bgm_cadlinhas lin on pon.codintlinha = lin.codintlinha
                                     WHERE 
                                         pon.dtdigit BETWEEN to_date('01/${dados.data}','DD/MM/YYYY') and to_date('31/${dados.data}','DD/MM/YYYY')
-                                        and func.codfunc= ${funcionario?.id_funcionario_erp}
+                                        and func.id_funcionario_erp= '${funcionario?.id_funcionario_erp}'
                                     order by DATA_DIGITACAO ASC
                                     `);
 
@@ -581,6 +582,7 @@ export default class FuncionariosController {
             response.badRequest(error);
         }
     }
+
     private tratarDadosDotCard(dados,dados_empresa,funcionario,data){
 
         let dadosTemp = {
@@ -616,4 +618,39 @@ export default class FuncionariosController {
         return dadosTemp;
     }
 
+    public async confirmPdf({request,response,auth}:HttpContextContract) {
+
+        try {
+            const foto = request.file('foto');
+            const data = request.body().data_pdf;
+
+            if(foto && data){
+                let hashImg =  crypto.randomBytes(10).toString('hex');
+                let filename = `${hashImg}-${foto.clientName}`;
+                let empresa = await Empresa.findBy('id_empresa',auth.user?.id_empresa);
+                let s3Object = 
+                await upload({
+                     folder : 'confirmaPdf',
+                     filename : filename,
+                     bucket: empresa?.bucket,
+                     path: filename,
+                     file: foto,
+                     type: foto.extname
+                 });
+
+                await ConfirmarVideo.create({
+                    id_funcionario : auth.user?.id_funcionario,
+                    foto : s3Object.Location,
+                    data_pdf : data
+                });
+
+                response.json({sucess : "Confirmado com sucesso!"});
+
+            } else {
+                response.badRequest({error: "Foto e data são requeridos"});
+            }
+        } catch (error) {
+            response.badRequest(error);
+        }
+    }
 }

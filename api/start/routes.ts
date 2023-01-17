@@ -64,6 +64,7 @@ Route.group(()=>{
     Route.post('/confirmDotCard','FuncionariosController.confirmDotCard').middleware('auth');
     Route.post('/inactivate','FuncionariosController.inactivate').middleware('auth');
     Route.post('/deleteAccount','FuncionariosController.deleteAccount').middleware('auth');
+    Route.post('/confirmPdf','FuncionariosController.confirmPdf').middleware('auth');
   }).prefix('/employee');
 
   //Rotas Veiculos
@@ -100,8 +101,8 @@ Route.group(()=>{
   // Rotas telemetria
   Route.group(()=>{
 
-    //Route.post('/get_list','TelemetriasController.list');
-    //Route.post('/list_events','TelemetriasController.list_events');
+    Route.post('/get_list','TelemetriasController.list');
+    Route.post('/list_events','TelemetriasController.list_events');
 
   }).prefix('/telemetria').middleware('auth');
 
