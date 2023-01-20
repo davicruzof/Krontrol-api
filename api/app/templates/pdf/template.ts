@@ -277,7 +277,7 @@ export const templateDotCard = `
 `
 
 export const fichaPonto = `
-!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -345,29 +345,29 @@ export const fichaPonto = `
     <hr size="1" style="border:1px dashed #000;">
     <table style="margin-bottom: 20px;">
         <tr>
-            <td>Data</td>
-            <td>Entrada</td>
-            <td>I. Ini.</td>
-            <td>I. Fim</td>
-            <td>Saída</td>
-            <td>Linha</td>
-            <td>Normal</td>
-            <td>Extra</td>
-            <td>Excess</td>
-            <td>Outra</td>
-            <td>Total</td>
+            <td style= "width:20%;" > Data </td>
+            <td style= "width:10%;" > Entrada </td>
+            <td align="center" style= "width:10%;"> I. Ini.</td>
+            <td align="center" style= "width:10%;"> I. Fim </td>
+            <td align="center" style= "width:10%;"> Saída </td>
+            <td align="center" style= "width:10%;"> Linha </td>
+            <td style= "width:6%;"> Normal </td>
+            <td> Extra </td>
+            <td> Excess </td>
+            <td> Outra </td>
+            <td> Total </td>
         </tr>
 
         {{#each dados.dadosDias}}
             <tr>
-                <td>{{this.DATA_MOVIMENTO}}</td>
-                <td>{{this.ENTRADA}}</td>
-                <td>{{this.I_INI}}</td>
-                <td>{{this.I_FIM}}</td>
-                <td>{{this.SAIDA}}</td>
-                <td>{{this.LINHA}}</td>
-                <td>{{this.NORMAL}}</td>
-                <td>{{this.EXTRANOTDM}}</td>
+                <td style= "width:20%; align:center;">{{this.DATA_MOVIMENTO}}</td>
+                <td style= "width:10%;">{{this.ENTRADA}}</td>
+                <td style= "width:10%;">{{this.I_INI}}</td>
+                <td style= "width:10%;">{{this.I_FIM}}</td>
+                <td style= "width:10%;">{{this.SAIDA}}</td>
+                <td style= "width:10%;">{{this.LINHA}}</td>
+                <td style= "width:7%;">{{this.NORMAL}}</td>
+                <td>{{this.EXTRA}}</td>
                 <td>{{this.EXCES}}</td>
                 <td>{{this.OUTRA}}</td>
                 <td>{{this.TOTALF}}</td>

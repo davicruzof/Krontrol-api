@@ -537,37 +537,30 @@ export default class FuncionariosController {
                 let query = await Database
                                     .connection('oracle')
                                     .rawQuery(`
-                                    SELECT DISTINCT 
-                                    ID_FUNCIONARIO_ERP,
-                                    CHAPA,
-                                    to_char(DATA_MOVIMENTO,'DD/MM/YYYY') AS DATA_MOVIMENTO,
-                                    OCORRENCIA,
-                                    ENTRADA,
-                                    I_INI,
-                                    I_FIM,
-                                    SAIDA,
-                                    LINHA,
-                                    TABELA,
-                                    CODOCORR,
-                                    NORMAL,
-                                    EXCES,
-                                    OUTRA,
-                                    A_NOT,
-                                    EXTRANOTDM,
-                                    CREDITO,
-                                    DEBITO,
-                                    SALDOANTERIOR,
-                                    VALORPAGO,
-                                    to_char(TOTAL, 'FM999G999G999D90') AS TOTALF
-                                    FROM  GUDMA.VW_ML_FRQ_ESPELHODEHORAS esp
-                                WHERE 
-                                esp.id_funcionario_erp = 23210  and to_char(esp.data_movimento, 'YYYY-MM') = '${dados.data}'
-                                order by DATA_MOVIMENTO
+                                    select distinct
+                                    fun.id_funcionario_erp, fun.chapafunc chapa,
+                                    to_char(df.dtdigit,'YYYY-MM-DD') as data_movimento, oco.descocorr ocorrencia,
+                                    REPLACE(replace(to_char(df.entradigit,'HH24:MI:SS'),'00:00:00','FOLGA'),'10/11/2022 00:00:00','ATESTADO')  as entrada, replace(to_char(df.intidigit,'HH24:MI:SS'),'00:00:00','FOLGA')  as I_INI, 
+                                    replace(to_char(df.intfdigit,'HH24:MI:SS'),'00:00:00','FOLGA')  as I_FIM, replace(to_char(df.saidadigit,'HH24:MI:SS'),'00:00:00','FOLGA')  as SAIDA,
+                                    lin.codigolinha linha, df.servicodigit as tabela,df.codocorr,
+                                    df.normaldm as normal,CAST(df.extradm AS NUMBER(6,2)) as extra,
+                                     df.excessodm exces, df.outradm outra, df.adnotdm a_not, df.extranotdm, (df.normaldm + df.extradm + df.excessodm + df.outradm + df.adnotdm + df.extranotdm) as totalf, 
+                                    bh.competencia bh_competencia, bh.credito,bh.debito,bh.saldoanterior,bh.valorpago
+                                    from globus.frq_digitacaomovimento df 
+                                    inner join globus.vw_ml_flp_funcionario fun on df.codintfunc = fun.id_funcionario_erp 
+                                    left join globus.vw_bancohoras bh on df.codintfunc = bh.codintfunc
+                                    left join globus.frq_ocorrencia oco on df.codocorr = oco.codocorr
+                                    left join globus.bgm_cadlinhas lin on df.codintlinha = lin.codintlinha
+                                    where     
+                                       to_char(df.dtdigit,'MM/YYYY') = to_char(bh.competencia,'MM/YYYY')
+                                       and df.tipodigit='F' AND
+                                                                       id_funcionario_erp = '${funcionario?.id_funcionario_erp}'  and to_char(df.dtdigit, 'YYYY-MM') = '${dados.data}'
+                                                                   order by  DATA_MOVIMENTO
                                 `);
                 
                 let empresa = await Empresa.findBy('id_empresa',auth.user?.id_empresa);
                 let pdfTemp = await this.generatePdf(this.tratarDadosDotCard(query,empresa,funcionario,dados.data),fichaPonto);
-                return pdfTemp;
+
                 let file =  await uploadPdfEmpresa(pdfTemp.filename, auth.user?.id_empresa);
 
                 if(file){
@@ -604,17 +597,11 @@ export default class FuncionariosController {
                 },
                 dadosDias : new Array()
             }
-        dados.forEach(element => {  
-
-            if (element.ENTRADA == "FOLGA" || element.ENTRADA == "ATESTADO"){
-                console.log(element.ENTRADA);
-            } else{
-                element.ENTRADA = element.ENTRADA.split(' ')[1];
-                console.log(element.ENTRADA);
-            }
+        dados.forEach(element => {
+            element.TOTALF = element.TOTALF.toFixed(2);  
+            element.EXCES = element.EXCES.toFixed(2);  
             dadosTemp.dadosDias.push(element);
         });
-        console.log(dadosTemp);
         return dadosTemp;
     }
 
