@@ -13,6 +13,7 @@ import User from 'App/Models/User';
 import ConfirmaFichaPonto from 'App/Models/ConfirmaFichaPonto';
 import crypto from 'crypto';
 import { fichaPonto, templateDotCard } from 'App/templates/pdf/template';
+import Funcao from 'App/Models/Funcao';
 export default class FuncionariosController {
 
     public async create({request,response}:HttpContextContract){
@@ -533,6 +534,8 @@ export default class FuncionariosController {
             if(dados.data){
 
                 let funcionario = await Funcionario.findBy('id_funcionario',auth.user?.id_funcionario);
+                let queryFuncao = await Funcao.findBy('id_funcao_erp',funcionario?.id_funcao_erp);
+                //return await ConfirmarVideo.query().select('*').where('id_funcionario','=',`${funcionario?.id_funcionario}`).andWhere('to_char(data_pdf,"YYYY-MM")','=',`${dados.data}`);
 
                 let query = await Database
                                     .connection('oracle')
@@ -559,13 +562,17 @@ export default class FuncionariosController {
                                 `);
                 
                 let empresa = await Empresa.findBy('id_empresa',auth.user?.id_empresa);
-                let pdfTemp = await this.generatePdf(this.tratarDadosDotCard(query,empresa,funcionario,dados.data),fichaPonto);
-
+                let pdfTemp = await this.generatePdf(this.tratarDadosDotCard(query,empresa,funcionario,dados.data,queryFuncao),fichaPonto);
+                //let confirmacao = await ConfirmaFichaPonto.query().select('1').where('id_funcionario','=',`${funcionario?.id_funcionario}`).andWhere('data_pdf','=',`${dados.data}`);
+                
                 let file =  await uploadPdfEmpresa(pdfTemp.filename, auth.user?.id_empresa);
 
                 if(file){
                     fs.unlink(pdfTemp.filename,()=>{});
-                    response.json({pdf : file.Location});
+                    response.json({
+                        pdf : file.Location,
+                        confirmado : null
+                    });
                 }
 
             } else{
@@ -576,7 +583,7 @@ export default class FuncionariosController {
         }
     }
 
-    private tratarDadosDotCard(dados,dados_empresa,funcionario,data){
+    private tratarDadosDotCard(dados,dados_empresa,funcionario,data,queryFuncao){
 
         let dadosTemp = {
                 cabecalho : {
@@ -584,10 +591,10 @@ export default class FuncionariosController {
                     nomeEmpresa : dados_empresa.nome,
                     cnpj : dados_empresa.cnpj,
                     nome :funcionario.nome,
-                    funcao : funcionario.funcao,
+                    funcao : queryFuncao.funcao,
                     competencia : data,
                     endereco : dados_empresa.endereco,
-                    data : data
+                    periodo : data.split("").reverse().join("")
                 },
                 rodape : {
                     saldoAnterior : dados[0].SALDOANTERIOR,
@@ -600,6 +607,8 @@ export default class FuncionariosController {
         dados.forEach(element => {
             element.TOTALF = element.TOTALF.toFixed(2);  
             element.EXCES = element.EXCES.toFixed(2);  
+            element.EXTRA = element.EXTRA.toFixed(2);
+            element.OUTRA = element.OUTRA.toFixed(2);  
             dadosTemp.dadosDias.push(element);
         });
         return dadosTemp;
