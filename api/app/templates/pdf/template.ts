@@ -327,10 +327,10 @@ export const fichaPonto = `
     </span>
     <hr size="1" style="border:1px dashed #000;">
     <div>
-        <span>EMPRESA: </span><span>{{dados.nomeEmpresa}}</span>
+        <span>EMPRESA: </span><span>{{dados.cabecalho.nomeEmpresa}}</span>
     </div>
     <div>
-        <span>ENDEREÇO: </span><span>{{dados.endereco}}</span>
+        <span>ENDEREÇO: </span><span>{{dados.cabecalho.endereco}}</span>
     </div>
     <div>
         <span>CNPJ: </span><span>{{dados.cabecalho.cnpj}}</span>

@@ -563,7 +563,7 @@ export default class FuncionariosController {
                 
                 let empresa = await Empresa.findBy('id_empresa',auth.user?.id_empresa);
                 let pdfTemp = await this.generatePdf(this.tratarDadosDotCard(query,empresa,funcionario,dados.data,queryFuncao),fichaPonto);
-                //let confirmacao = await ConfirmaFichaPonto.query().select('1').where('id_funcionario','=',`${funcionario?.id_funcionario}`).andWhere('data_pdf','=',`${dados.data}`);
+                let confirmacao = await ConfirmarVideo.query().select('*').where('id_funcionario','=',`${funcionario?.id_funcionario}`).andWhere('data_pdf','=',`${dados.data}`);
                 
                 let file =  await uploadPdfEmpresa(pdfTemp.filename, auth.user?.id_empresa);
 
@@ -571,7 +571,7 @@ export default class FuncionariosController {
                     fs.unlink(pdfTemp.filename,()=>{});
                     response.json({
                         pdf : file.Location,
-                        confirmado : null
+                        confirmado : confirmacao[0] ? true : false
                     });
                 }
 
@@ -588,12 +588,12 @@ export default class FuncionariosController {
         let dadosTemp = {
                 cabecalho : {
                     logo: dados_empresa.logo,
-                    nomeEmpresa : dados_empresa.nome,
+                    nomeEmpresa : dados_empresa.nomeempresarial,
                     cnpj : dados_empresa.cnpj,
                     nome :funcionario.nome,
                     funcao : queryFuncao.funcao,
                     competencia : data,
-                    endereco : dados_empresa.endereco,
+                    endereco : dados_empresa.logradouro,
                     periodo : data.split("").reverse().join("")
                 },
                 rodape : {
