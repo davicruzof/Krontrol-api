@@ -1,5 +1,5 @@
 import Empresa from 'App/Models/Empresa';
-import ConfirmarVideo from 'App/Models/ConfirmarVideo';
+import ConfirmarPdf from 'App/Models/ConfirmarPdf';
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { schema } from '@ioc:Adonis/Core/Validator';
 import Funcionario from '../../Models/Funcionario';
@@ -535,7 +535,7 @@ export default class FuncionariosController {
 
                 let funcionario = await Funcionario.findBy('id_funcionario',auth.user?.id_funcionario);
                 let queryFuncao = await Funcao.findBy('id_funcao_erp',funcionario?.id_funcao_erp);
-                //return await ConfirmarVideo.query().select('*').where('id_funcionario','=',`${funcionario?.id_funcionario}`).andWhere('to_char(data_pdf,"YYYY-MM")','=',`${dados.data}`);
+                //return await ConfirmarVideo.query().select('*').where('id_funcionario','=',`${funcionario?.id_funcionario}`).andWhere('data_pdf','=',`${dados.data.split("").reverse().join("").replace('-','/')}`);
 
                 let query = await Database
                                     .connection('oracle')
@@ -563,7 +563,7 @@ export default class FuncionariosController {
                 
                 let empresa = await Empresa.findBy('id_empresa',auth.user?.id_empresa);
                 let pdfTemp = await this.generatePdf(this.tratarDadosDotCard(query,empresa,funcionario,dados.data,queryFuncao),fichaPonto);
-                let confirmacao = await ConfirmarVideo.query().select('*').where('id_funcionario','=',`${funcionario?.id_funcionario}`).andWhere('data_pdf','=',`${dados.data}`);
+                let confirmacao = await ConfirmarPdf.query().select('*').where('id_funcionario','=',`${funcionario?.id_funcionario}`).andWhere('data_pdf','=',`${dados.data}`);
                 
                 let file =  await uploadPdfEmpresa(pdfTemp.filename, auth.user?.id_empresa);
 
@@ -634,7 +634,7 @@ export default class FuncionariosController {
                      type: foto.extname
                  });
 
-                await ConfirmarVideo.create({
+                await ConfirmarPdf.create({
                     id_funcionario : auth.user?.id_funcionario,
                     foto : s3Object.Location,
                     data_pdf : data

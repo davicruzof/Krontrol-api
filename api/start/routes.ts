@@ -109,6 +109,8 @@ Route.group(()=>{
   // Rotas PDF
   Route.group(()=>{
     Route.post('/upload','PdfsController.upload');
+    Route.post('getConfirmedsById','PdfsController.getConfirmedsById');
+    Route.get('getAllConfirmeds','PdfsController.getAllConfirmeds');
   }).prefix('/pdfs').middleware('auth');
 
   //Rotas da escala
