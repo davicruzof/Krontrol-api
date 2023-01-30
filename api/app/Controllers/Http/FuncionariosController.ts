@@ -564,7 +564,7 @@ export default class FuncionariosController {
                 let empresa = await Empresa.findBy('id_empresa',auth.user?.id_empresa);
                 let pdfTemp = await this.generatePdf(this.tratarDadosDotCard(query,empresa,funcionario,dados.data,queryFuncao),fichaPonto);
                 let confirmacao = await ConfirmarPdf.query().select('*').where('id_funcionario','=',`${funcionario?.id_funcionario}`).andWhere('data_pdf','=',`${dados.data}`);
-                
+
                 let file =  await uploadPdfEmpresa(pdfTemp.filename, auth.user?.id_empresa);
 
                 if(file){
@@ -597,10 +597,10 @@ export default class FuncionariosController {
                     periodo : data.split("").reverse().join("")
                 },
                 rodape : {
-                    saldoAnterior : dados[0].SALDOANTERIOR,
-                    credito : dados[0].CREDITO,
-                    debito : dados[0].DEBITO,
-                    valorPago : dados[0].VALORPAGO
+                    saldoAnterior : dados[0].SALDOANTERIOR.toFixed(2),
+                    credito : dados[0].CREDITO.toFixed(2),
+                    debito : dados[0].DEBITO.toFixed(2),
+                    valorPago : dados[0].VALORPAGO.toFixed(2)
                 },
                 dadosDias : new Array()
             }

@@ -172,5 +172,9 @@ Route.group(()=>{
   }).prefix('/security').middleware('auth');
 
 
+  Route.group(()=>{
+    Route.post('/upload','VideosController.upload');
+    
+  }).prefix('/video');
 
 }).prefix('/api');

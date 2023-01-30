@@ -14,6 +14,9 @@ export default class Video extends BaseModel {
   public id_empresa: number
 
   @column()
+  public link : string
+
+  @column()
   public descricao: string
 
   @column.dateTime({ autoCreate: true })
