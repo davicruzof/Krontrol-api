@@ -542,7 +542,7 @@ export default class FuncionariosController {
                                     .rawQuery(`
                                     select distinct
                                     fun.id_funcionario_erp, fun.chapafunc chapa,
-                                    to_char(df.dtdigit,'YYYY-MM-DD') as data_movimento, oco.descocorr ocorrencia,
+                                    to_char(df.dtdigit,'DD-MM-YYYY') as data_movimento, oco.descocorr ocorrencia,
                                     REPLACE(replace(to_char(df.entradigit,'HH24:MI:SS'),'00:00:00','FOLGA'),'10/11/2022 00:00:00','ATESTADO')  as entrada, replace(to_char(df.intidigit,'HH24:MI:SS'),'00:00:00','FOLGA')  as I_INI, 
                                     replace(to_char(df.intfdigit,'HH24:MI:SS'),'00:00:00','FOLGA')  as I_FIM, replace(to_char(df.saidadigit,'HH24:MI:SS'),'00:00:00','FOLGA')  as SAIDA,
                                     lin.codigolinha linha, df.servicodigit as tabela,df.codocorr,
