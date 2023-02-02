@@ -152,6 +152,7 @@ Route.group(()=>{
   Route.group(()=>{
 
     Route.group(()=>{
+
       Route.post('/create','SecuritiesController.createGroup');
       Route.get('/getAll','SecuritiesController.getAllGroups');
       Route.post('/getById','SecuritiesController.getGroupById');
@@ -174,6 +175,7 @@ Route.group(()=>{
 
   Route.group(()=>{
     Route.post('/upload','VideosController.upload');
+    Route.post('/sendToEmployee','VideosController.sendToEmployee');
     
   }).prefix('/video');
 

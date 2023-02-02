@@ -4,6 +4,7 @@ import { schema } from '@ioc:Adonis/Core/Validator';
 import Video from 'App/Models/Video';
 import crypto from 'crypto';
 import Empresa from 'App/Models/Empresa';
+import Database from '@ioc:Adonis/Lucid/Database';
 
 export default class VideosController {
 
@@ -46,6 +47,34 @@ export default class VideosController {
         }
 
 
+    }
+
+    public async sendToEmployee({request, response}){
+
+        try {
+            await request.validate({schema: schema.create({
+                id_video : schema.number(),
+                id_funcionario : schema.number(),
+                dt_expiracao : schema.date()
+            })});
+
+            let dados = request.body();
+
+            let id = await Database.connection('pg')
+                    .table('ml_fol_md_video_funcionario')
+                    .returning('id')
+                    .insert({
+                        id_video: dados.id_video,
+                        id_funcionario: dados.id_funcionario,
+                        dt_expiracao: dados.dt_expiracao,
+                    })
+            if(id){
+                response.json({sucess: "Criado com sucesso!"});
+            }
+
+        } catch (error) {
+            response.badRequest(error);
+        }
     }
 
 }
