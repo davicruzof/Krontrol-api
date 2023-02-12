@@ -65,6 +65,7 @@ Route.group(()=>{
     Route.post('/inactivate','FuncionariosController.inactivate').middleware('auth');
     Route.post('/deleteAccount','FuncionariosController.deleteAccount').middleware('auth');
     Route.post('/confirmPdf','FuncionariosController.confirmPdf').middleware('auth');
+    Route.get('/getVideos','FuncionariosController.getVideos').middleware('auth');
   }).prefix('/employee');
 
   //Rotas Veiculos

@@ -473,7 +473,7 @@ export default class FuncionariosController {
                     telefone: dados_empresa.telefone,
                     nomeEmpresa : dados[0].RSOCIALEMPRESA,
                     inscricaoEmpresa : dados[0].INSCRICAOEMPRESA,
-                    matricula : dados[0].CODINTFUNC,
+                    matricula : dados[0].chapa,
                     nome : dados[0].NOMEFUNC,
                     funcao : dados[0].DESCFUNCAO,
                     competencia : dados[0].COMPETFICHA,
@@ -645,6 +645,22 @@ export default class FuncionariosController {
             } else {
                 response.badRequest({error: "Foto e data são requeridos"});
             }
+        } catch (error) {
+            response.badRequest(error);
+        }
+    }
+
+    public async getVideos({response,auth}:HttpContextContract){
+
+        try {
+            let dados = await Database.connection('pg').query()
+            .select('*')
+            .from('ml_fol_md_video_funcionario')
+            .where('id_funcionario','=',auth.user?.id_funcionario)
+            .where('dt_expiracao','<=','CURRENT_DATE');
+
+            response.json(dados);
+
         } catch (error) {
             response.badRequest(error);
         }
