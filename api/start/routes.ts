@@ -173,10 +173,12 @@ Route.group(()=>{
 
   }).prefix('/security').middleware('auth');
 
-
+  //Rotas Video
   Route.group(()=>{
     Route.post('/upload','VideosController.upload');
     Route.post('/sendToEmployee','VideosController.sendToEmployee');
+    Route.post('/getById','VideosController.getById');
+    Route.get('/getAll','VideosController.getAll');
     
   }).prefix('/video');
 

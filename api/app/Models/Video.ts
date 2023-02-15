@@ -19,6 +19,12 @@ export default class Video extends BaseModel {
   @column()
   public descricao: string
 
+  @column()
+  public dt_expiracao : Date
+
+  @column()
+  public titulo: string
+
   @column.dateTime({ autoCreate: true })
   public dt_criacao: DateTime
 

@@ -16,7 +16,9 @@ export default class VideosController {
             await request.validate({schema: schema.create({
                 id_empresa : schema.number(),
                 descricao : schema.string(),
-                video : schema.file({extnames : ['mp4','mov']})
+                titulo : schema.string(),
+                video : schema.file({extnames : ['mp4','mov']}),
+                dt_expiracao : schema.date()
             })});
 
             let dados = request.body();
@@ -37,7 +39,9 @@ export default class VideosController {
             await Video.create({
                 descricao : dados.descricao,
                 link : s3Object.Location,
-                id_empresa : dados.id_empresa
+                titulo : dados.titulo,
+                id_empresa : dados.id_empresa,
+                dt_expiracao : dados.dt_expiracao
             });
 
             response.json({sucess : "Cadastro feito com sucesso"});
@@ -54,27 +58,56 @@ export default class VideosController {
         try {
             await request.validate({schema: schema.create({
                 id_video : schema.number(),
-                id_funcionario : schema.number(),
-                dt_expiracao : schema.date()
+                ids_funcionario : schema.array().members(schema.number())
             })});
 
             let dados = request.body();
 
-            let id = await Database.connection('pg')
+
+            await Promise.all(
+                dados.ids_funcionario.map( async id => {
+                    await Database.connection('pg')
                     .table('ml_fol_md_video_funcionario')
-                    .returning('id')
                     .insert({
                         id_video: dados.id_video,
-                        id_funcionario: dados.id_funcionario,
-                        dt_expiracao: dados.dt_expiracao,
-                    })
-            if(id){
-                response.json({sucess: "Criado com sucesso!"});
-            }
+                        id_funcionario: id,
+                    });
+                })
+            );
+            response.json({sucess:"Cadastros realizados"});
+
+        } catch (error) {
+            response.badRequest(error);
+            console.log(error);
+        }
+    }
+
+    public async getById({request, response}:HttpContextContract){
+        try {
+            
+            await request.validate({schema: schema.create({
+                id_video : schema.number()
+            })});
+            let id_video = request.body().id_video;
+
+            response.json(
+                await Video.findBy('id_video',id_video)
+            );
 
         } catch (error) {
             response.badRequest(error);
         }
     }
 
+    public async getAll({request, response}:HttpContextContract){
+        try {
+            
+            response.json(
+                await Video.all()
+            );
+
+        } catch (error) {
+            response.badRequest(error);
+        }
+    }
 }

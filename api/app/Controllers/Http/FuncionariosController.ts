@@ -656,8 +656,9 @@ export default class FuncionariosController {
             let dados = await Database.connection('pg').query()
             .select('*')
             .from('ml_fol_md_video_funcionario')
+            .innerJoin('ml_md_video','ml_fol_md_video_funcionario.id_video','=','ml_md_video.id_video')
             .where('id_funcionario','=',auth.user?.id_funcionario)
-            .where('dt_expiracao','<=','CURRENT_DATE');
+            .where('ml_md_video.dt_expiracao','<=','CURRENT_DATE');
 
             response.json(dados);
 
