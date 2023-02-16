@@ -92,7 +92,13 @@ export default class FuncionariosController {
                             SELECT CODFUNC FROM globus.vw_ml_flp_funcionario 
                             WHERE id_funcionario_erp = '${funcionario[0].id_funcionario_erp}'
                         `);
+                let departamentos = await Database.connection('pg').rawQuery(`
+                    SELECT fa.id_area,ar.area 
+                    FROM ml_ctr_funcionario_area fa INNER JOIN ml_ctr_programa_area ar ON (fa.id_area = ar.id_area)
+                    WHERE fa.id_funcionario = ${id_funcionario}
+                `);
                 funcionario[0].codfunc = funcionario_erp[0].CODFUNC;
+                funcionario[0].departamentos = departamentos.rows;
                 response.json(funcionario);
 
             }
@@ -658,7 +664,7 @@ export default class FuncionariosController {
             .from('ml_fol_md_video_funcionario')
             .innerJoin('ml_md_video','ml_fol_md_video_funcionario.id_video','=','ml_md_video.id_video')
             .where('id_funcionario','=',auth.user?.id_funcionario)
-            .where('ml_md_video.dt_expiracao','<=','CURRENT_DATE');
+            .where(`to_char(ml_md_video.dt_expiracao,'YYYY-MM-DD')`,'<=','CURRENT_DATE');
 
             response.json(dados);
 
