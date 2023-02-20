@@ -659,14 +659,15 @@ export default class FuncionariosController {
     public async getVideos({response,auth}:HttpContextContract){
 
         try {
-            let dados = await Database.connection('pg').query()
-            .select('*')
-            .from('ml_fol_md_video_funcionario')
-            .innerJoin('ml_md_video','ml_fol_md_video_funcionario.id_video','=','ml_md_video.id_video')
-            .where('id_funcionario','=',auth.user?.id_funcionario)
-            .where(`to_char(ml_md_video.dt_expiracao,'YYYY-MM-DD')`,'<=','CURRENT_DATE');
+            let dados = await Database.connection('pg')
+            .rawQuery(`
+                SELECT * FROM ml_fol_md_video_funcionario video_func
+                        INNER JOIN ml_md_video video ON(video_func.id_video = video.id_video)
+                        WHERE video_func.id_funcionario = '${auth.user?.id_funcionario}'
+                                AND to_char(video.dt_expiracao,'YYYY-MM-DD') >= to_char(CURRENT_DATE,'YYYY-MM-DD')
+            `);
 
-            response.json(dados);
+            response.json(dados.rows);
 
         } catch (error) {
             response.badRequest(error);
