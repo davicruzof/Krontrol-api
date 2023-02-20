@@ -9,7 +9,7 @@ import Database from '@ioc:Adonis/Lucid/Database';
 export default class VideosController {
 
 
-    public async upload({request,response}){
+    public async upload({request,response, auth}){
 
         try {
 
@@ -17,14 +17,15 @@ export default class VideosController {
                 id_empresa : schema.number(),
                 descricao : schema.string(),
                 titulo : schema.string(),
-                video : schema.file({extnames : ['mp4','mov']}),
+                video : schema.file(),
                 dt_expiracao : schema.date()
             })});
 
+            let video = request.file('video');
             let dados = request.body();
             let empresa = await Empresa.findBy('id_empresa',dados.id_empresa);
-            let hashVideo =  crypto.randomBytes(999).toString('hex');
-            let filename = `${hashVideo}-${dados.video.clientName}`;
+            let hashVideo =  crypto.randomBytes(9).toString('hex');
+            let filename = `${hashVideo}-${video.clientName}`;
 
             let s3Object = 
                 await upload({
@@ -32,8 +33,8 @@ export default class VideosController {
                     filename : filename,
                     bucket: empresa?.bucket,
                     path: filename,
-                    file: dados.video,
-                    type: dados.video.extname
+                    file: video,
+                    type: video.extname
                 });
 
             await Video.create({
@@ -47,6 +48,7 @@ export default class VideosController {
             response.json({sucess : "Cadastro feito com sucesso"});
 
         } catch (error) {
+            console.log(error);
             response.badRequest(error);
         }
 
