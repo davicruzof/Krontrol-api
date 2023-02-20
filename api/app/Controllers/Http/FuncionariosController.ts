@@ -136,11 +136,14 @@ export default class FuncionariosController {
         if(id_funcionario && arrayArea){
 
             arrayArea.forEach( async element =>  {
-                await FuncionarioArea.create({
-                    id_funcionario : id_funcionario,
-                    id_empresa : funcionario_dados?.id_empresa,
-                    id_area : element,
-                });
+                let existe = await FuncionarioArea.query().where('id_funcionario','=',id_funcionario).andWhere('id_area','=',element);
+                if(!existe) {
+                    await FuncionarioArea.create({
+                        id_funcionario : id_funcionario,
+                        id_empresa : funcionario_dados?.id_empresa,
+                        id_area : element,
+                    });
+                }
             });
             response.json({sucess: "Cadastro Realizado"});
 
