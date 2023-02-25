@@ -134,19 +134,20 @@ export default class FuncionariosController {
         const id_funcionario = request.body().id_funcionario;
         const funcionario_dados = await Funcionario.findBy('id_funcionario',id_funcionario); 
         if(id_funcionario && arrayArea){
-
-            arrayArea.forEach( async element =>  {
-                let existe = await FuncionarioArea.query().where('id_funcionario','=',id_funcionario).andWhere('id_area','=',element);
-                if(!existe) {
+            let deleta = await FuncionarioArea.query().where('id_funcionario','=',id_funcionario).delete();
+            if (deleta) {
+                arrayArea.forEach( async element =>  {
                     await FuncionarioArea.create({
                         id_funcionario : id_funcionario,
                         id_empresa : funcionario_dados?.id_empresa,
                         id_area : element,
                     });
-                }
-            });
-            response.json({sucess: "Cadastro Realizado"});
-
+                });
+                response.json({sucess: "Cadastro Realizado"});
+            }
+        } else if (id_funcionario) {
+            await FuncionarioArea.query().where('id_funcionario','=',id_funcionario).delete();
+            response.json({sucess: "Alteração realizada"});
         }
     }
 
