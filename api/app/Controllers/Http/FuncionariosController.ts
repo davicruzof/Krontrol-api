@@ -677,4 +677,24 @@ export default class FuncionariosController {
             response.badRequest(error);
         }
     }
+
+    public async confirmarVideo({request, response,auth}:HttpContextContract) {
+        try {
+            await request.validate({schema: schema.create({
+                id_video : schema.string()
+            })});
+            let dados = request.body();
+            await Database.connection('pg')
+            .table('ml_video_confirmed')
+            .returning('id_video_confirmed')
+            .insert({
+                id_funcionario : auth.user?.id_funcionario,
+                id_video : dados.id_video,
+            });
+            response.json({sucess: "Confirmado com sucesso"});
+        } catch (error) {
+            response.badRequest("Erro interno");
+        }
+
+    }
 }

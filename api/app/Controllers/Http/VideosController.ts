@@ -112,4 +112,46 @@ export default class VideosController {
             response.badRequest(error);
         }
     }
+
+    public async update({request, response}){
+        try {
+            await request.validate({schema: schema.create({
+                id_video : schema.number(),
+                id_empresa : schema.number.nullableAndOptional(),
+                descricao : schema.string.nullableAndOptional(),
+                titulo : schema.string.nullableAndOptional(),
+                dt_expiracao : schema.date.nullableAndOptional()
+            })});
+            let dados = request.body();
+            let video = await Video.findBy('id_video',dados.id_video);
+            if(video){
+                video.merge(dados);
+                await video.save();
+                response.json({sucess : "Atualizado com sucesso"});
+            } else {
+                response.badRequest({error: "Erro interno ou video não encontrado"});
+            }
+        } catch (error) {
+            response.badRequest("Erro interno");
+        }
+    }
+
+    public async delete({request, response}) {
+        try {
+            await request.validate({schema: schema.create({
+                id_video : schema.number()
+            })});
+            let id_video = request.body().id_video;
+            let video = await Video.findBy('id_video',id_video);
+            if(video) {
+                await video.delete();
+                response.json({sucess : "Deletado com sucesso"});
+            } else {
+                response.badRequest({error : "Video não encontrado"});
+            }
+        } catch (error) {
+            response.badRequest("Erro interno");
+        }
+    }
+
 }

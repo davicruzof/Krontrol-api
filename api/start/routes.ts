@@ -66,6 +66,7 @@ Route.group(()=>{
     Route.post('/deleteAccount','FuncionariosController.deleteAccount').middleware('auth');
     Route.post('/confirmPdf','FuncionariosController.confirmPdf').middleware('auth');
     Route.get('/getVideos','FuncionariosController.getVideos').middleware('auth');
+    Route.get('/confirmVideo','FuncionariosController.confirmVideo').middleware('auth');
   }).prefix('/employee');
 
   //Rotas Veiculos
@@ -179,6 +180,8 @@ Route.group(()=>{
     Route.post('/sendToEmployee','VideosController.sendToEmployee');
     Route.post('/getById','VideosController.getById');
     Route.get('/getAll','VideosController.getAll');
+    Route.put('/update', 'VideosController.update');
+    Route.delete('/delete','VideosController.delete');
     
   }).prefix('/video');
 

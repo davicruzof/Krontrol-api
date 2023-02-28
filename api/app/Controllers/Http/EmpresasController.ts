@@ -5,6 +5,7 @@ import Empresa from 'App/Models/Empresa';
 import { EmpresaSchema, EmpresaSchemaUpdate } from 'App/Schemas/Empresa';
 import { createBucket, upload } from 'App/Controllers/Http/S3';
 import crypto from 'crypto';
+import { Exception } from '@adonisjs/core/build/standalone';
 export default class EmpresasController {
 
 
@@ -74,9 +75,7 @@ export default class EmpresasController {
             }
 
         } catch (error) {
-
-            response.badRequest(error.messages);
-            
+            response.badRequest(new Exception ('Erro interno',404));
         }
     }
 

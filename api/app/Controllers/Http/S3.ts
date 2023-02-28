@@ -2,6 +2,7 @@ import { s3Client, s3connection } from '../../../libs/aws-sdk';
 import { CreateBucketCommand } from "@aws-sdk/client-s3";
 import fs from 'fs';
 import Empresa from 'App/Models/Empresa';
+import { Exception } from '@adonisjs/core/build/standalone';
 export  const createBucket = async (params) =>{
     try{
         
@@ -11,7 +12,7 @@ export  const createBucket = async (params) =>{
         //return data;
     }
     catch(error){
-        console.log(error);
+        return(new Exception(error));
     }
 }
 
