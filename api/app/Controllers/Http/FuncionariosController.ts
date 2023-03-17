@@ -4,19 +4,24 @@ import type { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
 import { schema } from "@ioc:Adonis/Core/Validator";
 import Funcionario from "../../Models/Funcionario";
 import pdf from "pdf-creator-node";
-import fs, { unlink } from "fs";
+import fs from "fs";
 import { uploadPdfEmpresa, upload } from "App/Controllers/Http/S3";
 import FuncionarioArea from "App/Models/FuncionarioArea";
 import {
   FuncionarioSchemaInsert,
   updateProfileFuncionario,
 } from "App/Schemas/Funcionario";
-import Database from "@ioc:Adonis/Lucid/Database";
+import Database, {
+  ChainableContract,
+  RawQuery,
+  ReferenceBuilderContract,
+} from "@ioc:Adonis/Lucid/Database";
 import User from "App/Models/User";
 import ConfirmaFichaPonto from "App/Models/ConfirmaFichaPonto";
 import crypto from "crypto";
 import { fichaPonto, templateDotCard } from "App/templates/pdf/template";
 import Funcao from "App/Models/Funcao";
+import GlobalController from "./GlobalController";
 export default class FuncionariosController {
   public async create({ request, response }: HttpContextContract) {
     try {
@@ -97,13 +102,13 @@ export default class FuncionariosController {
                             SELECT CODFUNC FROM globus.vw_ml_flp_funcionario
                             WHERE id_funcionario_erp = '${funcionario[0].id_funcionario_erp}'
                         `);
-        let departamentos = await Database.connection("pg").rawQuery(`
-                    SELECT fa.id_area,ar.area
-                    FROM ml_ctr_funcionario_area fa INNER JOIN ml_ctr_programa_area ar ON (fa.id_area = ar.id_area)
-                    WHERE fa.id_funcionario = ${id_funcionario}
-                `);
+
+        const global = new GlobalController();
+
+        const departments = global.getDepartments(id_funcionario);
+
         funcionario[0].codfunc = funcionario_erp[0].CODFUNC;
-        funcionario[0].departamentos = departamentos.rows;
+        funcionario[0].departamentos = departments;
         response.json(funcionario);
       } else {
         response.json({ error: "Funcionário não encontrada" });
@@ -114,22 +119,26 @@ export default class FuncionariosController {
   }
 
   public async getAll({ response, auth }: HttpContextContract) {
-    let funcionarios = await Database.from("ml_fol_funcionario")
-      .select("id_funcionario")
-      .select("cpf")
-      .select("nome")
-      .select("registro")
-      .select("ml_fol_funcionario_funcao.funcao")
-      .where("ml_fol_funcionario.id_empresa", "=", auth.user?.id_empresa)
-      .where("ml_fol_funcionario.id_situacao", "=", 1)
-      .leftJoin(
-        "ml_fol_funcionario_funcao",
-        "ml_fol_funcionario_funcao.id_funcao_erp",
-        "=",
-        "ml_fol_funcionario.id_funcao_erp"
-      );
+    if (auth.user) {
+      let funcionarios = await Database.from("ml_fol_funcionario")
+        .select("id_funcionario")
+        .select("cpf")
+        .select("nome")
+        .select("registro")
+        .select("ml_fol_funcionario_funcao.funcao")
+        .where("ml_fol_funcionario.id_empresa", "=", auth.user.id_empresa)
+        .where("ml_fol_funcionario.id_situacao", "=", 1)
+        .leftJoin(
+          "ml_fol_funcionario_funcao",
+          "ml_fol_funcionario_funcao.id_funcao_erp",
+          "=",
+          "ml_fol_funcionario.id_funcao_erp"
+        );
 
-    response.json(funcionarios);
+      response.json(funcionarios);
+    } else {
+      response.json({ error: "Usuário inválido" });
+    }
   }
 
   public async addArea({ request, response }: HttpContextContract) {
@@ -166,22 +175,34 @@ export default class FuncionariosController {
     const id_funcionario = request.body().id_funcionario;
 
     await Promise.all(
-      arrayArea.forEach(async (element) => {
-        let areaFunc = await FuncionarioArea.query()
-          .select("*")
-          .where("id_funcionario", "=", id_funcionario)
-          .andWhere("id_area", "=", element)
-          .limit(1);
-        if (areaFunc[0]) {
-          await areaFunc[0].delete();
+      arrayArea.forEach(
+        async (
+          element:
+            | string
+            | number
+            | boolean
+            | Date
+            | Buffer
+            | ChainableContract
+            | RawQuery
+            | string[]
+            | number[]
+            | Date[]
+            | boolean[]
+            | ReferenceBuilderContract
+        ) => {
+          let areaFunc = await FuncionarioArea.query()
+            .select("*")
+            .where("id_funcionario", "=", id_funcionario)
+            .andWhere("id_area", "=", element)
+            .limit(1);
+          if (areaFunc[0]) {
+            await areaFunc[0].delete();
+          }
         }
-      })
+      )
     );
     response.json({ sucess: "Area(s) removidas com sucesso" });
-  }
-
-  public async getDepartamentsbyFuncionario(id_funcionario: number) {
-    const areas = await FuncionarioArea.query().select("");
   }
 
   public async updateProfile({ request, response, auth }: HttpContextContract) {

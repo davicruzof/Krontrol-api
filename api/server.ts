@@ -9,7 +9,7 @@ import { TripType } from "./services/serverTypes";
 
 sourceMapSupport.install({ handleUncaughtExceptions: false });
 
-const CRON_TIME_MINUTE = "*/1 * * * *";
+const CRON_TIME_MINUTE = "*/50 * * * *";
 const CRON_DAILY = "0 0 0 1/1 * ? *";
 
 const date_log = DateTime.now().toFormat("yyyy-MM-dd");

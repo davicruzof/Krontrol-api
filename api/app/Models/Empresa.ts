@@ -1,83 +1,81 @@
 /* eslint-disable @typescript-eslint/explicit-member-accessibility */
-import { DateTime } from 'luxon'
-import { BaseModel, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
+import { DateTime } from "luxon";
+import { BaseModel, column } from "@ioc:Adonis/Lucid/Orm";
 
 export default class Empresa extends BaseModel {
-  static get table () {
-    return 'ml_ctr_empresa';
+  static get table() {
+    return "ml_ctr_empresa";
   }
 
   @column({ isPrimary: true })
-  public id_empresa: number
+  public id_empresa: number;
 
   @column()
-  public nomeempresarial: string
+  public nomeempresarial: string;
 
   @column()
-  public cnpj: string
+  public cnpj: string;
 
   @column()
-  public logradouro: string
+  public logradouro: string;
 
   @column()
-  public numero: string
+  public numero: string;
 
   @column()
-  public complemento: string
+  public complemento: string;
 
   @column()
-  public cep: string
+  public cep: string;
 
   @column()
-  public bairro: string
+  public bairro: string;
 
   @column()
-  public municipio: string
+  public municipio: string;
 
   @column()
-  public uf: string
+  public uf: string;
 
   @column()
-  public email: string
+  public email: string;
 
   @column()
-  public telefone: string
+  public telefone: string;
 
   @column()
-  public situacaocadastral: string
+  public situacaocadastral: string;
 
   @column()
-  public dt_situacaocadastral: Date
+  public dt_situacaocadastral: Date;
 
   @column()
-  public contato: string
+  public contato: string;
 
   @column()
-  public id_grupo: number
+  public id_grupo: number;
 
   @column()
-  public id_usuario: number
+  public id_usuario: number;
 
   @column()
-  public status: number
+  public status: number;
 
   @column()
-  public background: string
+  public background: string;
 
   @column()
-  public primary_color: string
+  public primary_color: string;
 
   @column()
-  public logo: string
+  public logo: string;
 
   @column.dateTime({ autoCreate: true })
-  public dt_cadastro: DateTime
+  public dt_cadastro: DateTime;
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
-  public updatedat: DateTime
-  
+  public updatedat: DateTime;
+
   @column()
-  public bucket: string
-
-
+  public bucket: string;
 }

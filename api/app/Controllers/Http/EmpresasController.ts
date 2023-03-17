@@ -5,6 +5,16 @@ import { EmpresaSchema, EmpresaSchemaUpdate } from "App/Schemas/Empresa";
 import { createBucket, upload } from "App/Controllers/Http/S3";
 import crypto from "crypto";
 import { Exception } from "@adonisjs/core/build/standalone";
+
+const EnterpriseQuery = [
+  "id_empresa",
+  "nomeempresarial",
+  "cnpj",
+  "telefone",
+  "situacaocadastral",
+  "status",
+];
+
 export default class EmpresasController {
   public async create({ request, response }: HttpContextContract) {
     try {
@@ -81,16 +91,7 @@ export default class EmpresasController {
   }
 
   public async getAll({ response }: HttpContextContract) {
-    response.json(
-      await Empresa.query().select(
-        "id_empresa",
-        "nomeempresarial",
-        "cnpj",
-        "telefone",
-        "situacaocadastral",
-        "status"
-      )
-    );
+    response.json(await Empresa.query().select(...EnterpriseQuery));
   }
 
   public async getEnterprises({ response }: HttpContextContract) {
@@ -119,14 +120,7 @@ export default class EmpresasController {
     let { nomeempresarial } = request.body();
     if (nomeempresarial) {
       let empresa = await Empresa.query()
-        .select(
-          "id_empresa",
-          "nomeempresarial",
-          "cnpj",
-          "telefone",
-          "situacaocadastral",
-          "status"
-        )
+        .select(...EnterpriseQuery)
         .where("nomeempresarial", "LIKE", "%" + nomeempresarial + "%");
       if (empresa) {
         response.json(empresa);

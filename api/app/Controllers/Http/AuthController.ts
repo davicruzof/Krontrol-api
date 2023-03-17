@@ -1,166 +1,171 @@
+import { ResponseContract } from "@ioc:Adonis/Core/Response";
+import type { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
+import { schema } from "@ioc:Adonis/Core/Validator";
+import Hash from "@ioc:Adonis/Core/Hash";
+import User from "App/Models/User";
+import Funcionario from "App/Models/Funcionario";
+import Database from "@ioc:Adonis/Lucid/Database";
+import { AuthContract } from "@ioc:Adonis/Addons/Auth";
+import GlobalController from "./GlobalController";
 
-import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
-import { schema } from '@ioc:Adonis/Core/Validator';
-import Hash from '@ioc:Adonis/Core/Hash';
-import User from 'App/Models/User';
-import  Funcionario  from 'App/Models/Funcionario';
-import Database from '@ioc:Adonis/Lucid/Database';
-import { afterUpdate } from '@ioc:Adonis/Lucid/Orm';
-const loginSchema =  schema.create({
-    cpf: schema.string(),
-    id_empresa: schema.number(),
-    senha : schema.string()
+const userSchema = schema.create({
+  cpf: schema.string(),
+  id_empresa: schema.number(),
+  senha: schema.string(),
 });
 
-const changePassword =  schema.create({
-    senha_atual : schema.string(),
-    senha_nova : schema.string()
-});
 export default class AuthController {
+  private getEmployee = async (
+    cpf: string,
+    id_empresa: string
+  ): Promise<Funcionario | null> => {
+    const funcionario = await Funcionario.query()
+      .where("cpf", cpf)
+      .where("id_empresa", id_empresa)
+      .where("id_situacao", 1)
+      .first();
 
-    public async login({request,response,auth}:HttpContextContract){
-        try {
-             await request.validate({schema: loginSchema});
-             const { cpf,id_empresa,senha } = request.body();
+    return funcionario;
+  };
 
-             const funcionario = await Funcionario
-               .query()
-               .where('cpf',cpf)
-               .where('id_empresa',id_empresa)
-               .where('id_situacao',1)
-               .first()
-            
-               //Verify password
-                if(funcionario){
-                    const usuario = await User
-                    .query()
-                    .where('id_funcionario',funcionario.id_funcionario)
-                    .where('id_empresa',funcionario.id_empresa)
-                    .first()
-                    if(usuario){
-                        if (!(await Hash.verify(usuario.senha, senha))) {
-                            return response.unauthorized({error:"Dados inválidos"})
-                          }
-                          else{
-                            const token =  await auth.use('api').generate(usuario);
-                            return token;
-                          }
-                    }
-                }
-                else{
-                    response.json({error: "Dados inválidos"});
-                }
-          } catch (error) {
-            response.badRequest(error.messages);
-          }
+  private getUser = async (funcionario: Funcionario): Promise<User | null> => {
+    const user = await User.query()
+      .where("id_funcionario", funcionario.id_funcionario)
+      .where("id_empresa", funcionario.id_empresa)
+      .first();
+
+    return user;
+  };
+
+  private verifyPassword = async (
+    user: User,
+    senha: string,
+    response: ResponseContract,
+    auth: AuthContract
+  ) => {
+    if (user) {
+      if (!(await Hash.verify(user.senha, senha))) {
+        return response.unauthorized({ error: "Dados inválidos" });
+      } else {
+        await auth.use("api").generate(user);
+      }
     }
+  };
 
-    public async logout({auth}:HttpContextContract){
+  public async login({ request, response, auth }: HttpContextContract) {
+    try {
+      await request.validate({ schema: userSchema });
 
-        if(auth){
-            await auth.logout();
+      const { cpf, id_empresa, senha } = request.body();
+
+      const employee = await this.getEmployee(cpf, id_empresa);
+
+      if (employee) {
+        const user = await this.getUser(employee);
+        user && this.verifyPassword(user, senha, response, auth);
+      }
+    } catch (error) {
+      response.badRequest(error.messages);
+    }
+  }
+
+  public async logout({ auth }: HttpContextContract) {
+    if (auth) {
+      await auth.logout();
+    }
+  }
+
+  private getEmployeeById = async (id_funcionario: number) => {
+    const queryGetUser = `
+      SELECT usu.id_usuario,usu.id_status,func.id_funcionario,
+      func.id_grupo,func.id_empresa,func.nome,func.cpf,
+      func.celular,func.email,func.cnh_validade,func.dt_nascimento
+      FROM ml_fol_funcionario func
+        INNER JOIN ml_usu_usuario usu ON (usu.id_funcionario = func.id_funcionario)
+      WHERE func.id_funcionario = ${id_funcionario}`;
+
+    let dadosFuncionario = await Database.connection("pg").rawQuery(
+      queryGetUser
+    );
+
+    return dadosFuncionario.rows[0];
+  };
+
+  public async me({ auth, response }: HttpContextContract) {
+    const global = new GlobalController();
+
+    if (auth.user) {
+      const departments = global.getDepartments(auth.user.id_funcionario);
+
+      return response.json({
+        user: this.getEmployeeById(auth.user.id_funcionario),
+        departamentos: departments,
+      });
+    }
+  }
+
+  public async change({ auth, request, response }: HttpContextContract) {
+    try {
+      const changePassword = schema.create({
+        senha_atual: schema.string(),
+        senha_nova: schema.string(),
+      });
+
+      await request.validate({ schema: changePassword });
+      let dados = request.body();
+
+      if (auth.user) {
+        if (await Hash.verify(auth.user.senha, dados.senha_atual)) {
+          auth.user.senha = dados.senha_nova;
+          auth.user.save();
+
+          response.json({ sucess: "Senha Atualizada com sucesso" });
+        } else {
+          response.badRequest({ error: "Dados inválidos" });
         }
-
+      } else {
+        response.badRequest({ error: "Usuário inválido" });
+      }
+    } catch (error) {
+      response.json(error);
     }
+  }
 
-    public async me({auth, response}:HttpContextContract){
+  public async recovery({ request, response }: HttpContextContract) {
+    try {
+      await request.validate({ schema: userSchema });
 
-        let dadosFuncionario = await Database
-                    .connection('pg')
-                    .rawQuery(`
-                        SELECT
-                        usu.id_usuario,
-                        usu.id_status,
-                        func.id_funcionario,
-                        func.id_grupo,
-                        func.id_empresa,
-                        func.nome,
-                        func.cpf,
-                        func.celular,
-                        func.email,
-                        func.cnh_validade,
-                        func.dt_nascimento
-                        FROM ml_fol_funcionario func
-                            INNER JOIN ml_usu_usuario usu ON (usu.id_funcionario = func.id_funcionario)
-                        WHERE func.id_funcionario = ${auth.user?.id_funcionario}`);
-        let departamentos = await Database.connection('pg').rawQuery(`
-            SELECT fa.id_area,ar.area 
-            FROM ml_ctr_funcionario_area fa INNER JOIN ml_ctr_programa_area ar ON (fa.id_area = ar.id_area)
-            WHERE fa.id_funcionario = ${auth.user?.id_funcionario}
-        `);
-        let user = dadosFuncionario.rows[0];
-        return  response.json({
-            user,
-            departamentos: departamentos.rows
-        });
+      let dados = request.body();
 
-    }
+      let funcionario = await Funcionario.query()
+        .select("id_funcionario")
+        .select("cpf")
+        .select("nome")
+        .select("celular")
+        .select("dt_nascimento")
+        .where("cpf", "=", dados.cpf)
+        .where("id_empresa", "=", dados.id_empresa)
+        .where("ml_fol_funcionario.id_situacao", "=", 1)
+        .first();
 
-    public async change({auth,request,response}:HttpContextContract){
+      if (funcionario) {
+        let usuario = await User.findBy(
+          "id_funcionario",
+          funcionario.id_funcionario
+        );
 
-        try {
-            
-            await request.validate({schema : changePassword});
-            let dados = request.body();
-
-            if ( await Hash.verify(auth.user?.senha, dados.senha_atual)){
-                auth.user.senha = dados.senha_nova;
-                auth.user.save();
-
-                response.json({sucess: 'Senha Atualizada com sucesso'});
-            } else {
-                response.badRequest({error:'Dados inválidos'});
-            }
-            
-            
-        } catch (error) {
-            response.json(error);
+        if (usuario) {
+          usuario.senha = dados.senha;
+          usuario.save();
+          response.json({ sucess: "Senha alterada com sucesso" });
+        } else {
+          response.json({ error: "Usuário não encontrado" });
         }
+      } else {
+        response.json({ error: "Dados inválidos" });
+      }
+    } catch (error) {
+      response.json(error.messages);
     }
-
-    public async recovery({auth,request,response}:HttpContextContract){
-        
-        try {
-            await request.validate({schema : schema.create({
-                cpf: schema.string(),
-                id_empresa: schema.number(),
-                senha : schema.string() 
-            })});    
-
-            let dados = request.body();
-
-            let funcionario = await Funcionario
-                .query()
-                .select('id_funcionario')
-                .select('cpf')
-                .select('nome')
-                .select('celular')
-                .select('dt_nascimento')
-                .where('cpf','=',dados.cpf)
-                .where('id_empresa','=',dados.id_empresa)
-                .where('ml_fol_funcionario.id_situacao','=',1)
-                .first();
-
-            if(funcionario){
-
-                let usuario = await User.findBy('id_funcionario',funcionario.id_funcionario);
-                
-                if(usuario){
-                    usuario.senha = dados.senha;
-                    usuario.save();
-                    response.json({sucess :  'Senha alterada com sucesso'});
-
-                } else{
-                    response.json({error: 'Usuário não encontrado'});
-                }
-                
-            }
-            else{
-                response.json({error: 'Dados inválidos'});
-            }
-
-        } catch (error) {
-            response.json(error.messages);
-        }
-    }
+  }
 }
