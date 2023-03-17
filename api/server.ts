@@ -65,7 +65,6 @@ schedule(CRON_TIME_MINUTE, async () => {
       const dataTrips = trips.data.data;
       tripsList.push(...dataTrips);
 
-      console.log(tripsList);
       var tips = trips.data;
       var nextPage = "&" + trips.data.next_page_url;
 
