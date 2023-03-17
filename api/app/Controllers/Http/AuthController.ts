@@ -97,10 +97,13 @@ export default class AuthController {
     const global = new GlobalController();
 
     if (auth.user) {
-      const departments = global.getDepartments(auth.user.id_funcionario);
+      const [departments, user] = await Promise.all([
+        global.getDepartments(auth.user.id_funcionario),
+        this.getEmployeeById(auth.user.id_funcionario),
+      ]);
 
       return response.json({
-        user: this.getEmployeeById(auth.user.id_funcionario),
+        user,
         departamentos: departments,
       });
     }
@@ -135,37 +138,34 @@ export default class AuthController {
 
   public async recovery({ request, response }: HttpContextContract) {
     try {
-      await request.validate({ schema: userSchema });
+      const dados = await request.validate({ schema: userSchema });
 
-      let dados = request.body();
-
-      let funcionario = await Funcionario.query()
-        .select("id_funcionario")
-        .select("cpf")
-        .select("nome")
-        .select("celular")
-        .select("dt_nascimento")
-        .where("cpf", "=", dados.cpf)
-        .where("id_empresa", "=", dados.id_empresa)
-        .where("ml_fol_funcionario.id_situacao", "=", 1)
+      const funcionario = await Funcionario.query()
+        .where({
+          cpf: dados.cpf,
+          id_empresa: dados.id_empresa,
+        })
+        .andWhere("ml_fol_funcionario.id_situacao", "=", 1)
+        .select("id_funcionario", "cpf", "nome", "celular", "dt_nascimento")
         .first();
 
-      if (funcionario) {
-        let usuario = await User.findBy(
-          "id_funcionario",
-          funcionario.id_funcionario
-        );
-
-        if (usuario) {
-          usuario.senha = dados.senha;
-          usuario.save();
-          response.json({ sucess: "Senha alterada com sucesso" });
-        } else {
-          response.json({ error: "Usuário não encontrado" });
-        }
-      } else {
-        response.json({ error: "Dados inválidos" });
+      if (!funcionario) {
+        return response.json({ error: "Dados inválidos" });
       }
+
+      const usuario = await User.findBy(
+        "id_funcionario",
+        funcionario.id_funcionario
+      );
+
+      if (!usuario) {
+        return response.json({ error: "Usuário não encontrado" });
+      }
+
+      usuario.senha = dados.senha;
+      await usuario.save();
+
+      response.json({ success: "Senha alterada com sucesso" });
     } catch (error) {
       response.json(error.messages);
     }
