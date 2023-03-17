@@ -1,11 +1,9 @@
-import { ResponseContract } from "@ioc:Adonis/Core/Response";
 import type { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
 import { schema } from "@ioc:Adonis/Core/Validator";
 import Hash from "@ioc:Adonis/Core/Hash";
 import User from "App/Models/User";
 import Funcionario from "App/Models/Funcionario";
 import Database from "@ioc:Adonis/Lucid/Database";
-import { AuthContract } from "@ioc:Adonis/Addons/Auth";
 import GlobalController from "./GlobalController";
 
 const userSchema = schema.create({
@@ -39,17 +37,9 @@ export default class AuthController {
 
   private verifyPassword = async (
     user: User,
-    senha: string,
-    response: ResponseContract,
-    auth: AuthContract
-  ) => {
-    if (user) {
-      if (!(await Hash.verify(user.senha, senha))) {
-        return response.unauthorized({ error: "Dados inválidos" });
-      } else {
-        await auth.use("api").generate(user);
-      }
-    }
+    senha: string
+  ): Promise<Boolean> => {
+    return await Hash.verify(user.senha, senha);
   };
 
   public async login({ request, response, auth }: HttpContextContract) {
@@ -62,7 +52,19 @@ export default class AuthController {
 
       if (employee) {
         const user = await this.getUser(employee);
-        user && this.verifyPassword(user, senha, response, auth);
+        if (user) {
+          const isValidPassword = await this.verifyPassword(user, senha);
+
+          if (isValidPassword) {
+            await auth.use("api").generate(user);
+          } else {
+            return response.unauthorized({ error: "Dados inválidos" });
+          }
+        } else {
+          return response.unauthorized({ error: "Usuário inválido" });
+        }
+      } else {
+        return response.unauthorized({ error: "Funcionário inválido" });
       }
     } catch (error) {
       response.badRequest(error.messages);
