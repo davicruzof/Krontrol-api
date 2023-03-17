@@ -50,22 +50,23 @@ export default class AuthController {
 
       const employee = await this.getEmployee(cpf, id_empresa);
 
-      if (employee) {
-        const user = await this.getUser(employee);
-        if (user) {
-          const isValidPassword = await this.verifyPassword(user, senha);
-
-          if (isValidPassword) {
-            await auth.use("api").generate(user);
-          } else {
-            return response.unauthorized({ error: "Dados inválidos" });
-          }
-        } else {
-          return response.unauthorized({ error: "Usuário inválido" });
-        }
-      } else {
+      if (!employee) {
         return response.unauthorized({ error: "Funcionário inválido" });
       }
+
+      const user = await this.getUser(employee);
+
+      if (!user) {
+        return response.unauthorized({ error: "Usuário inválido" });
+      }
+
+      const isValidPassword = await this.verifyPassword(user, senha);
+
+      if (!isValidPassword) {
+        return response.unauthorized({ error: "Dados inválidos" });
+      }
+
+      await auth.use("api").generate(user);
     } catch (error) {
       response.badRequest(error.messages);
     }
