@@ -5,10 +5,11 @@ import { AxiosError, AxiosResponse } from "axios";
 
 export const getToken = async (): Promise<AxiosResponse<AuthProps>> => {
   try {
-    const URL = "/login?email=viasulpbi@gmail.com&password=Viapbi@900";
+    const URL = `/login?email=${process.env.DATALBUS_API_LOGIN}&password=${process.env.DATALBUS_API_PASSWORD}`;
 
-    const { data } = await api.post(URL);
-    return data;
+    const  token  = await api.post(URL);
+
+    return token;
   } catch (err) {
     const { error } = (err as AxiosError<any, any>)?.response?.data;
     throw new Error(error);
@@ -19,7 +20,7 @@ export const getEvents = async (): Promise<AxiosResponse<Events>> => {
   try {
     const URL = "/events-schema?per_page=1000";
 
-    const { data } = await api.get(URL);
+    const  data  = await api.get(URL);
     return data;
   } catch (err) {
     const { error } = (err as AxiosError<any, any>)?.response?.data;
@@ -37,7 +38,7 @@ export const getTrips = async (
 
     const URL = `/trips?per_page=100&date=${date_consult}${nextPage}`;
 
-    const { data } = await api.get(URL);
+    const  data  = await api.get(URL);
     return data;
   } catch (err) {
     const { error } = (err as AxiosError<any, any>)?.response?.data;

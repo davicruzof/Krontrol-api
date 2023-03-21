@@ -542,6 +542,7 @@ export default class FuncionariosController {
       totais: {
         DESCONTOS: 0,
         PROVENTOS: 0,
+        LIQUIDO: 0,
       },
       bases: {
         BASE_FGTS_FOLHA: 0,
@@ -568,9 +569,11 @@ export default class FuncionariosController {
         if (element.VALORFICHA[0] == ",") {
           element.VALORFICHA = "0" + element.VALORFICHA;
         }
+
         dadosTemp.descricao.push(element);
       }
     });
+    dadosTemp.totais.LIQUIDO = dadosTemp.totais.PROVENTOS - dadosTemp.totais.DESCONTOS;
     return dadosTemp;
   }
 

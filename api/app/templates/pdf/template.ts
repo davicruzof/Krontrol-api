@@ -220,6 +220,11 @@ export const templateDotCard = `
                     width: 20%;">
                 {{dados.totais.DESCONTOS}}
             </td>
+            <td style="
+                border: 1px solid black; 
+                width: 20%;">
+                {{dados.totais.LIQUIDO}}
+            </td>
         </tr>
 
     </table>

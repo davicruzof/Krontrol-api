@@ -37,4 +37,7 @@ export default Env.rules({
 	ORACLE_USER: Env.schema.string(),
 	ORACLE_PASSWORD: Env.schema.string.optional(),
 	ORACLE_DB_NAME: Env.schema.string(),
+
+	DATALBUS_API_LOGIN: Env.schema.string(),
+	DATALBUS_API_PASSWORD: Env.schema.string(),
 })

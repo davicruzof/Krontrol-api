@@ -8,7 +8,7 @@ export type AuthProps = {
   };
 };
 
-type EventType = {
+export type EventType = {
   id: number;
   name: string;
   type: string;
