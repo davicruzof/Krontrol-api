@@ -157,7 +157,7 @@ export default class TelemetriasController {
     return events;
   }
 
-  public async score({request,response}: HttpContextContract) {
+  /*public async score({request,response}: HttpContextContract) {
     
     try {
       const queryParams = request.qs();
@@ -241,6 +241,6 @@ export default class TelemetriasController {
     } catch (error) {
       response.badRequest(error);
     }
-  }
+  }*/
 
 }
