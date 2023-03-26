@@ -79,3 +79,33 @@ export type Trips = {
   to: number;
   total: number;
 };
+
+export type EventsTrip = {
+  current_page: number;
+  data: Array<Event>;
+  first_page_url: string;
+  from: number;
+  last_page: number;
+  last_page_url: string;
+  next_page_url: string;
+  path: string;
+  per_page: number;
+  prev_page_url: string;
+  to: number;
+  total: number;
+};
+
+export type Event = {
+  id: number;
+  trip_id: number;
+  event_id: number;
+  asset_id: number;
+  license_number: string;
+  time: string;
+  event_type_id: number;
+  event_type_description: string;
+  event_category_description: string;
+  latitude: string;
+  longitude: string;
+  coordinates: string;
+};

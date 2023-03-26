@@ -105,6 +105,7 @@ Route.group(()=>{
 
     Route.post('/get_list','TelemetriasController.list');
     Route.post('/list_events','TelemetriasController.list_events');
+    Route.get('/score','TelemetriasController.score');
 
   }).prefix('/telemetria').middleware('auth');
 

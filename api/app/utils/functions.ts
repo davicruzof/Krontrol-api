@@ -25,3 +25,8 @@ export function sleep(ms) {
     setTimeout(resolve, ms);
   });
 }
+
+export function isValidDate(dateString) {
+  let date = new Date(dateString);
+  return !isNaN(date.getTime());
+}

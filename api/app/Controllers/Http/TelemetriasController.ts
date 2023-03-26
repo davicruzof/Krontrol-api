@@ -1,6 +1,9 @@
 import { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
 import Database from "@ioc:Adonis/Lucid/Database";
 import { schema } from "@ioc:Adonis/Core/Validator";
+import { isValidDate } from "App/utils/functions";
+
+const formato_data = "YYYY-MM-DD";
 
 const listSchema = schema.create({
   data_inicial: schema.date(),
@@ -153,4 +156,91 @@ export default class TelemetriasController {
 
     return events;
   }
+
+  public async score({request,response}: HttpContextContract) {
+    
+    try {
+      const queryParams = request.qs();
+      if (isValidDate(queryParams.data_inicial) && isValidDate(queryParams.data_final)) {
+
+        const data_inicial = queryParams.data_inicial;
+        const data_final = queryParams.data_final;
+
+
+
+        let abs = await Database.connection('pg').rawQuery(`
+          SELECT COUNT(events_trip.*) as abs
+          FROM ml_int_telemetria_trips trips
+          INNER JOIN ml_int_telemetria_subtrips subtrips ON (subtrips.trip_id = trips.drive_id)
+          INNER JOIN ml_int_telemetria_events_trip events_trip ON (events_trip.trip_id = trips.id_trip)
+          INNER JOIN ml_int_telemetria_kontrow_evento event ON (events_trip.event_type_id = event.id_evento_kontrow)
+          WHERE (event.id_evento_kontrow = 32)
+          and to_date(trips.date,'YYYY-MM-DD') BETWEEN to_date(${data_inicial},'YYYY-MM-DD') and to_date(${data_final},'YYYY-MM-DD');
+        `);
+
+        let acceleration = await Database.connection('pg').rawQuery(`
+          SELECT COUNT(events_trip.*) as abs
+          FROM ml_int_telemetria_trips trips
+          INNER JOIN ml_int_telemetria_subtrips subtrips ON (subtrips.trip_id = trips.drive_id)
+          INNER JOIN ml_int_telemetria_events_trip events_trip ON (events_trip.trip_id = trips.id_trip)
+          INNER JOIN ml_int_telemetria_kontrow_evento event ON (events_trip.event_type_id = event.id_evento_kontrow)
+          WHERE (event.id_evento_kontrow = 21)
+          and to_date(trips.date,'YYYY-MM-DD') BETWEEN to_date(${data_inicial},'YYYY-MM-DD') and to_date(${data_final},'YYYY-MM-DD');
+        `);
+
+        let braking = await Database.connection('pg').rawQuery(`
+          SELECT COUNT(events_trip.*) as abs
+          FROM ml_int_telemetria_trips trips
+          INNER JOIN ml_int_telemetria_subtrips subtrips ON (subtrips.trip_id = trips.drive_id)
+          INNER JOIN ml_int_telemetria_events_trip events_trip ON (events_trip.trip_id = trips.id_trip)
+          INNER JOIN ml_int_telemetria_kontrow_evento event ON (events_trip.event_type_id = event.id_evento_kontrow)
+          WHERE (event.id_evento_kontrow = 21)
+          and to_date(trips.date,'YYYY-MM-DD') BETWEEN to_date(${data_inicial},'YYYY-MM-DD') and to_date(${data_final},'YYYY-MM-DD');
+        `);
+
+        let sharp_turn = await Database.connection('pg').rawQuery(`
+        SELECT COUNT(events_trip.*) as abs
+          FROM ml_int_telemetria_trips trips
+          INNER JOIN ml_int_telemetria_subtrips subtrips ON (subtrips.trip_id = trips.drive_id)
+          INNER JOIN ml_int_telemetria_events_trip events_trip ON (events_trip.trip_id = trips.id_trip)
+          INNER JOIN ml_int_telemetria_kontrow_evento event ON (events_trip.event_type_id = event.id_evento_kontrow)
+          WHERE event.id_evento_kontrow IN (54,55)
+          and to_date(trips.date,'YYYY-MM-DD') BETWEEN to_date(${data_inicial},'YYYY-MM-DD') and to_date(${data_final},'YYYY-MM-DD');
+        `);
+
+        let speed_up = await Database.connection('pg').rawQuery(`
+        SELECT COUNT(events_trip.*) as abs
+          FROM ml_int_telemetria_trips trips
+          INNER JOIN ml_int_telemetria_subtrips subtrips ON (subtrips.trip_id = trips.drive_id)
+          INNER JOIN ml_int_telemetria_events_trip events_trip ON (events_trip.trip_id = trips.id_trip)
+          INNER JOIN ml_int_telemetria_kontrow_evento event ON (events_trip.event_type_id = event.id_evento_kontrow)
+          WHERE event.id_evento_kontrow IN (54,55)
+          and to_date(trips.date,'YYYY-MM-DD') BETWEEN to_date(${data_inicial},'YYYY-MM-DD') and to_date(${data_final},'YYYY-MM-DD');
+        `);
+        console.log(abs);
+
+
+        response.json({
+          abs: abs,
+          acceleration : acceleration,
+          braking : braking,
+          sharp_turn : sharp_turn,
+          speed_up : speed_up,
+          distance : distance,
+          driver : driver,
+          group_descr : group_descr,
+          line_name : line_name,
+          mkbe : distance / total_score,
+          total_score : total_score,
+          worker_id : worker_id
+        });
+      } else {
+        response.badRequest({error :"Período não informado ou data inválida."});
+      }
+
+    } catch (error) {
+      response.badRequest(error);
+    }
+  }
+
 }

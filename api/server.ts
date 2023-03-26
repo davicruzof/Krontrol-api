@@ -1,4 +1,4 @@
-import { getEvents, getToken, getTrips } from "./services/datalBus";
+import { getEvents, getToken, getTrips, getEventsTrip } from "./services/datalBus";
 import "reflect-metadata";
 import sourceMapSupport from "source-map-support";
 import { Exception, Ignitor } from "@adonisjs/core/build/standalone";
@@ -42,7 +42,7 @@ schedule(CRON_MIDNIGHT, async () => {
 
       let eventoBusca;
       await Promise.all(
-        eventsList.map(async (event){
+        eventsList.map(async (event)=> {
           eventoBusca = await KontrolEvento.findBy('id_evento_kontrow',event.id);
           if (!eventoBusca) {
             await KontrolEvento.create({
@@ -85,6 +85,25 @@ schedule(CRON_MIDNIGHT, async () => {
               updated_at: trip.updated_at,
               line_name: trip.line_name,
             });
+
+            const eventsTrip = (await getEventsTrip(trip.id)).data.data;
+            eventsTrip.map(async (event)=>{
+              await Database.connection('pg').table('ml_int_telemetria_events_trip').insert({
+                id_trip_event: event.id,
+                trip_id: event.trip_id,
+                event_id: event.event_id,
+                asset_id: event.asset_id,
+                license_number: event.license_number,
+                time: event.time,
+                event_type_id: event.event_type_id,
+                event_type_description: event.event_type_description,
+                event_category_description: event.event_category_description,
+                latitude: event.latitude,
+                longitude: event.longitude,
+                coordinates: event.coordinates,
+              });
+            });
+            
             trip.subtrips.map(async (subtrip)=> {
               await Database.connection('pg').table('ml_int_telemetria_subtrips').insert({
                 id_subtrip: subtrip.id,
@@ -102,6 +121,10 @@ schedule(CRON_MIDNIGHT, async () => {
             })
           })
         );
+
+      
+
+
       } catch (error) {
         console.log(error);
       }
