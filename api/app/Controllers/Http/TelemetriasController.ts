@@ -220,18 +220,39 @@ export default class TelemetriasController {
           and TO_CHAR(trips.date,'YYYY-MM-DD') >= '${data_inicial}' AND TO_CHAR(trips.date,'YYYY-MM-DD') <= '${data_final}'
         `);
 
+        let distance_sum = await Database.connection('pg').rawQuery(`
+        SELECT COUNT(events_trip.*) as sum_speed_up,subtrips.driver_name, subtrips.worker_id, trips.line_name, SUM(trips.total_mileage::numeric) as distance
+          FROM ml_int_telemetria_trips trips
+          INNER JOIN ml_int_telemetria_subtrips subtrips ON (subtrips.trip_id = trips.drive_id)
+          INNER JOIN ml_int_telemetria_events_trip events_trip ON (events_trip.trip_id = trips.id_trip)
+          WHERE events_trip.event_type_id IN (54,55)
+          AND subtrips.worker_id = ${funcionario?.id_funcionario_erp}
+          and TO_CHAR(trips.date,'YYYY-MM-DD') >= '${data_inicial}' AND TO_CHAR(trips.date,'YYYY-MM-DD') <= '${data_final}'
+          GROUP BY subtrips.driver_name,subtrips.worker_id,trips.line_name
+        `);
+
         const { sum_abs } = abs.rows[0];
         const { sum_acceleration } = acceleration.rows[0];
         const { sum_braking } = braking.rows[0];
         const { sum_sharp_turn } = sharp_turn.rows[0];
         const { sum_speed_up } = speed_up.rows[0];
-
+        const { driver_name } = distance_sum.rows[0];
+        const { worker_id } = distance_sum.rows[0];
+        const { line_name } = distance_sum.rows[0];
+        const { distance } = distance_sum.rows[0];
+        const total_score = sum_abs + sum_acceleration + sum_braking + sum_sharp_turn + sum_speed_up;
         response.json({
+          total_score : total_score,
+          distance : distance,
           abs: sum_abs,
           acceleration : sum_acceleration,
           braking : sum_braking,
           sharp_turn : sum_sharp_turn,
           speed_up : sum_speed_up,
+          driver_name : driver_name,
+          worker_id : worker_id,
+          line_name : line_name,
+          mkbe : distance / total_score
         });
         /*
           distance : distance,
