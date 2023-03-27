@@ -66,6 +66,12 @@ const date_log = luxon_1.DateTime.now().toFormat("yyyy-MM-dd");
                         });
                     }
                 }));
+                while (tips.next_page_url !== null) {
+                    const tripsNew = await (0, datalBus_1.getTrips)(nextPage.replace("/?", ""));
+                    tripsList.push(...tripsNew.data.data);
+                    tips = tripsNew.data;
+                    nextPage = "&" + tripsNew.data.next_page_url;
+                }
                 await Promise.all(tripsList.map(async (trip) => {
                     await Database.connection('pg').table('ml_int_telemetria_trips').insert({
                         id_trip: trip.id,
