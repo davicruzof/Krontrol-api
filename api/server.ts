@@ -55,12 +55,12 @@ schedule(CRON_MIDNIGHT, async () => {
       );
 
 
-      /*while (tips.next_page_url !== null) {
+      while (tips.next_page_url !== null) {
         const tripsNew = await getTrips(nextPage.replace("/?", ""));
         tripsList.push(...tripsNew.data.data);
         tips = tripsNew.data;
         nextPage = "&" + tripsNew.data.next_page_url;
-      }*/
+      }
 
       
         await Promise.all(
