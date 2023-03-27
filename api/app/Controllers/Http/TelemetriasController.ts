@@ -2,6 +2,7 @@ import { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
 import Database from "@ioc:Adonis/Lucid/Database";
 import { schema } from "@ioc:Adonis/Core/Validator";
 import { isValidDate } from "App/utils/functions";
+import Funcionario from "App/Models/Funcionario";
 
 const formato_data = "YYYY-MM-DD";
 
@@ -157,75 +158,82 @@ export default class TelemetriasController {
     return events;
   }
 
-  /*public async score({request,response}: HttpContextContract) {
+  public async score({request,response,auth}: HttpContextContract) {
     
     try {
       const queryParams = request.qs();
       if (isValidDate(queryParams.data_inicial) && isValidDate(queryParams.data_final)) {
-
+        let funcionario = await Funcionario.findBy('id_funcionario',auth.user?.id_funcionario);
         const data_inicial = queryParams.data_inicial;
         const data_final = queryParams.data_final;
 
-
-
         let abs = await Database.connection('pg').rawQuery(`
-          SELECT COUNT(events_trip.*) as abs
+          SELECT COUNT(events_trip.*) as sum_abs
           FROM ml_int_telemetria_trips trips
           INNER JOIN ml_int_telemetria_subtrips subtrips ON (subtrips.trip_id = trips.drive_id)
           INNER JOIN ml_int_telemetria_events_trip events_trip ON (events_trip.trip_id = trips.id_trip)
           INNER JOIN ml_int_telemetria_kontrow_evento event ON (events_trip.event_type_id = event.id_evento_kontrow)
-          WHERE (event.id_evento_kontrow = 32)
-          and to_date(trips.date,'YYYY-MM-DD') BETWEEN to_date(${data_inicial},'YYYY-MM-DD') and to_date(${data_final},'YYYY-MM-DD');
+          WHERE events_trip.event_type_id = 32
+          AND subtrips.worker_id = ${funcionario?.id_funcionario_erp}
+          and TO_CHAR(trips.date,'YYYY-MM-DD') >= '${data_inicial}' AND TO_CHAR(trips.date,'YYYY-MM-DD') <= '${data_final}'
         `);
 
         let acceleration = await Database.connection('pg').rawQuery(`
-          SELECT COUNT(events_trip.*) as abs
+          SELECT COUNT(events_trip.*) as sum_acceleration
           FROM ml_int_telemetria_trips trips
           INNER JOIN ml_int_telemetria_subtrips subtrips ON (subtrips.trip_id = trips.drive_id)
           INNER JOIN ml_int_telemetria_events_trip events_trip ON (events_trip.trip_id = trips.id_trip)
           INNER JOIN ml_int_telemetria_kontrow_evento event ON (events_trip.event_type_id = event.id_evento_kontrow)
-          WHERE (event.id_evento_kontrow = 21)
-          and to_date(trips.date,'YYYY-MM-DD') BETWEEN to_date(${data_inicial},'YYYY-MM-DD') and to_date(${data_final},'YYYY-MM-DD');
+          WHERE events_trip.event_type_id = 21
+          AND subtrips.worker_id = ${funcionario?.id_funcionario_erp}
+          and TO_CHAR(trips.date,'YYYY-MM-DD') >= '${data_inicial}' AND TO_CHAR(trips.date,'YYYY-MM-DD') <= '${data_final}'
         `);
 
         let braking = await Database.connection('pg').rawQuery(`
-          SELECT COUNT(events_trip.*) as abs
+          SELECT COUNT(events_trip.*) as sum_braking
           FROM ml_int_telemetria_trips trips
           INNER JOIN ml_int_telemetria_subtrips subtrips ON (subtrips.trip_id = trips.drive_id)
           INNER JOIN ml_int_telemetria_events_trip events_trip ON (events_trip.trip_id = trips.id_trip)
           INNER JOIN ml_int_telemetria_kontrow_evento event ON (events_trip.event_type_id = event.id_evento_kontrow)
-          WHERE (event.id_evento_kontrow = 21)
-          and to_date(trips.date,'YYYY-MM-DD') BETWEEN to_date(${data_inicial},'YYYY-MM-DD') and to_date(${data_final},'YYYY-MM-DD');
+          WHERE events_trip.event_type_id = 22
+          AND subtrips.worker_id = ${funcionario?.id_funcionario_erp}
+          and TO_CHAR(trips.date,'YYYY-MM-DD') >= '${data_inicial}' AND TO_CHAR(trips.date,'YYYY-MM-DD') <= '${data_final}'
         `);
 
         let sharp_turn = await Database.connection('pg').rawQuery(`
-        SELECT COUNT(events_trip.*) as abs
+        SELECT COUNT(events_trip.*) as sum_sharp_turn
           FROM ml_int_telemetria_trips trips
           INNER JOIN ml_int_telemetria_subtrips subtrips ON (subtrips.trip_id = trips.drive_id)
           INNER JOIN ml_int_telemetria_events_trip events_trip ON (events_trip.trip_id = trips.id_trip)
-          INNER JOIN ml_int_telemetria_kontrow_evento event ON (events_trip.event_type_id = event.id_evento_kontrow)
-          WHERE event.id_evento_kontrow IN (54,55)
-          and to_date(trips.date,'YYYY-MM-DD') BETWEEN to_date(${data_inicial},'YYYY-MM-DD') and to_date(${data_final},'YYYY-MM-DD');
+          WHERE events_trip.event_type_id IN (54,55)
+          AND subtrips.worker_id = ${funcionario?.id_funcionario_erp}
+          and TO_CHAR(trips.date,'YYYY-MM-DD') >= '${data_inicial}' AND TO_CHAR(trips.date,'YYYY-MM-DD') <= '${data_final}'
         `);
 
         let speed_up = await Database.connection('pg').rawQuery(`
-        SELECT COUNT(events_trip.*) as abs
+        SELECT COUNT(events_trip.*) as sum_speed_up
           FROM ml_int_telemetria_trips trips
           INNER JOIN ml_int_telemetria_subtrips subtrips ON (subtrips.trip_id = trips.drive_id)
           INNER JOIN ml_int_telemetria_events_trip events_trip ON (events_trip.trip_id = trips.id_trip)
-          INNER JOIN ml_int_telemetria_kontrow_evento event ON (events_trip.event_type_id = event.id_evento_kontrow)
-          WHERE event.id_evento_kontrow IN (54,55)
-          and to_date(trips.date,'YYYY-MM-DD') BETWEEN to_date(${data_inicial},'YYYY-MM-DD') and to_date(${data_final},'YYYY-MM-DD');
+          WHERE events_trip.event_type_id IN (54,55)
+          AND subtrips.worker_id = ${funcionario?.id_funcionario_erp}
+          and TO_CHAR(trips.date,'YYYY-MM-DD') >= '${data_inicial}' AND TO_CHAR(trips.date,'YYYY-MM-DD') <= '${data_final}'
         `);
-        console.log(abs);
 
+        const { sum_abs } = abs.rows[0];
+        const { sum_acceleration } = acceleration.rows[0];
+        const { sum_braking } = braking.rows[0];
+        const { sum_sharp_turn } = sharp_turn.rows[0];
+        const { sum_speed_up } = speed_up.rows[0];
 
         response.json({
-          abs: abs,
-          acceleration : acceleration,
-          braking : braking,
-          sharp_turn : sharp_turn,
-          speed_up : speed_up,
+          abs: sum_abs,
+          acceleration : sum_acceleration,
+          braking : sum_braking,
+          sharp_turn : sum_sharp_turn,
+          speed_up : sum_speed_up,
+        });
+        /*
           distance : distance,
           driver : driver,
           group_descr : group_descr,
@@ -233,7 +241,8 @@ export default class TelemetriasController {
           mkbe : distance / total_score,
           total_score : total_score,
           worker_id : worker_id
-        });
+
+        */
       } else {
         response.badRequest({error :"Período não informado ou data inválida."});
       }
@@ -241,6 +250,19 @@ export default class TelemetriasController {
     } catch (error) {
       response.badRequest(error);
     }
-  }*/
+  }
+
+  private async consultarDadosTelemetria (campos:string, idEvents, data_inicial, data_final) {
+    let retorno = await Database.connection('pg').rawQuery(`
+      SELECT COUNT(events_trip.*) as total
+        FROM ml_int_telemetria_trips trips
+        INNER JOIN ml_int_telemetria_subtrips subtrips ON (subtrips.trip_id = trips.drive_id)
+        INNER JOIN ml_int_telemetria_events_trip events_trip ON (events_trip.trip_id = trips.id_trip)
+        WHERE events_trip.event_type_id IN (${idEvents})
+        and TO_CHAR(trips.date,'YYYY-MM-DD') >= '${data_inicial}' AND TO_CHAR(trips.date,'YYYY-MM-DD') <= '${data_final}'
+    `);
+
+    return retorno;
+  } 
 
 }

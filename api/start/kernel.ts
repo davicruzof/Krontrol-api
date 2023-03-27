@@ -46,4 +46,6 @@ Server.middleware.registerNamed({
   multer : 'App/Middleware/Multer'
 })*/
 
-Event.on("db:query", function () {});
+Event.on('db:query', function ({ sql, bindings }) {
+  console.log(sql, bindings)
+});
