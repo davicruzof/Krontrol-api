@@ -62,7 +62,7 @@ class AuthController {
             if (!isValidPassword) {
                 return response.unauthorized({ error: "Dados inválidos" });
             }
-            await auth.use("api").generate(user);
+            response.json(await auth.use("api").generate(user));
         }
         catch (error) {
             response.badRequest(error.messages);
