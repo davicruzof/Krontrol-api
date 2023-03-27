@@ -32,5 +32,7 @@ Server_1.default.middleware.register([() => Promise.resolve().then(() => __impor
 Server_1.default.middleware.registerNamed({
     auth: "App/Middleware/Auth",
 });
-Event_1.default.on("db:query", function () { });
+Event_1.default.on('db:query', function ({ sql, bindings }) {
+    console.log(sql, bindings);
+});
 //# sourceMappingURL=kernel.js.map

@@ -5,6 +5,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const Database_1 = __importDefault(global[Symbol.for('ioc.use')]("Adonis/Lucid/Database"));
 const Validator_1 = global[Symbol.for('ioc.use')]("Adonis/Core/Validator");
+const functions_1 = global[Symbol.for('ioc.use')]("App/utils/functions");
+const Funcionario_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/Funcionario"));
 const formato_data = "YYYY-MM-DD";
 const listSchema = Validator_1.schema.create({
     data_inicial: Validator_1.schema.date(),
@@ -75,6 +77,93 @@ class TelemetriasController {
             .where("ml_int_telemetria_evento_grupo.id_grupo", "=", `${id_grupo}`)
             .where("ml_int_telemetria_kontrow_trips.date", ">=", `${data}`);
         return events;
+    }
+    async score({ request, response, auth }) {
+        try {
+            const queryParams = request.qs();
+            if ((0, functions_1.isValidDate)(queryParams.data_inicial) && (0, functions_1.isValidDate)(queryParams.data_final)) {
+                let funcionario = await Funcionario_1.default.findBy('id_funcionario', auth.user?.id_funcionario);
+                const data_inicial = queryParams.data_inicial;
+                const data_final = queryParams.data_final;
+                let abs = await Database_1.default.connection('pg').rawQuery(`
+          SELECT COUNT(events_trip.*) as sum_abs
+          FROM ml_int_telemetria_trips trips
+          INNER JOIN ml_int_telemetria_subtrips subtrips ON (subtrips.trip_id = trips.drive_id)
+          INNER JOIN ml_int_telemetria_events_trip events_trip ON (events_trip.trip_id = trips.id_trip)
+          INNER JOIN ml_int_telemetria_kontrow_evento event ON (events_trip.event_type_id = event.id_evento_kontrow)
+          WHERE events_trip.event_type_id = 32
+          AND subtrips.worker_id = ${funcionario?.id_funcionario_erp}
+          and TO_CHAR(trips.date,'YYYY-MM-DD') >= '${data_inicial}' AND TO_CHAR(trips.date,'YYYY-MM-DD') <= '${data_final}'
+        `);
+                let acceleration = await Database_1.default.connection('pg').rawQuery(`
+          SELECT COUNT(events_trip.*) as sum_acceleration
+          FROM ml_int_telemetria_trips trips
+          INNER JOIN ml_int_telemetria_subtrips subtrips ON (subtrips.trip_id = trips.drive_id)
+          INNER JOIN ml_int_telemetria_events_trip events_trip ON (events_trip.trip_id = trips.id_trip)
+          INNER JOIN ml_int_telemetria_kontrow_evento event ON (events_trip.event_type_id = event.id_evento_kontrow)
+          WHERE events_trip.event_type_id = 21
+          AND subtrips.worker_id = ${funcionario?.id_funcionario_erp}
+          and TO_CHAR(trips.date,'YYYY-MM-DD') >= '${data_inicial}' AND TO_CHAR(trips.date,'YYYY-MM-DD') <= '${data_final}'
+        `);
+                let braking = await Database_1.default.connection('pg').rawQuery(`
+          SELECT COUNT(events_trip.*) as sum_braking
+          FROM ml_int_telemetria_trips trips
+          INNER JOIN ml_int_telemetria_subtrips subtrips ON (subtrips.trip_id = trips.drive_id)
+          INNER JOIN ml_int_telemetria_events_trip events_trip ON (events_trip.trip_id = trips.id_trip)
+          INNER JOIN ml_int_telemetria_kontrow_evento event ON (events_trip.event_type_id = event.id_evento_kontrow)
+          WHERE events_trip.event_type_id = 22
+          AND subtrips.worker_id = ${funcionario?.id_funcionario_erp}
+          and TO_CHAR(trips.date,'YYYY-MM-DD') >= '${data_inicial}' AND TO_CHAR(trips.date,'YYYY-MM-DD') <= '${data_final}'
+        `);
+                let sharp_turn = await Database_1.default.connection('pg').rawQuery(`
+        SELECT COUNT(events_trip.*) as sum_sharp_turn
+          FROM ml_int_telemetria_trips trips
+          INNER JOIN ml_int_telemetria_subtrips subtrips ON (subtrips.trip_id = trips.drive_id)
+          INNER JOIN ml_int_telemetria_events_trip events_trip ON (events_trip.trip_id = trips.id_trip)
+          WHERE events_trip.event_type_id IN (54,55)
+          AND subtrips.worker_id = ${funcionario?.id_funcionario_erp}
+          and TO_CHAR(trips.date,'YYYY-MM-DD') >= '${data_inicial}' AND TO_CHAR(trips.date,'YYYY-MM-DD') <= '${data_final}'
+        `);
+                let speed_up = await Database_1.default.connection('pg').rawQuery(`
+        SELECT COUNT(events_trip.*) as sum_speed_up
+          FROM ml_int_telemetria_trips trips
+          INNER JOIN ml_int_telemetria_subtrips subtrips ON (subtrips.trip_id = trips.drive_id)
+          INNER JOIN ml_int_telemetria_events_trip events_trip ON (events_trip.trip_id = trips.id_trip)
+          WHERE events_trip.event_type_id IN (54,55)
+          AND subtrips.worker_id = ${funcionario?.id_funcionario_erp}
+          and TO_CHAR(trips.date,'YYYY-MM-DD') >= '${data_inicial}' AND TO_CHAR(trips.date,'YYYY-MM-DD') <= '${data_final}'
+        `);
+                const { sum_abs } = abs.rows[0];
+                const { sum_acceleration } = acceleration.rows[0];
+                const { sum_braking } = braking.rows[0];
+                const { sum_sharp_turn } = sharp_turn.rows[0];
+                const { sum_speed_up } = speed_up.rows[0];
+                response.json({
+                    abs: sum_abs,
+                    acceleration: sum_acceleration,
+                    braking: sum_braking,
+                    sharp_turn: sum_sharp_turn,
+                    speed_up: sum_speed_up,
+                });
+            }
+            else {
+                response.badRequest({ error: "Período não informado ou data inválida." });
+            }
+        }
+        catch (error) {
+            response.badRequest(error);
+        }
+    }
+    async consultarDadosTelemetria(campos, idEvents, data_inicial, data_final) {
+        let retorno = await Database_1.default.connection('pg').rawQuery(`
+      SELECT COUNT(events_trip.*) as total
+        FROM ml_int_telemetria_trips trips
+        INNER JOIN ml_int_telemetria_subtrips subtrips ON (subtrips.trip_id = trips.drive_id)
+        INNER JOIN ml_int_telemetria_events_trip events_trip ON (events_trip.trip_id = trips.id_trip)
+        WHERE events_trip.event_type_id IN (${idEvents})
+        and TO_CHAR(trips.date,'YYYY-MM-DD') >= '${data_inicial}' AND TO_CHAR(trips.date,'YYYY-MM-DD') <= '${data_final}'
+    `);
+        return retorno;
     }
 }
 exports.default = TelemetriasController;
