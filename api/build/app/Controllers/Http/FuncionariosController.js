@@ -251,7 +251,6 @@ class FuncionariosController {
             await request.validate({
                 schema: Validator_1.schema.create({ data: Validator_1.schema.date({ format: 'yyyy-mm' }) }),
             });
-            return;
             let dados = request.body();
             let data = dados.data.split('-');
             const lastDay = new Date(data[0], data[1] + 1, 0);
