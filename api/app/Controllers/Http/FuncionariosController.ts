@@ -329,7 +329,6 @@ export default class FuncionariosController {
       await request.validate({
         schema: schema.create({data : schema.date({format:'yyyy-mm'})}),
       });
-      return;
       let dados = request.body();
       let data = dados.data.split('-');
       const lastDay = new Date(data[0], data[1] + 1, 0);
