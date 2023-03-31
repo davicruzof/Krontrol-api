@@ -326,8 +326,16 @@ export default class FuncionariosController {
 
   public async dotCard({ request, auth, response }: HttpContextContract) {
     try {
+      await request.validate({
+        schema: schema.create({data : schema.date({format:'yyyy-mm'})}),
+      });
+      return;
       let dados = request.body();
-
+      let data = dados.data.split('-');
+      const lastDay = new Date(data[0], data[1] + 1, 0);
+      const firstDay = new Date(data[0], data[1], 1);
+      console.log(lastDay);
+      
       if (dados.data) {
         let funcionario = await Funcionario.findBy(
           "id_funcionario",
@@ -357,7 +365,7 @@ export default class FuncionariosController {
                                     left join globus.frt_cadveiculos car on pon.codigoveic = car.codigoveic
                                     left join globus.bgm_cadlinhas lin on pon.codintlinha = lin.codintlinha
                                     WHERE
-                                        pon.dtdigit BETWEEN to_date('01/${dados.data}','DD/MM/YYYY') and to_date('31/${dados.data}','DD/MM/YYYY')
+                                        pon.dtdigit BETWEEN to_date('${firstDay.toLocaleDateString()}','DD/MM/YYYY') and to_date('${lastDay.toLocaleDateString()}','DD/MM/YYYY')
                                         and func.id_funcionario_erp= '${funcionario?.id_funcionario_erp}'
                                     order by DATA_DIGITACAO ASC
                                     `);

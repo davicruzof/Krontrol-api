@@ -3,6 +3,7 @@ import Database from "@ioc:Adonis/Lucid/Database";
 import { schema } from "@ioc:Adonis/Core/Validator";
 import { isValidDate } from "App/utils/functions";
 import Funcionario from "App/Models/Funcionario";
+import { Exception } from "@adonisjs/core/build/standalone";
 
 const formato_data = "YYYY-MM-DD";
 
@@ -171,8 +172,7 @@ export default class TelemetriasController {
           SELECT COUNT(events_trip.*) as sum_abs
           FROM ml_int_telemetria_trips trips
           INNER JOIN ml_int_telemetria_subtrips subtrips ON (subtrips.trip_id = trips.drive_id)
-          INNER JOIN ml_int_telemetria_events_trip events_trip ON (events_trip.trip_id = trips.id_trip)
-          INNER JOIN ml_int_telemetria_kontrow_evento event ON (events_trip.event_type_id = event.id_evento_kontrow)
+          INNER JOIN ml_int_telemetria_events_trip events_trip ON (events_trip.asset_id::int = trips.asset_id)
           WHERE events_trip.event_type_id = 32
           AND subtrips.worker_id = ${funcionario?.id_funcionario_erp}
           and TO_CHAR(trips.date,'YYYY-MM-DD') >= '${data_inicial}' AND TO_CHAR(trips.date,'YYYY-MM-DD') <= '${data_final}'
@@ -182,8 +182,7 @@ export default class TelemetriasController {
           SELECT COUNT(events_trip.*) as sum_acceleration
           FROM ml_int_telemetria_trips trips
           INNER JOIN ml_int_telemetria_subtrips subtrips ON (subtrips.trip_id = trips.drive_id)
-          INNER JOIN ml_int_telemetria_events_trip events_trip ON (events_trip.trip_id = trips.id_trip)
-          INNER JOIN ml_int_telemetria_kontrow_evento event ON (events_trip.event_type_id = event.id_evento_kontrow)
+          INNER JOIN ml_int_telemetria_events_trip events_trip ON (events_trip.asset_id::int = trips.asset_id)
           WHERE events_trip.event_type_id = 21
           AND subtrips.worker_id = ${funcionario?.id_funcionario_erp}
           and TO_CHAR(trips.date,'YYYY-MM-DD') >= '${data_inicial}' AND TO_CHAR(trips.date,'YYYY-MM-DD') <= '${data_final}'
@@ -193,8 +192,7 @@ export default class TelemetriasController {
           SELECT COUNT(events_trip.*) as sum_braking
           FROM ml_int_telemetria_trips trips
           INNER JOIN ml_int_telemetria_subtrips subtrips ON (subtrips.trip_id = trips.drive_id)
-          INNER JOIN ml_int_telemetria_events_trip events_trip ON (events_trip.trip_id = trips.id_trip)
-          INNER JOIN ml_int_telemetria_kontrow_evento event ON (events_trip.event_type_id = event.id_evento_kontrow)
+          INNER JOIN ml_int_telemetria_events_trip events_trip ON (events_trip.asset_id::int = trips.asset_id)
           WHERE events_trip.event_type_id = 22
           AND subtrips.worker_id = ${funcionario?.id_funcionario_erp}
           and TO_CHAR(trips.date,'YYYY-MM-DD') >= '${data_inicial}' AND TO_CHAR(trips.date,'YYYY-MM-DD') <= '${data_final}'
@@ -204,7 +202,7 @@ export default class TelemetriasController {
         SELECT COUNT(events_trip.*) as sum_sharp_turn
           FROM ml_int_telemetria_trips trips
           INNER JOIN ml_int_telemetria_subtrips subtrips ON (subtrips.trip_id = trips.drive_id)
-          INNER JOIN ml_int_telemetria_events_trip events_trip ON (events_trip.trip_id = trips.id_trip)
+          INNER JOIN ml_int_telemetria_events_trip events_trip ON (events_trip.asset_id::int = trips.asset_id)
           WHERE events_trip.event_type_id IN (54,55)
           AND subtrips.worker_id = ${funcionario?.id_funcionario_erp}
           and TO_CHAR(trips.date,'YYYY-MM-DD') >= '${data_inicial}' AND TO_CHAR(trips.date,'YYYY-MM-DD') <= '${data_final}'
@@ -214,7 +212,7 @@ export default class TelemetriasController {
         SELECT COUNT(events_trip.*) as sum_speed_up
           FROM ml_int_telemetria_trips trips
           INNER JOIN ml_int_telemetria_subtrips subtrips ON (subtrips.trip_id = trips.drive_id)
-          INNER JOIN ml_int_telemetria_events_trip events_trip ON (events_trip.trip_id = trips.id_trip)
+          INNER JOIN ml_int_telemetria_events_trip events_trip ON (events_trip.asset_id::int = trips.asset_id)
           WHERE events_trip.event_type_id IN (54,55)
           AND subtrips.worker_id = ${funcionario?.id_funcionario_erp}
           and TO_CHAR(trips.date,'YYYY-MM-DD') >= '${data_inicial}' AND TO_CHAR(trips.date,'YYYY-MM-DD') <= '${data_final}'
@@ -224,23 +222,25 @@ export default class TelemetriasController {
         SELECT COUNT(events_trip.*) as sum_speed_up,subtrips.driver_name, subtrips.worker_id, trips.line_name, SUM(trips.total_mileage::numeric) as distance
           FROM ml_int_telemetria_trips trips
           INNER JOIN ml_int_telemetria_subtrips subtrips ON (subtrips.trip_id = trips.drive_id)
-          INNER JOIN ml_int_telemetria_events_trip events_trip ON (events_trip.trip_id = trips.id_trip)
+          INNER JOIN ml_int_telemetria_events_trip events_trip ON (events_trip.asset_id::int = trips.asset_id)
           WHERE events_trip.event_type_id IN (54,55)
           AND subtrips.worker_id = ${funcionario?.id_funcionario_erp}
           and TO_CHAR(trips.date,'YYYY-MM-DD') >= '${data_inicial}' AND TO_CHAR(trips.date,'YYYY-MM-DD') <= '${data_final}'
           GROUP BY subtrips.driver_name,subtrips.worker_id,trips.line_name
         `);
-
         const { sum_abs } = abs.rows[0];
         const { sum_acceleration } = acceleration.rows[0];
         const { sum_braking } = braking.rows[0];
         const { sum_sharp_turn } = sharp_turn.rows[0];
         const { sum_speed_up } = speed_up.rows[0];
-        const { driver_name } = distance_sum.rows[0];
-        const { worker_id } = distance_sum.rows[0];
-        const { line_name } = distance_sum.rows[0];
-        const { distance } = distance_sum.rows[0];
+        if (distance_sum.rows[0]) {
+          const { driver_name } = distance_sum.rows[0];
+          const { worker_id } = distance_sum.rows[0];
+          const { line_name } = distance_sum.rows[0];
+          const { distance } = distance_sum.rows[0];
+        }
         const total_score = sum_abs + sum_acceleration + sum_braking + sum_sharp_turn + sum_speed_up;
+
         response.json({
           total_score : total_score,
           distance : distance,
@@ -269,7 +269,8 @@ export default class TelemetriasController {
       }
 
     } catch (error) {
-      response.badRequest(error);
+      console.log(error);
+      response.badRequest({error :'Erro interno'});
     }
   }
 
