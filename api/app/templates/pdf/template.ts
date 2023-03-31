@@ -220,11 +220,6 @@ export const templateDotCard = `
                     width: 20%;">
                 {{dados.totais.DESCONTOS}}
             </td>
-            <td style="
-                border: 1px solid black; 
-                width: 20%;">
-                {{dados.totais.LIQUIDO}}
-            </td>
         </tr>
 
     </table>
@@ -233,45 +228,55 @@ export const templateDotCard = `
         <tr>
             <th style="
                         border: 1px solid black; 
-                        width: 25%;">
+                        width: 20%;">
                 Base FGTS
             </th>
             <th style="
                         border: 1px solid black; 
-                        width: 25%;">
+                        width: 20%;">
                 FGTS
             </th>
             <th style="
                         border: 1px solid black; 
-                        width: 25%;">
+                        width: 20%;">
                 Base IRRF
             </th>
             <th style="
                         border: 1px solid black; 
-                        width: 25%;">
+                        width: 20%;">
                 Base INSS
+            </th>
+            <th style="
+                        border: 1px solid black; 
+                        width: 20%;">
+                LIQUIDO
             </th>
         </tr>
         <tr>
             <td style="
                         border: 1px solid black; 
-                        width: 25%;">
+                        width: 20%;">
                 {{ dados.bases.BASE_FGTS_FOLHA }}
             </td>
             <td style="
                         border: 1px solid black; 
-                        width: 25%;">
+                        width: 20%;">
                 {{dados.bases.FGTS_FOLHA}}
             </td>
             <td style="
                         border: 1px solid black; 
-                        width: 25%;">
+                        width: 20%;">
                 {{dados.bases.BASE_IRRF_FOLHA}}
             </td>
             <td style="
                         border: 1px solid black; 
-                        width: 25%;">
+                        width: 20%;">
                 {{dados.bases.BASE_INSS_FOLHA}}
+            </td>
+            <td style="
+                        border: 1px solid black; 
+                        width: 20%;">
+                {{dados.totais.LIQUIDO}}
             </td>
         </tr>
     </table>

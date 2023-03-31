@@ -572,6 +572,8 @@ export default class FuncionariosController {
         dadosTemp.totais.DESCONTOS = element.VALORFICHA;
       } else if (element.DESCEVEN == "TOTAL DE PROVENTOS") {
         dadosTemp.totais.PROVENTOS = element.VALORFICHA;
+      } else if (element.DESCEVEN == "LIQUIDO DA FOLHA") {
+        dadosTemp.totais.LIQUIDO = element.VALORFICHA;
       } else if (element.TIPOEVEN != "B") {
         if (element.VALORFICHA[0] == ",") {
           element.VALORFICHA = "0" + element.VALORFICHA;
@@ -580,7 +582,6 @@ export default class FuncionariosController {
         dadosTemp.descricao.push(element);
       }
     });
-    dadosTemp.totais.LIQUIDO = dadosTemp.totais.PROVENTOS - dadosTemp.totais.DESCONTOS;
     return dadosTemp;
   }
 
