@@ -365,6 +365,7 @@ export default class FuncionariosController {
                                     left join globus.frt_cadveiculos car on pon.codigoveic = car.codigoveic
                                     left join globus.bgm_cadlinhas lin on pon.codintlinha = lin.codintlinha
                                     WHERE
+                                        pon.tipodigit = 'F' AND
                                         pon.dtdigit BETWEEN to_date('${firstDay.toLocaleDateString()}','DD/MM/YYYY') and to_date('${lastDay.toLocaleDateString()}','DD/MM/YYYY')
                                         and func.id_funcionario_erp= '${funcionario?.id_funcionario_erp}'
                                     order by DATA_DIGITACAO ASC
