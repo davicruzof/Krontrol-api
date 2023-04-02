@@ -253,9 +253,8 @@ class FuncionariosController {
             });
             let dados = request.body();
             let data = dados.data.split('-');
-            const lastDay = new Date(data[0], data[1] + 1, 0);
-            const firstDay = new Date(data[0], data[1], 1);
-            console.log(lastDay);
+            const firstDay = new Date(data[0], data[1] - 1, 1);
+            const lastDay = new Date(firstDay.getFullYear(), firstDay.getMonth() + 1, 0);
             if (dados.data) {
                 let funcionario = await Funcionario_1.default.findBy("id_funcionario", auth.user?.id_funcionario);
                 let query = await Database_1.default.connection("oracle").rawQuery(`
