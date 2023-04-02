@@ -27,7 +27,7 @@ export const EmpresaSchemaUpdate = {
     cnpj: schema.string.nullableAndOptional(),
     nomeempresarial: schema.string.nullableAndOptional(),
     logradouro: schema.string.nullableAndOptional(),
-    numero: schema.number.nullableAndOptional(),
+    numero: schema.string.nullableAndOptional(),
     complemento: schema.string.nullableAndOptional(),
     cep: schema.string.nullableAndOptional(),
     bairro: schema.string.nullableAndOptional(),

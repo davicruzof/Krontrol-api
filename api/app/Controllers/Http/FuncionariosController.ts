@@ -331,10 +331,11 @@ export default class FuncionariosController {
       });
       let dados = request.body();
       let data = dados.data.split('-');
-      const lastDay = new Date(data[0], data[1] + 1, 0);
-      const firstDay = new Date(data[0], data[1], 1);
-      console.log(lastDay);
-      
+      const firstDay = new Date(data[0], data[1]-1, 1);
+      //console.log(firstDay.toLocaleDateString());
+      const lastDay = new Date(firstDay.getFullYear(), firstDay.getMonth() + 1, 0);
+      //console.log(lastDay.toLocaleDateString());
+
       if (dados.data) {
         let funcionario = await Funcionario.findBy(
           "id_funcionario",
