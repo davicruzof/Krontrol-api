@@ -730,11 +730,12 @@ export default class FuncionariosController {
 
   public async getVideos({ response, auth }: HttpContextContract) {
     try {
+      const hoje = new Date();
       let dados = await Database.connection("pg").rawQuery(`
                 SELECT * FROM ml_fol_md_video_funcionario video_func
                         INNER JOIN ml_md_video video ON(video_func.id_video = video.id_video)
                         WHERE video_func.id_funcionario = '${auth.user?.id_funcionario}'
-                                AND to_char(video.dt_expiracao,'YYYY-MM-DD') >= to_char(CURRENT_DATE,'YYYY-MM-DD')
+                                AND to_char(video.dt_expiracao,'DD-MM-YYYY') >= '${hoje.toLocaleDateString()}'
             `);
 
       response.json(dados.rows);

@@ -213,7 +213,7 @@ export default class TelemetriasController {
           FROM ml_int_telemetria_trips trips
           INNER JOIN ml_int_telemetria_subtrips subtrips ON (subtrips.trip_id = trips.drive_id)
           INNER JOIN ml_int_telemetria_events_trip events_trip ON (events_trip.asset_id::int = trips.asset_id)
-          WHERE events_trip.event_type_id IN (54,55)
+          WHERE events_trip.event_type_id IN (5,10)
           AND subtrips.worker_id = ${funcionario?.id_funcionario_erp}
           and TO_CHAR(trips.date,'YYYY-MM-DD') >= '${data_inicial}' AND TO_CHAR(trips.date,'YYYY-MM-DD') <= '${data_final}'
         `);
@@ -223,7 +223,7 @@ export default class TelemetriasController {
           FROM ml_int_telemetria_trips trips
           INNER JOIN ml_int_telemetria_subtrips subtrips ON (subtrips.trip_id = trips.drive_id)
           INNER JOIN ml_int_telemetria_events_trip events_trip ON (events_trip.asset_id::int = trips.asset_id)
-          WHERE events_trip.event_type_id IN (54,55)
+          WHERE events_trip.event_type_id IN (63,44)
           AND subtrips.worker_id = ${funcionario?.id_funcionario_erp}
           and TO_CHAR(trips.date,'YYYY-MM-DD') >= '${data_inicial}' AND TO_CHAR(trips.date,'YYYY-MM-DD') <= '${data_final}'
           GROUP BY subtrips.driver_name,subtrips.worker_id,trips.line_name
@@ -233,12 +233,17 @@ export default class TelemetriasController {
         const { sum_braking } = braking.rows[0];
         const { sum_sharp_turn } = sharp_turn.rows[0];
         const { sum_speed_up } = speed_up.rows[0];
+        let driver_name;
+        let line_name;
+        let distance;
+        let worker_id;
         if (distance_sum.rows[0]) {
-          const { driver_name } = distance_sum.rows[0];
-          const { worker_id } = distance_sum.rows[0];
-          const { line_name } = distance_sum.rows[0];
-          const { distance } = distance_sum.rows[0];
+          ({driver_name} = distance_sum.rows[0]);
+          ({line_name} = distance_sum.rows[0]);
+          ({distance} = distance_sum.rows[0]);
+          ({worker_id} = distance_sum.rows[0]);
         }
+        
         const total_score = sum_abs + sum_acceleration + sum_braking + sum_sharp_turn + sum_speed_up;
 
         response.json({
