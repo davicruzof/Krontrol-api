@@ -183,7 +183,7 @@ export default class TelemetriasController {
           FROM ml_int_telemetria_trips trips
           INNER JOIN ml_int_telemetria_subtrips subtrips ON (subtrips.trip_id = trips.drive_id)
           INNER JOIN ml_int_telemetria_events_trip events_trip ON (events_trip.asset_id::int = trips.asset_id)
-          WHERE events_trip.event_type_id = 21
+          WHERE events_trip.event_type_id IN (2,21)
           AND subtrips.worker_id = ${funcionario?.id_funcionario_erp}
           and TO_CHAR(trips.date,'YYYY-MM-DD') >= '${data_inicial}' AND TO_CHAR(trips.date,'YYYY-MM-DD') <= '${data_final}'
         `);
@@ -193,7 +193,7 @@ export default class TelemetriasController {
           FROM ml_int_telemetria_trips trips
           INNER JOIN ml_int_telemetria_subtrips subtrips ON (subtrips.trip_id = trips.drive_id)
           INNER JOIN ml_int_telemetria_events_trip events_trip ON (events_trip.asset_id::int = trips.asset_id)
-          WHERE events_trip.event_type_id = 22
+          WHERE events_trip.event_type_id IN (15,16)
           AND subtrips.worker_id = ${funcionario?.id_funcionario_erp}
           and TO_CHAR(trips.date,'YYYY-MM-DD') >= '${data_inicial}' AND TO_CHAR(trips.date,'YYYY-MM-DD') <= '${data_final}'
         `);
@@ -213,7 +213,7 @@ export default class TelemetriasController {
           FROM ml_int_telemetria_trips trips
           INNER JOIN ml_int_telemetria_subtrips subtrips ON (subtrips.trip_id = trips.drive_id)
           INNER JOIN ml_int_telemetria_events_trip events_trip ON (events_trip.asset_id::int = trips.asset_id)
-          WHERE events_trip.event_type_id IN (5,10)
+          WHERE events_trip.event_type_id IN (2)
           AND subtrips.worker_id = ${funcionario?.id_funcionario_erp}
           and TO_CHAR(trips.date,'YYYY-MM-DD') >= '${data_inicial}' AND TO_CHAR(trips.date,'YYYY-MM-DD') <= '${data_final}'
         `);
@@ -223,11 +223,11 @@ export default class TelemetriasController {
           FROM ml_int_telemetria_trips trips
           INNER JOIN ml_int_telemetria_subtrips subtrips ON (subtrips.trip_id = trips.drive_id)
           INNER JOIN ml_int_telemetria_events_trip events_trip ON (events_trip.asset_id::int = trips.asset_id)
-          WHERE events_trip.event_type_id IN (63,44)
-          AND subtrips.worker_id = ${funcionario?.id_funcionario_erp}
+          WHERE subtrips.worker_id = ${funcionario?.id_funcionario_erp}
           and TO_CHAR(trips.date,'YYYY-MM-DD') >= '${data_inicial}' AND TO_CHAR(trips.date,'YYYY-MM-DD') <= '${data_final}'
           GROUP BY subtrips.driver_name,subtrips.worker_id,trips.line_name
         `);
+        
         const { sum_abs } = abs.rows[0];
         const { sum_acceleration } = acceleration.rows[0];
         const { sum_braking } = braking.rows[0];
