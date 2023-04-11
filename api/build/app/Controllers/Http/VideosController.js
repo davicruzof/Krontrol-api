@@ -18,7 +18,7 @@ class VideosController {
                     descricao: Validator_1.schema.string(),
                     titulo: Validator_1.schema.string(),
                     video: Validator_1.schema.file(),
-                    dt_expiracao: Validator_1.schema.date(),
+                    dt_expiracao: Validator_1.schema.date.nullableAndOptional(),
                 }),
             });
             let video = request.file("video");
