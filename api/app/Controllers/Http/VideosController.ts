@@ -15,7 +15,7 @@ export default class VideosController {
           descricao: schema.string(),
           titulo: schema.string(),
           video: schema.file(),
-          dt_expiracao: schema.date(),
+          dt_expiracao: schema.date.nullableAndOptional(),
         }),
       });
 
