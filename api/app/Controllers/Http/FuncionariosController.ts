@@ -734,7 +734,7 @@ export default class FuncionariosController {
       let dados = await Database.connection("pg").rawQuery(`
                 SELECT * FROM ml_fol_md_video_funcionario video_func
                         INNER JOIN ml_md_video video ON(video_func.id_video = video.id_video)
-                        WHERE video_func.id_funcionario = '20286'
+                        WHERE video_func.id_funcionario = '${auth.user?.id_funcionario}'
                         AND (to_date(to_char(video.dt_expiracao,'DD/MM/YYYY'),'DD/MM/YYYY') >= to_date('${hoje.toLocaleDateString()}','DD/MM/YYYY')
                         OR video.dt_expiracao IS NULL
                         )
