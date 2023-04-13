@@ -168,96 +168,45 @@ export default class TelemetriasController {
         const data_inicial = queryParams.data_inicial;
         const data_final = queryParams.data_final;
 
-        let abs = await Database.connection('pg').rawQuery(`
-          SELECT COUNT(events_trip.*) as sum_abs
-          FROM ml_int_telemetria_trips trips
-          INNER JOIN ml_int_telemetria_subtrips subtrips ON (subtrips.trip_id = trips.drive_id)
-          INNER JOIN ml_int_telemetria_events_trip events_trip ON (events_trip.asset_id::int = trips.asset_id)
-          WHERE events_trip.event_type_id = 32
-          AND subtrips.worker_id = ${funcionario?.id_funcionario_erp}
-          and TO_CHAR(trips.date,'YYYY-MM-DD') >= '${data_inicial}' AND TO_CHAR(trips.date,'YYYY-MM-DD') <= '${data_final}'
-        `);
-
-        let acceleration = await Database.connection('pg').rawQuery(`
-          SELECT COUNT(events_trip.*) as sum_acceleration
-          FROM ml_int_telemetria_trips trips
-          INNER JOIN ml_int_telemetria_subtrips subtrips ON (subtrips.trip_id = trips.drive_id)
-          INNER JOIN ml_int_telemetria_events_trip events_trip ON (events_trip.asset_id::int = trips.asset_id)
-          WHERE events_trip.event_type_id IN (2,21)
-          AND subtrips.worker_id = ${funcionario?.id_funcionario_erp}
-          and TO_CHAR(trips.date,'YYYY-MM-DD') >= '${data_inicial}' AND TO_CHAR(trips.date,'YYYY-MM-DD') <= '${data_final}'
-        `);
-
-        let braking = await Database.connection('pg').rawQuery(`
-          SELECT COUNT(events_trip.*) as sum_braking
-          FROM ml_int_telemetria_trips trips
-          INNER JOIN ml_int_telemetria_subtrips subtrips ON (subtrips.trip_id = trips.drive_id)
-          INNER JOIN ml_int_telemetria_events_trip events_trip ON (events_trip.asset_id::int = trips.asset_id)
-          WHERE events_trip.event_type_id IN (15,16)
-          AND subtrips.worker_id = ${funcionario?.id_funcionario_erp}
-          and TO_CHAR(trips.date,'YYYY-MM-DD') >= '${data_inicial}' AND TO_CHAR(trips.date,'YYYY-MM-DD') <= '${data_final}'
-        `);
-
-        let sharp_turn = await Database.connection('pg').rawQuery(`
-        SELECT COUNT(events_trip.*) as sum_sharp_turn
-          FROM ml_int_telemetria_trips trips
-          INNER JOIN ml_int_telemetria_subtrips subtrips ON (subtrips.trip_id = trips.drive_id)
-          INNER JOIN ml_int_telemetria_events_trip events_trip ON (events_trip.asset_id::int = trips.asset_id)
-          WHERE events_trip.event_type_id IN (54,55)
-          AND subtrips.worker_id = ${funcionario?.id_funcionario_erp}
-          and TO_CHAR(trips.date,'YYYY-MM-DD') >= '${data_inicial}' AND TO_CHAR(trips.date,'YYYY-MM-DD') <= '${data_final}'
-        `);
-
-        let speed_up = await Database.connection('pg').rawQuery(`
-        SELECT COUNT(events_trip.*) as sum_speed_up
-          FROM ml_int_telemetria_trips trips
-          INNER JOIN ml_int_telemetria_subtrips subtrips ON (subtrips.trip_id = trips.drive_id)
-          INNER JOIN ml_int_telemetria_events_trip events_trip ON (events_trip.asset_id::int = trips.asset_id)
-          WHERE events_trip.event_type_id IN (2)
-          AND subtrips.worker_id = ${funcionario?.id_funcionario_erp}
-          and TO_CHAR(trips.date,'YYYY-MM-DD') >= '${data_inicial}' AND TO_CHAR(trips.date,'YYYY-MM-DD') <= '${data_final}'
-        `);
-
-        let distance_sum = await Database.connection('pg').rawQuery(`
-        SELECT COUNT(events_trip.*) as sum_speed_up,subtrips.driver_name, subtrips.worker_id, trips.line_name, SUM(trips.total_mileage::numeric) as distance
-          FROM ml_int_telemetria_trips trips
-          INNER JOIN ml_int_telemetria_subtrips subtrips ON (subtrips.trip_id = trips.drive_id)
-          INNER JOIN ml_int_telemetria_events_trip events_trip ON (events_trip.asset_id::int = trips.asset_id)
-          WHERE subtrips.worker_id = ${funcionario?.id_funcionario_erp}
-          and TO_CHAR(trips.date,'YYYY-MM-DD') >= '${data_inicial}' AND TO_CHAR(trips.date,'YYYY-MM-DD') <= '${data_final}'
-          GROUP BY subtrips.driver_name,subtrips.worker_id,trips.line_name
+        let dados = await Database.connection('pg').rawQuery(`
+          select distinct  
+          count(evento) qtd_evento, evento
+          from vw_ml_bi_kontrow_score sco
+          where
+            to_char(time,'YYYY-MM-DD') between '${data_inicial}' AND '${data_final}'
+            and sco.registro='${funcionario?.registro}'
+            and sco.id_empresa_grupo = 2
+          group by  evento 
         `);
         
-        const { sum_abs } = abs.rows[0];
-        const { sum_acceleration } = acceleration.rows[0];
-        const { sum_braking } = braking.rows[0];
-        const { sum_sharp_turn } = sharp_turn.rows[0];
-        const { sum_speed_up } = speed_up.rows[0];
-        let driver_name;
-        let line_name;
-        let distance;
-        let worker_id;
-        if (distance_sum.rows[0]) {
-          ({driver_name} = distance_sum.rows[0]);
-          ({line_name} = distance_sum.rows[0]);
-          ({distance} = distance_sum.rows[0]);
-          ({worker_id} = distance_sum.rows[0]);
-        }
+        let km_rodados = await Database.connection('pg').rawQuery(`
+          select distinct  
+          avg(cast(km_rodado as numeric)) km_rodado
+          from vw_ml_bi_kontrow_score sco
+          where
+            to_char(time,'YYYY-MM-DD') between '${data_inicial}' AND '${data_final}'
+            and sco.registro='${funcionario?.registro}'
+            and sco.id_empresa_grupo = 2
+          group by  sco.registro 
+        `);
+        let score = await Database.connection('pg').rawQuery(`
+          select distinct  
+          count(evento) total
+          from vw_ml_bi_kontrow_score sco
+          where
+            to_char(time,'YYYY-MM-DD') between '${data_inicial}' AND '${data_final}'
+            and sco.registro='${funcionario?.registro}'
+            and sco.id_empresa_grupo = 2
+          group by  sco.registro 
+        `);
+
         
-        const total_score = sum_abs + sum_acceleration + sum_braking + sum_sharp_turn + sum_speed_up;
+        let {total_score} = score.rows;
 
         response.json({
-          total_score : total_score,
-          distance : distance,
-          abs: sum_abs,
-          acceleration : sum_acceleration,
-          braking : sum_braking,
-          sharp_turn : sum_sharp_turn,
-          speed_up : sum_speed_up,
-          driver_name : driver_name,
-          worker_id : worker_id,
-          line_name : line_name,
-          mkbe : distance / total_score
+          events : dados.rows,
+          score : score.rows[0],
+          distance : km_rodados.rows[0]
         });
         /*
           distance : distance,
