@@ -90,7 +90,7 @@ class TelemetriasController {
           count(evento) qtd_evento, evento
           from vw_ml_bi_kontrow_score sco
           where
-            to_char(time,'YYYY-MM-DD') between '${data_inicial}' AND '${data_final}'
+            to_char(sco.time,'YYYY-MM-DD') between '${data_inicial}' AND '${data_final}'
             and sco.registro='${funcionario?.registro}'
             and sco.id_empresa_grupo = 2
           group by  evento 
@@ -100,7 +100,7 @@ class TelemetriasController {
           avg(cast(km_rodado as numeric)) km_rodado
           from vw_ml_bi_kontrow_score sco
           where
-            to_char(time,'YYYY-MM-DD') between '${data_inicial}' AND '${data_final}'
+            to_char(sco.time,'YYYY-MM-DD') between '${data_inicial}' AND '${data_final}'
             and sco.registro='${funcionario?.registro}'
             and sco.id_empresa_grupo = 2
           group by  sco.registro 
@@ -110,7 +110,7 @@ class TelemetriasController {
           count(evento) total
           from vw_ml_bi_kontrow_score sco
           where
-            to_char(time,'YYYY-MM-DD') between '${data_inicial}' AND '${data_final}'
+          to_char(sco.time,'YYYY-MM-DD') between '${data_inicial}' AND '${data_final}'
             and sco.registro='${funcionario?.registro}'
             and sco.id_empresa_grupo = 2
           group by  sco.registro 
