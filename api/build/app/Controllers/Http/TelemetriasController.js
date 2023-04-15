@@ -116,15 +116,16 @@ class TelemetriasController {
           group by  sco.registro 
         `);
                 let total_eventos = await Database_1.default.connection('pg').rawQuery(`
-        select count(*) as total_eventos
-        from vw_ml_bi_kontrow_score sco
-        where
-        to_char(sco.time,'YYYY-MM-DD') between '${data_inicial}' AND '${data_final}'
-          and sco.registro='${funcionario?.registro}'
-          and sco.id_empresa_grupo = 2
-        group by  sco.registro 
+        select distinct count(evento) score,
+          (select count(*) from ml_int_telemetria_evento_score where id_empresa_grupo = 2 ) total_evento
+          from 
+            vw_ml_bi_kontrow_score sco
+          where 
+            sco.registro='${funcionario?.registro}' and
+            to_char(sco.time,'YYYY-MM-DD') between '${data_inicial}' AND '${data_final}'
+            and sco.id_empresa_grupo = 2
+          group by evento
       `);
-                let { total_score } = score.rows;
                 response.json({
                     funcionario: {
                         registro: funcionario?.registro
@@ -132,7 +133,9 @@ class TelemetriasController {
                     events: dados.rows,
                     score: score.rows[0],
                     distance: km_rodados.rows[0],
-                    total: total_eventos.rows[0]
+                    total: {
+                        total_evento: total_eventos.rows[0].total_evento
+                    }
                 });
             }
             else {
