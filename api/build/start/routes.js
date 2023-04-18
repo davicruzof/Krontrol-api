@@ -40,7 +40,7 @@ Route_1.default.group(() => {
         Route_1.default.post('/deleteAccount', 'FuncionariosController.deleteAccount').middleware('auth');
         Route_1.default.post('/confirmPdf', 'FuncionariosController.confirmPdf').middleware('auth');
         Route_1.default.get('/getVideos', 'FuncionariosController.getVideos').middleware('auth');
-        Route_1.default.get('/confirmVideo', 'FuncionariosController.confirmVideo').middleware('auth');
+        Route_1.default.post('/confirmVideo', 'FuncionariosController.confirmVideo').middleware('auth');
     }).prefix('/employee');
     Route_1.default.group(() => {
         Route_1.default.post('/create', 'VeiculosController.create');
