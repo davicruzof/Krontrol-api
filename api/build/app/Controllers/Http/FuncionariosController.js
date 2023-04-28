@@ -193,11 +193,9 @@ class FuncionariosController {
             .where("id_empresa", "=", dados.id_empresa)
             .first();
         if (funcionario) {
-            let usuario = await User_1.default.findBy("id_funcionario", funcionario.id_funcionario);
-            if (!usuario) {
-                response.json({ error: "Usuário não encontrado" });
-            }
-            response.json(funcionario);
+            response.json({
+                situacao: "OK"
+            });
         }
         else {
             response.json({ return: "CPF não encontrado" });

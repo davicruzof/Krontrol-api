@@ -250,14 +250,9 @@ export default class FuncionariosController {
       .first();
 
     if (funcionario) {
-      let usuario = await User.findBy(
-        "id_funcionario",
-        funcionario.id_funcionario
-      );
-      if (!usuario) {
-        response.json({ error: "Usuário não encontrado" });
-      }
-      response.json(funcionario);
+      response.json({
+        situacao : "OK"
+      });
     } else {
       response.json({ return: "CPF não encontrado" });
     }
