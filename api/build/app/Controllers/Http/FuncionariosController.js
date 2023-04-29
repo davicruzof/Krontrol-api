@@ -192,8 +192,14 @@ class FuncionariosController {
             .where("cpf", "=", dados.cpf)
             .where("id_empresa", "=", dados.id_empresa)
             .first();
+        let situacao = { situacao: "OK" };
         if (funcionario) {
             response.json({
+                id_funcionario: funcionario.id_funcionario,
+                cpf: funcionario.cpf,
+                nome: funcionario.nome,
+                celular: funcionario.celular,
+                dt_nascimento: funcionario.dt_nascimento,
                 situacao: "OK"
             });
         }
@@ -208,7 +214,7 @@ class FuncionariosController {
                 let funcionario = await Funcionario_1.default.findBy("id_funcionario", auth.user?.id_funcionario);
                 let query = await Database_1.default.connection("oracle").rawQuery(`
                                     SELECT DISTINCT
-                                    to_char(competficha, 'DD-MM-YYYY') as COMPETFICHA,
+                                    to_char(competficha, 'MM-YYYY') as COMPETFICHA,
                                     CODINTFUNC,
                                     to_char(VALORFICHA, 'FM999G999G999D90', 'nls_numeric_characters='',.''') AS VALORFICHA,
                                     REFERENCIA,
@@ -229,6 +235,7 @@ class FuncionariosController {
                                 order by hol.tipoeven desc,hol.desceven
                                 `);
                 let empresa = await Empresa_1.default.findBy("id_empresa", auth.user?.id_empresa);
+                query[0].registro = funcionario?.registro;
                 let pdfTemp = await this.generatePdf(this.tratarDadosEvents(query, empresa), template_1.templateDotCard);
                 let file = await (0, S3_1.uploadPdfEmpresa)(pdfTemp.filename, auth.user?.id_empresa);
                 if (file) {
@@ -426,7 +433,7 @@ class FuncionariosController {
                 telefone: dados_empresa.telefone,
                 nomeEmpresa: dados[0].RSOCIALEMPRESA,
                 inscricaoEmpresa: dados[0].INSCRICAOEMPRESA,
-                matricula: dados[0].chapa,
+                matricula: dados[0].registro,
                 nome: dados[0].NOMEFUNC,
                 funcao: dados[0].DESCFUNCAO,
                 competencia: dados[0].COMPETFICHA,
@@ -475,7 +482,7 @@ class FuncionariosController {
             }
             else if (element.TIPOEVEN != "B") {
                 if (element.VALORFICHA[0] == ",") {
-                    element.VALORFICHA = "0" + element.VALORFICHA;
+                    element.VALORFICHA = ("0" + element.VALORFICHA);
                 }
                 dadosTemp.descricao.push(element);
             }
@@ -617,14 +624,23 @@ class FuncionariosController {
                 }),
             });
             let dados = request.body();
-            await Database_1.default.connection("pg")
-                .table("ml_video_confirmed")
-                .returning("id_video_confirmed")
-                .insert({
-                id_funcionario: auth.user?.id_funcionario,
-                id_video: dados.id_video,
-            });
-            response.json({ sucess: "Confirmado com sucesso" });
+            let video = await Database_1.default.connection("pg").rawQuery(`
+        SELECT id_video_funcionario FROM ml_fol_md_video_funcionario video_func
+        WHERE video_func.id_video_funcionario = '${dados.id_video}'
+      `);
+            if (video.rows[0]) {
+                await Database_1.default.connection("pg")
+                    .table("ml_video_confirmed")
+                    .returning("id_video_confirmed")
+                    .insert({
+                    id_funcionario: auth.user?.id_funcionario,
+                    id_video: dados.id_video,
+                });
+                response.json({ sucess: "Confirmado com sucesso" });
+            }
+            else {
+                response.badRequest({ error: "ID inválido" });
+            }
         }
         catch (error) {
             response.badRequest("Erro interno");
