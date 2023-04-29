@@ -152,12 +152,12 @@ export const templateDotCard = `
             <th style="
                     border: 1px solid black; 
                     width: 20%;">
-                Vencimentos
+                Referência
             </th>
             <th style="
                     border: 1px solid black; 
                     width: 20%;">
-                Referência
+                Vencimentos
             </th>
             <th style="
                     border: 1px solid black; 
@@ -175,8 +175,8 @@ export const templateDotCard = `
                         border: 1px solid black; 
                         width: 20%;">
                         <span>
-                        {{#ifCond this.TIPOEVEN "!=" 'D'}}
-                            {{this.VALORFICHA}}
+                        {{#ifCond this.REFERENCIA "!=" '0'}}
+                            {{this.REFERENCIA}}
                         {{/ifCond}}
                         </span>
                 </td>
@@ -184,8 +184,8 @@ export const templateDotCard = `
                         border: 1px solid black; 
                         width: 20%;">
                         <span>
-                        {{#ifCond this.REFERENCIA "!=" '0'}}
-                            {{this.REFERENCIA}}
+                        {{#ifCond this.TIPOEVEN "!=" 'D'}}
+                            {{this.VALORFICHA}}
                         {{/ifCond}}
                         </span>
                 </td>
@@ -208,12 +208,12 @@ export const templateDotCard = `
             <td style="
                     border: 1px solid black; 
                     width: 20%;">
-                {{dados.totais.PROVENTOS}}
+                --
             </td>
             <td style="
                     border: 1px solid black; 
                     width: 20%;">
-                --
+                {{dados.totais.PROVENTOS}}
             </td>
             <td style="
                     border: 1px solid black; 
