@@ -174,7 +174,9 @@ exports.templateDotCard = `
                         border: 1px solid black; 
                         width: 40%;"><span>{{this.DESCEVEN}}</span>
                 </td>
-                <td style="
+                <td
+                    align="right"
+                    style="
                         border: 1px solid black; 
                         width: 20%;">
                         <span>
@@ -183,7 +185,9 @@ exports.templateDotCard = `
                         {{/ifCond}}
                         </span>
                 </td>
-                <td style="
+                <td 
+                    align="right"
+                    style="
                         border: 1px solid black; 
                         width: 20%;">
                         <span>
@@ -192,7 +196,9 @@ exports.templateDotCard = `
                         {{/ifCond}}
                         </span>
                 </td>
-                <td style="
+                <td 
+                    align="right"
+                    style="
                         border: 1px solid black; 
                         width: 20%;">
                         <span>
@@ -208,17 +214,22 @@ exports.templateDotCard = `
             <th style="width: 40%; border: 1px solid black; ">
                 Total
             </th>
-            <td style="
+            <td 
+                style="
                     border: 1px solid black; 
                     width: 20%;">
                 --
             </td>
-            <td style="
+            <td 
+                align="right"
+                style="
                     border: 1px solid black; 
                     width: 20%;">
                 {{dados.totais.PROVENTOS}}
             </td>
-            <td style="
+            <td 
+                align="right"
+                style="
                     border: 1px solid black; 
                     width: 20%;">
                 {{dados.totais.DESCONTOS}}
@@ -256,27 +267,37 @@ exports.templateDotCard = `
             </th>
         </tr>
         <tr>
-            <td style="
+            <td 
+                align="right"
+                style="
                         border: 1px solid black; 
                         width: 20%;">
                 {{ dados.bases.BASE_FGTS_FOLHA }}
             </td>
-            <td style="
+            <td 
+                align="right"
+                style="
                         border: 1px solid black; 
                         width: 20%;">
                 {{dados.bases.FGTS_FOLHA}}
             </td>
-            <td style="
+            <td
+                align="right"
+                 style="
                         border: 1px solid black; 
                         width: 20%;">
                 {{dados.bases.BASE_IRRF_FOLHA}}
             </td>
-            <td style="
+            <td
+            align="right"
+                style="
                         border: 1px solid black; 
                         width: 20%;">
                 {{dados.bases.BASE_INSS_FOLHA}}
             </td>
-            <td style="
+            <td 
+                align="right"
+                style="
                         border: 1px solid black; 
                         width: 20%;">
                 {{dados.totais.LIQUIDO}}
