@@ -581,6 +581,10 @@ export default class FuncionariosController {
         if (element.VALORFICHA[0] == ",") {
           element.VALORFICHA = ("0" + element.VALORFICHA);
         }
+        element.VALORFICHA = element.VALORFICHA.toLocaleString('pt-BR', { minimumFractionDigits: 2});
+        if (element.REFERENCIA != '') {
+          element.REFERENCIA = element.REFERENCIA.toLocaleString('pt-BR', { minimumFractionDigits: 2});
+        }
         dadosTemp.descricao.push(element);
       }
     });
