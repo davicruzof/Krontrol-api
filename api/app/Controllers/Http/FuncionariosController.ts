@@ -298,6 +298,7 @@ export default class FuncionariosController {
                                     FROM  globus.vw_flp_fichaeventosrecibo hol
                                 WHERE
                                 hol.codintfunc = ${funcionario?.id_funcionario_erp} and to_char(competficha, 'YYYY-MM') = '${dados.data}'
+                                and hol.TIPOFOLHA = 1
                                 order by hol.tipoeven desc,hol.desceven
                                 `);
 
