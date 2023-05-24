@@ -80,6 +80,7 @@ class SolicitacoesController {
             sol.id_empresa,
             sol.id_funcionario,
             func.nome,
+            func.registro,
             sol.id_area,
             sol.id_modulo,
             sol.id_evento,
