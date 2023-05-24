@@ -386,6 +386,9 @@ export const fichaPonto = `
             <td style="width: 25%;">
                 SALDO ANTERIOR: {{dados.rodape.saldoAnterior}}
             </td>
+            <td style="width: 25%;">
+                SALDO ATUAL: {{dados.rodape.saldoAnterior + dados.rodape.credito - dados.rodape.debito - dados.rodape.valorPago}}
+            </td>
         </tr>
         <tr style="border: none;display: table-row">
             <td style="width: 25%;"><span><b></b></span></td>
