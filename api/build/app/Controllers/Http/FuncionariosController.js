@@ -561,7 +561,7 @@ class FuncionariosController {
                 credito: dados[0].CREDITO.toFixed(2),
                 debito: dados[0].DEBITO.toFixed(2),
                 valorPago: dados[0].VALORPAGO.toFixed(2),
-                saldoAtual: (dados.rodape.saldoAnterior + dados.rodape.credito - dados.rodape.debito - dados.rodape.valorPago).toFixed(2),
+                saldoAtual: (dados[0].SALDOANTERIOR + dados[0].CREDITO - dados[0].DEBITO - dados[0].VALORPAGO).toFixed(2),
             },
             dadosDias: new Array(),
         };
