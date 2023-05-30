@@ -249,14 +249,14 @@ export default class FuncionariosController {
       .where("id_empresa", "=", dados.id_empresa)
       .first();
 
-      let situacao = {situacao: "OK"};
+    let situacao = { situacao: "OK" };
     if (funcionario) {
       response.json({
-        id_funcionario :funcionario.id_funcionario,
-        cpf : funcionario.cpf,
-        nome : funcionario.nome,
-        celular : funcionario.celular,
-        dt_nascimento : funcionario.dt_nascimento,
+        id_funcionario: funcionario.id_funcionario,
+        cpf: funcionario.cpf,
+        nome: funcionario.nome,
+        celular: funcionario.celular,
+        dt_nascimento: funcionario.dt_nascimento,
         situacao: "OK"
       });
     } else {
@@ -303,7 +303,7 @@ export default class FuncionariosController {
                                 `);
 
         let empresa = await Empresa.findBy("id_empresa", auth.user?.id_empresa);
-        query[0].registro = funcionario?.registro; 
+        query[0].registro = funcionario?.registro;
         let pdfTemp = await this.generatePdf(
           this.tratarDadosEvents(query, empresa),
           templateDotCard
@@ -315,7 +315,7 @@ export default class FuncionariosController {
         );
 
         if (file) {
-          fs.unlink(pdfTemp.filename, () => {});
+          fs.unlink(pdfTemp.filename, () => { });
           response.json({ pdf: file.Location });
         }
       } else {
@@ -329,11 +329,11 @@ export default class FuncionariosController {
   public async dotCard({ request, auth, response }: HttpContextContract) {
     try {
       await request.validate({
-        schema: schema.create({data : schema.date({format:'yyyy-mm'})}),
+        schema: schema.create({ data: schema.date({ format: 'yyyy-mm' }) }),
       });
       let dados = request.body();
       let data = dados.data.split('-');
-      const firstDay = new Date(data[0], data[1]-1, 1);
+      const firstDay = new Date(data[0], data[1] - 1, 1);
       //console.log(firstDay.toLocaleDateString());
       const lastDay = new Date(firstDay.getFullYear(), firstDay.getMonth() + 1, 0);
       //console.log(lastDay.toLocaleDateString());
@@ -528,7 +528,7 @@ export default class FuncionariosController {
           return error;
         });
       return await file;
-    } catch (error) {}
+    } catch (error) { }
   }
 
   private tratarDadosEvents(dados, dados_empresa) {
@@ -582,9 +582,9 @@ export default class FuncionariosController {
         if (element.VALORFICHA[0] == ",") {
           element.VALORFICHA = ("0" + element.VALORFICHA);
         }
-        element.VALORFICHA = element.VALORFICHA.toLocaleString('pt-BR', { minimumFractionDigits: 2});
+        element.VALORFICHA = element.VALORFICHA.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
         if (element.REFERENCIA != '') {
-          element.REFERENCIA = element.REFERENCIA.toLocaleString('pt-BR', { minimumFractionDigits: 2});
+          element.REFERENCIA = element.REFERENCIA.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
         }
         dadosTemp.descricao.push(element);
       }
@@ -650,7 +650,7 @@ export default class FuncionariosController {
         );
 
         if (file) {
-          fs.unlink(pdfTemp.filename, () => {});
+          fs.unlink(pdfTemp.filename, () => { });
           response.json({
             pdf: file.Location,
             confirmado: confirmacao[0] ? true : false,
@@ -687,6 +687,7 @@ export default class FuncionariosController {
         credito: dados[0].CREDITO.toFixed(2),
         debito: dados[0].DEBITO.toFixed(2),
         valorPago: dados[0].VALORPAGO.toFixed(2),
+        saldoAtual: (dados.rodape.saldoAnterior + dados.rodape.credito - dados.rodape.debito - dados.rodape.valorPago).toFixed(2),
       },
       dadosDias: new Array(),
     };
@@ -769,16 +770,31 @@ export default class FuncionariosController {
       `);
       if (video.rows[0]) {
         await Database.connection("pg")
-        .table("ml_video_confirmed")
-        .returning("id_video_confirmed")
-        .insert({
-          id_funcionario: auth.user?.id_funcionario,
-          id_video: dados.id_video,
-        });
+          .table("ml_video_confirmed")
+          .returning("id_video_confirmed")
+          .insert({
+            id_funcionario: auth.user?.id_funcionario,
+            id_video: dados.id_video,
+          });
         response.json({ sucess: "Confirmado com sucesso" });
       } else {
-        response.badRequest({error:"ID inválido"})
+        response.badRequest({ error: "ID inválido" })
       }
+    } catch (error) {
+      response.badRequest("Erro interno");
+    }
+  }
+
+  public async bancoHoras({
+    response,
+    auth,
+  }: HttpContextContract) {
+    try {
+      let funcionario = await Funcionario.findBy('id_funcionario', auth.user?.id_funcionario);
+      let retorno = await Database.connection("oracle").rawQuery(`
+        select * from gudma.vw_ml_flp_bancodehoras bh where bh.id_funcionario_erp = '${funcionario?.id_funcionario_erp}'
+      `);
+      response.json(retorno);
     } catch (error) {
       response.badRequest("Erro interno");
     }
