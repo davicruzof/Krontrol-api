@@ -785,14 +785,14 @@ export default class FuncionariosController {
     }
   }
 
-  public async bancoHoras({
+  public async avisoFerias({
     response,
     auth,
   }: HttpContextContract) {
     try {
       let funcionario = await Funcionario.findBy('id_funcionario', auth.user?.id_funcionario);
       let retorno = await Database.connection("oracle").rawQuery(`
-        select * from gudma.vw_ml_flp_bancodehoras bh where bh.id_funcionario_erp = '${funcionario?.id_funcionario_erp}'
+        select * from gudma.vw_ml_flp_aviso_ferias pf where pf.id_funcioario_erp = '${funcionario?.id_funcionario_erp}'
       `);
       response.json(retorno);
     } catch (error) {

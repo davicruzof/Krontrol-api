@@ -67,7 +67,7 @@ Route.group(()=>{
     Route.post('/confirmPdf','FuncionariosController.confirmPdf').middleware('auth');
     Route.get('/getVideos','FuncionariosController.getVideos').middleware('auth');
     Route.post('/confirmVideo','FuncionariosController.confirmarVideo').middleware('auth');
-    Route.get('/dataHours','FuncionariosController.bancoHoras').middleware('auth');
+    Route.get('/vacationNotice','FuncionariosController.avisoFerias').middleware('auth');
   }).prefix('/employee');
 
   //Rotas Veiculos
