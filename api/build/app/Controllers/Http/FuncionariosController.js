@@ -561,6 +561,7 @@ class FuncionariosController {
                 credito: dados[0].CREDITO.toFixed(2),
                 debito: dados[0].DEBITO.toFixed(2),
                 valorPago: dados[0].VALORPAGO.toFixed(2),
+                saldoAtual: (dados.rodape.saldoAnterior + dados.rodape.credito - dados.rodape.debito - dados.rodape.valorPago).toFixed(2),
             },
             dadosDias: new Array(),
         };
@@ -646,6 +647,18 @@ class FuncionariosController {
             else {
                 response.badRequest({ error: "ID inválido" });
             }
+        }
+        catch (error) {
+            response.badRequest("Erro interno");
+        }
+    }
+    async bancoHoras({ response, auth, }) {
+        try {
+            let funcionario = await Funcionario_1.default.findBy('id_funcionario', auth.user?.id_funcionario);
+            let retorno = await Database_1.default.connection("oracle").rawQuery(`
+        select * from gudma.vw_ml_flp_bancodehoras bh where bh.id_funcionario_erp = '${funcionario?.id_funcionario_erp}'
+      `);
+            response.json(retorno);
         }
         catch (error) {
             response.badRequest("Erro interno");
