@@ -652,11 +652,11 @@ class FuncionariosController {
             response.badRequest("Erro interno");
         }
     }
-    async bancoHoras({ response, auth, }) {
+    async avisoFerias({ response, auth, }) {
         try {
             let funcionario = await Funcionario_1.default.findBy('id_funcionario', auth.user?.id_funcionario);
             let retorno = await Database_1.default.connection("oracle").rawQuery(`
-        select * from gudma.vw_ml_flp_bancodehoras bh where bh.id_funcionario_erp = '${funcionario?.id_funcionario_erp}'
+        select * from gudma.vw_ml_flp_aviso_ferias pf where pf.id_funcioario_erp = '${funcionario?.id_funcionario_erp}'
       `);
             response.json(retorno);
         }
