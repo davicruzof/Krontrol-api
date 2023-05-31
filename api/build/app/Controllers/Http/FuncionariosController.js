@@ -664,6 +664,17 @@ class FuncionariosController {
             response.badRequest("Erro interno");
         }
     }
+    async getParams({ response, auth, }) {
+        try {
+            let retorno = await Database_1.default.connection("pg").rawQuery(`
+        select * from ml_pla_parametro where id_empresa = '${auth.user?.id_empresa}'
+      `);
+            response.json(retorno.rows);
+        }
+        catch (error) {
+            response.badRequest("Erro interno");
+        }
+    }
 }
 exports.default = FuncionariosController;
 //# sourceMappingURL=FuncionariosController.js.map
