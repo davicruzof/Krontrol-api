@@ -799,4 +799,18 @@ export default class FuncionariosController {
       response.badRequest("Erro interno");
     }
   }
+
+  public async getParams({
+    response,
+    auth,
+  }: HttpContextContract) {
+    try {
+      let retorno = await Database.connection("pg").rawQuery(`
+        select * from ml_pla_parametro where id_empresa = '${auth.user?.id_empresa}'
+      `);
+      response.json(retorno.rows);
+    } catch (error) {
+      response.badRequest("Erro interno");
+    }
+  }
 }

@@ -68,6 +68,7 @@ Route.group(()=>{
     Route.get('/getVideos','FuncionariosController.getVideos').middleware('auth');
     Route.post('/confirmVideo','FuncionariosController.confirmarVideo').middleware('auth');
     Route.get('/vacationNotice','FuncionariosController.avisoFerias').middleware('auth');
+    Route.get('/params','FuncionariosController.getParams').middleware('auth');
   }).prefix('/employee');
 
   //Rotas Veiculos
