@@ -604,28 +604,38 @@ export default class FuncionariosController {
           "id_funcao_erp",
           funcionario?.id_funcao_erp
         );
+        const data = dados.data.split('-');
         //return await ConfirmarVideo.query().select('*').where('id_funcionario','=',`${funcionario?.id_funcionario}`).andWhere('data_pdf','=',`${dados.data.split("").reverse().join("").replace('-','/')}`);
-
+          const periodoInicial = `27-${data[1]-1}-${data[0]}`;
+          const periodoFinal = `26-${data[1]}-${data[0]}`;
         let query = await Database.connection("oracle").rawQuery(`
-                                    select distinct
-                                    fun.id_funcionario_erp, fun.chapafunc chapa,
-                                    to_char(df.dtdigit,'DD-MM-YYYY') as data_movimento, oco.descocorr ocorrencia,
-                                    REPLACE(replace(to_char(df.entradigit,'HH24:MI:SS'),'00:00:00','FOLGA'),'10/11/2022 00:00:00','ATESTADO')  as entrada, replace(to_char(df.intidigit,'HH24:MI:SS'),'00:00:00','FOLGA')  as I_INI,
-                                    replace(to_char(df.intfdigit,'HH24:MI:SS'),'00:00:00','FOLGA')  as I_FIM, replace(to_char(df.saidadigit,'HH24:MI:SS'),'00:00:00','FOLGA')  as SAIDA,
-                                    lin.codigolinha linha, df.servicodigit as tabela,df.codocorr,
-                                    df.normaldm as normal,CAST(df.extradm AS NUMBER(6,2)) as extra,
-                                     df.excessodm exces, df.outradm outra, df.adnotdm a_not, df.extranotdm, (df.normaldm + df.extradm + df.excessodm + df.outradm + df.adnotdm + df.extranotdm) as totalf,
-                                    bh.competencia bh_competencia, bh.credito,bh.debito,bh.saldoanterior,bh.valorpago
-                                    from globus.frq_digitacaomovimento df
-                                    inner join globus.vw_ml_flp_funcionario fun on df.codintfunc = fun.id_funcionario_erp
-                                    left join globus.vw_bancohoras bh on df.codintfunc = bh.codintfunc
-                                    left join globus.frq_ocorrencia oco on df.codocorr = oco.codocorr
-                                    left join globus.bgm_cadlinhas lin on df.codintlinha = lin.codintlinha
-                                    where
-                                       to_char(df.dtdigit,'MM/YYYY') = to_char(bh.competencia,'MM/YYYY')
-                                       and df.tipodigit='F' AND
-                                                                       id_funcionario_erp = '${funcionario?.id_funcionario_erp}'  and to_char(df.dtdigit, 'YYYY-MM') = '${dados.data}'
-                                                                   order by  DATA_MOVIMENTO
+                                    SELECT
+                                    EH.ID_FUNCIONARIO_ERP,
+                                    EH.CHAPA,
+                                    to_char(EH.DATA_MOVIMENTO,'DD-MM-YYYY') as DATA_MOVIMENTO,
+                                    EH.OCORRENCIA,
+                                    EH.ENTRADA,
+                                    EH.I_INI,
+                                    EH.I_FIM,
+                                    EH.SAIDA,
+                                    EH.LINHA,
+                                    EH.TABELA,
+                                    EH.CODOCORR,
+                                    EH.NORMAL,
+                                    EH.EXTRA,
+                                    EH.EXCES,
+                                    EH.OUTRA,
+                                    EH.A_NOT,
+                                    EH.EXTRANOTDM,
+                                    EH.TOTAL AS TOTALF,
+                                    EH.BH_COMPETENCIA,
+                                    EH.CREDITO,
+                                    EH.DEBITO,
+                                    EH.SALDOANTERIOR,
+                                    EH.VALORPAGO
+                                    FROM VW_ML_FRQ_ESPELHODEHORAS EH
+                                    WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
+                                    AND DATA_MOVIMENTO BETWEEN to_date('${periodoInicial}','DD-MM-YYYY') and to_date('${periodoFinal}','DD-MM-YYYY')
                                 `);
 
         let empresa = await Empresa.findBy("id_empresa", auth.user?.id_empresa);

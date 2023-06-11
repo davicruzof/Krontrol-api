@@ -133,6 +133,13 @@ Route.group(()=>{
   
   }).prefix('/departaments').middleware('auth');
 
+  //Outras rotas
+  Route.group(()=>{
+
+    Route.get('/position','OthersController.getPosicao');
+
+  }).prefix('/others').middleware('auth');
+
   //Rotas Solicitações
   Route.group(()=>{
 
