@@ -85,6 +85,9 @@ Route_1.default.group(() => {
         Route_1.default.post('/list_area_departamento', 'DepartamentosController.list_area_departamento');
     }).prefix('/departaments').middleware('auth');
     Route_1.default.group(() => {
+        Route_1.default.get('/position', 'OthersController.getPosicao');
+    }).prefix('/others').middleware('auth');
+    Route_1.default.group(() => {
         Route_1.default.post('/create', 'SolicitacoesController.create');
         Route_1.default.post('/getById', 'SolicitacoesController.getById');
         Route_1.default.post('/list', 'SolicitacoesController.list');
