@@ -136,7 +136,7 @@ Route.group(()=>{
   //Outras rotas
   Route.group(()=>{
 
-    Route.get('/position','OthersController.getPosicao');
+    Route.get('/position','OthersController.getPositions');
 
   }).prefix('/others').middleware('auth');
 
