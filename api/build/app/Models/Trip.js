@@ -13,7 +13,7 @@ const luxon_1 = require("luxon");
 const Orm_1 = global[Symbol.for('ioc.use')]("Adonis/Lucid/Orm");
 class Trip extends Orm_1.BaseModel {
     static get table() {
-        return 'ml_int_telemetria_kontrow_trips';
+        return "ml_int_telemetria_kontrow_trips";
     }
 }
 __decorate([

@@ -10,7 +10,7 @@ const crypto_1 = __importDefault(require("crypto"));
 const Empresa_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/Empresa"));
 const Database_1 = __importDefault(global[Symbol.for('ioc.use')]("Adonis/Lucid/Database"));
 class VideosController {
-    async upload({ request, response, auth }) {
+    async upload({ request, response }) {
         try {
             await request.validate({
                 schema: Validator_1.schema.create({
@@ -84,7 +84,7 @@ class VideosController {
             response.badRequest(error);
         }
     }
-    async getAll({ request, response }) {
+    async getAll({ response }) {
         try {
             response.json(await Video_1.default.all());
         }

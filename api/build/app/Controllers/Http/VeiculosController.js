@@ -10,7 +10,7 @@ const Veiculo_2 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/Veic
 const Empresa_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/Empresa"));
 const crypto_1 = __importDefault(require("crypto"));
 class VeiculosController {
-    async create({ request, response, auth }) {
+    async create({ request, response }) {
         try {
             await request.validate({ schema: Validator_1.schema.create(Veiculo_1.VeiculoSchemaInsert) });
             const dados = request.body();
@@ -54,7 +54,7 @@ class VeiculosController {
             response.badRequest(error.messages);
         }
     }
-    async update({ request, response, auth }) {
+    async update({ request, response }) {
         try {
             await request.validate({ schema: Validator_1.schema.create(Veiculo_1.VeiculoSchemaUpdate) });
             let dados = request.body();

@@ -10,7 +10,7 @@ import Empresa from "App/Models/Empresa";
 import crypto from "crypto";
 
 export default class VeiculosController {
-  public async create({ request, response, auth }: HttpContextContract) {
+  public async create({ request, response }: HttpContextContract) {
     try {
       await request.validate({ schema: schema.create(VeiculoSchemaInsert) });
 
@@ -56,7 +56,7 @@ export default class VeiculosController {
       response.badRequest(error.messages);
     }
   }
-  public async update({ request, response, auth }) {
+  public async update({ request, response }) {
     try {
       await request.validate({ schema: schema.create(VeiculoSchemaUpdate) });
 

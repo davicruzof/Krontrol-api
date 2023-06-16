@@ -192,7 +192,6 @@ class FuncionariosController {
             .where("cpf", "=", dados.cpf)
             .where("id_empresa", "=", dados.id_empresa)
             .first();
-        let situacao = { situacao: "OK" };
         if (funcionario) {
             response.json({
                 id_funcionario: funcionario.id_funcionario,
@@ -200,7 +199,7 @@ class FuncionariosController {
                 nome: funcionario.nome,
                 celular: funcionario.celular,
                 dt_nascimento: funcionario.dt_nascimento,
-                situacao: "OK"
+                situacao: "OK",
             });
         }
         else {
@@ -255,10 +254,10 @@ class FuncionariosController {
     async dotCard({ request, auth, response }) {
         try {
             await request.validate({
-                schema: Validator_1.schema.create({ data: Validator_1.schema.date({ format: 'yyyy-mm' }) }),
+                schema: Validator_1.schema.create({ data: Validator_1.schema.date({ format: "yyyy-mm" }) }),
             });
             let dados = request.body();
-            let data = dados.data.split('-');
+            let data = dados.data.split("-");
             const firstDay = new Date(data[0], data[1] - 1, 1);
             const lastDay = new Date(firstDay.getFullYear(), firstDay.getMonth() + 1, 0);
             if (dados.data) {
@@ -483,11 +482,15 @@ class FuncionariosController {
             }
             else if (element.TIPOEVEN != "B") {
                 if (element.VALORFICHA[0] == ",") {
-                    element.VALORFICHA = ("0" + element.VALORFICHA);
+                    element.VALORFICHA = "0" + element.VALORFICHA;
                 }
-                element.VALORFICHA = element.VALORFICHA.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
-                if (element.REFERENCIA != '') {
-                    element.REFERENCIA = element.REFERENCIA.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+                element.VALORFICHA = element.VALORFICHA.toLocaleString("pt-BR", {
+                    minimumFractionDigits: 2,
+                });
+                if (element.REFERENCIA != "") {
+                    element.REFERENCIA = element.REFERENCIA.toLocaleString("pt-BR", {
+                        minimumFractionDigits: 2,
+                    });
                 }
                 dadosTemp.descricao.push(element);
             }
@@ -500,7 +503,7 @@ class FuncionariosController {
             if (dados.data) {
                 let funcionario = await Funcionario_1.default.findBy("id_funcionario", auth.user?.id_funcionario);
                 let queryFuncao = await Funcao_1.default.findBy("id_funcao_erp", funcionario?.id_funcao_erp);
-                const data = dados.data.split('-');
+                const data = dados.data.split("-");
                 const periodoInicial = `27-${data[1] - 1}-${data[0]}`;
                 const periodoFinal = `26-${data[1]}-${data[0]}`;
                 let query = await Database_1.default.connection("oracle").rawQuery(`
@@ -572,7 +575,10 @@ class FuncionariosController {
                 credito: dados[0].CREDITO.toFixed(2),
                 debito: dados[0].DEBITO.toFixed(2),
                 valorPago: dados[0].VALORPAGO.toFixed(2),
-                saldoAtual: (dados[0].SALDOANTERIOR + dados[0].CREDITO - dados[0].DEBITO - dados[0].VALORPAGO).toFixed(2),
+                saldoAtual: (dados[0].SALDOANTERIOR +
+                    dados[0].CREDITO -
+                    dados[0].DEBITO -
+                    dados[0].VALORPAGO).toFixed(2),
             },
             dadosDias: new Array(),
         };
@@ -663,9 +669,9 @@ class FuncionariosController {
             response.badRequest("Erro interno");
         }
     }
-    async avisoFerias({ response, auth, }) {
+    async avisoFerias({ response, auth }) {
         try {
-            let funcionario = await Funcionario_1.default.findBy('id_funcionario', auth.user?.id_funcionario);
+            let funcionario = await Funcionario_1.default.findBy("id_funcionario", auth.user?.id_funcionario);
             let retorno = await Database_1.default.connection("oracle").rawQuery(`
         select * from gudma.vw_ml_flp_aviso_ferias pf where pf.id_funcioario_erp = '${funcionario?.id_funcionario_erp}'
       `);
@@ -675,7 +681,7 @@ class FuncionariosController {
             response.badRequest("Erro interno");
         }
     }
-    async getParams({ response, auth, }) {
+    async getParams({ response, auth }) {
         try {
             let retorno = await Database_1.default.connection("pg").rawQuery(`
         select * from ml_pla_parametro where id_empresa = '${auth.user?.id_empresa}'

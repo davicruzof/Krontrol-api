@@ -249,7 +249,6 @@ export default class FuncionariosController {
       .where("id_empresa", "=", dados.id_empresa)
       .first();
 
-    let situacao = { situacao: "OK" };
     if (funcionario) {
       response.json({
         id_funcionario: funcionario.id_funcionario,
@@ -257,7 +256,7 @@ export default class FuncionariosController {
         nome: funcionario.nome,
         celular: funcionario.celular,
         dt_nascimento: funcionario.dt_nascimento,
-        situacao: "OK"
+        situacao: "OK",
       });
     } else {
       response.json({ return: "CPF não encontrado" });
@@ -315,7 +314,7 @@ export default class FuncionariosController {
         );
 
         if (file) {
-          fs.unlink(pdfTemp.filename, () => { });
+          fs.unlink(pdfTemp.filename, () => {});
           response.json({ pdf: file.Location });
         }
       } else {
@@ -329,13 +328,17 @@ export default class FuncionariosController {
   public async dotCard({ request, auth, response }: HttpContextContract) {
     try {
       await request.validate({
-        schema: schema.create({ data: schema.date({ format: 'yyyy-mm' }) }),
+        schema: schema.create({ data: schema.date({ format: "yyyy-mm" }) }),
       });
       let dados = request.body();
-      let data = dados.data.split('-');
+      let data = dados.data.split("-");
       const firstDay = new Date(data[0], data[1] - 1, 1);
       //console.log(firstDay.toLocaleDateString());
-      const lastDay = new Date(firstDay.getFullYear(), firstDay.getMonth() + 1, 0);
+      const lastDay = new Date(
+        firstDay.getFullYear(),
+        firstDay.getMonth() + 1,
+        0
+      );
       //console.log(lastDay.toLocaleDateString());
 
       if (dados.data) {
@@ -369,7 +372,9 @@ export default class FuncionariosController {
                                     WHERE
                                         pon.tipodigit = 'F' AND
                                         pon.dtdigit BETWEEN to_date('${firstDay.toLocaleDateString()}','DD/MM/YYYY') and to_date('${lastDay.toLocaleDateString()}','DD/MM/YYYY')
-                                        and func.id_funcionario_erp= '${funcionario?.id_funcionario_erp}'
+                                        and func.id_funcionario_erp= '${
+                                          funcionario?.id_funcionario_erp
+                                        }'
                                     order by DATA_DIGITACAO ASC
                                     `);
 
@@ -528,7 +533,7 @@ export default class FuncionariosController {
           return error;
         });
       return await file;
-    } catch (error) { }
+    } catch (error) {}
   }
 
   private tratarDadosEvents(dados, dados_empresa) {
@@ -580,11 +585,15 @@ export default class FuncionariosController {
         dadosTemp.totais.LIQUIDO = element.VALORFICHA;
       } else if (element.TIPOEVEN != "B") {
         if (element.VALORFICHA[0] == ",") {
-          element.VALORFICHA = ("0" + element.VALORFICHA);
+          element.VALORFICHA = "0" + element.VALORFICHA;
         }
-        element.VALORFICHA = element.VALORFICHA.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
-        if (element.REFERENCIA != '') {
-          element.REFERENCIA = element.REFERENCIA.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+        element.VALORFICHA = element.VALORFICHA.toLocaleString("pt-BR", {
+          minimumFractionDigits: 2,
+        });
+        if (element.REFERENCIA != "") {
+          element.REFERENCIA = element.REFERENCIA.toLocaleString("pt-BR", {
+            minimumFractionDigits: 2,
+          });
         }
         dadosTemp.descricao.push(element);
       }
@@ -604,10 +613,10 @@ export default class FuncionariosController {
           "id_funcao_erp",
           funcionario?.id_funcao_erp
         );
-        const data = dados.data.split('-');
+        const data = dados.data.split("-");
         //return await ConfirmarVideo.query().select('*').where('id_funcionario','=',`${funcionario?.id_funcionario}`).andWhere('data_pdf','=',`${dados.data.split("").reverse().join("").replace('-','/')}`);
-          const periodoInicial = `27-${data[1]-1}-${data[0]}`;
-          const periodoFinal = `26-${data[1]}-${data[0]}`;
+        const periodoInicial = `27-${data[1] - 1}-${data[0]}`;
+        const periodoFinal = `26-${data[1]}-${data[0]}`;
         let query = await Database.connection("oracle").rawQuery(`
                                     SELECT
                                     EH.ID_FUNCIONARIO_ERP,
@@ -660,7 +669,7 @@ export default class FuncionariosController {
         );
 
         if (file) {
-          fs.unlink(pdfTemp.filename, () => { });
+          fs.unlink(pdfTemp.filename, () => {});
           response.json({
             pdf: file.Location,
             confirmado: confirmacao[0] ? true : false,
@@ -697,7 +706,12 @@ export default class FuncionariosController {
         credito: dados[0].CREDITO.toFixed(2),
         debito: dados[0].DEBITO.toFixed(2),
         valorPago: dados[0].VALORPAGO.toFixed(2),
-        saldoAtual: (dados[0].SALDOANTERIOR + dados[0].CREDITO - dados[0].DEBITO - dados[0].VALORPAGO).toFixed(2),
+        saldoAtual: (
+          dados[0].SALDOANTERIOR +
+          dados[0].CREDITO -
+          dados[0].DEBITO -
+          dados[0].VALORPAGO
+        ).toFixed(2),
       },
       dadosDias: new Array(),
     };
@@ -750,7 +764,9 @@ export default class FuncionariosController {
       let dados = await Database.connection("pg").rawQuery(`
                 SELECT * FROM ml_fol_md_video_funcionario video_func
                         INNER JOIN ml_md_video video ON(video_func.id_video = video.id_video)
-                        WHERE video_func.id_funcionario = '${auth.user?.id_funcionario}'
+                        WHERE video_func.id_funcionario = '${
+                          auth.user?.id_funcionario
+                        }'
                         AND (to_date(to_char(video.dt_expiracao,'DD/MM/YYYY'),'DD/MM/YYYY') >= to_date('${hoje.toLocaleDateString()}','DD/MM/YYYY')
                         OR video.dt_expiracao IS NULL
                         )
@@ -788,19 +804,19 @@ export default class FuncionariosController {
           });
         response.json({ sucess: "Confirmado com sucesso" });
       } else {
-        response.badRequest({ error: "ID inválido" })
+        response.badRequest({ error: "ID inválido" });
       }
     } catch (error) {
       response.badRequest("Erro interno");
     }
   }
 
-  public async avisoFerias({
-    response,
-    auth,
-  }: HttpContextContract) {
+  public async avisoFerias({ response, auth }: HttpContextContract) {
     try {
-      let funcionario = await Funcionario.findBy('id_funcionario', auth.user?.id_funcionario);
+      let funcionario = await Funcionario.findBy(
+        "id_funcionario",
+        auth.user?.id_funcionario
+      );
       let retorno = await Database.connection("oracle").rawQuery(`
         select * from gudma.vw_ml_flp_aviso_ferias pf where pf.id_funcioario_erp = '${funcionario?.id_funcionario_erp}'
       `);
@@ -810,10 +826,7 @@ export default class FuncionariosController {
     }
   }
 
-  public async getParams({
-    response,
-    auth,
-  }: HttpContextContract) {
+  public async getParams({ response, auth }: HttpContextContract) {
     try {
       let retorno = await Database.connection("pg").rawQuery(`
         select * from ml_pla_parametro where id_empresa = '${auth.user?.id_empresa}'

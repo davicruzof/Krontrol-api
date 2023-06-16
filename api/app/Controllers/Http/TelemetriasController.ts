@@ -3,9 +3,6 @@ import Database from "@ioc:Adonis/Lucid/Database";
 import { schema } from "@ioc:Adonis/Core/Validator";
 import { isValidDate } from "App/utils/functions";
 import Funcionario from "App/Models/Funcionario";
-import { Exception } from "@adonisjs/core/build/standalone";
-
-const formato_data = "YYYY-MM-DD";
 
 const listSchema = schema.create({
   data_inicial: schema.date(),
@@ -159,53 +156,58 @@ export default class TelemetriasController {
     return events;
   }
 
-  public async score({request,response,auth}: HttpContextContract) {
-    
+  public async score({ request, response, auth }: HttpContextContract) {
     try {
       const queryParams = request.qs();
-      if (isValidDate(queryParams.data_inicial) && isValidDate(queryParams.data_final)) {
-        let funcionario = await Funcionario.findBy('id_funcionario',auth.user?.id_funcionario);
+      if (
+        isValidDate(queryParams.data_inicial) &&
+        isValidDate(queryParams.data_final)
+      ) {
+        let funcionario = await Funcionario.findBy(
+          "id_funcionario",
+          auth.user?.id_funcionario
+        );
         const data_inicial = queryParams.data_inicial;
         const data_final = queryParams.data_final;
 
-        let dados = await Database.connection('pg').rawQuery(`
-          select distinct  
+        let dados = await Database.connection("pg").rawQuery(`
+          select distinct
           count(evento) qtd_evento, evento
           from vw_ml_bi_kontrow_score sco
           where
             to_char(sco.time,'YYYY-MM-DD') between '${data_inicial}' AND '${data_final}'
             and sco.registro='${funcionario?.registro}'
             and sco.id_empresa_grupo = 2
-          group by  evento 
+          group by  evento
         `);
-        
-        let km_rodados = await Database.connection('pg').rawQuery(`
-          select distinct  
+
+        let km_rodados = await Database.connection("pg").rawQuery(`
+          select distinct
           avg(cast(km_rodado as numeric)) km_rodado
           from vw_ml_bi_kontrow_score sco
           where
             to_char(sco.time,'YYYY-MM-DD') between '${data_inicial}' AND '${data_final}'
             and sco.registro='${funcionario?.registro}'
             and sco.id_empresa_grupo = 2
-          group by  sco.registro 
+          group by  sco.registro
         `);
-        let score = await Database.connection('pg').rawQuery(`
-          select distinct  
+        let score = await Database.connection("pg").rawQuery(`
+          select distinct
           count(evento) total
           from vw_ml_bi_kontrow_score sco
           where
           to_char(sco.time,'YYYY-MM-DD') between '${data_inicial}' AND '${data_final}'
             and sco.registro='${funcionario?.registro}'
             and sco.id_empresa_grupo = 2
-          group by  sco.registro 
+          group by  sco.registro
         `);
 
-        let total_eventos = await Database.connection('pg').rawQuery(`
+        let total_eventos = await Database.connection("pg").rawQuery(`
         select distinct count(evento) score,
           (select count(*) from ml_int_telemetria_evento_score where id_empresa_grupo = 2 ) total_evento
-          from 
+          from
             vw_ml_bi_kontrow_score sco
-          where 
+          where
             sco.registro='${funcionario?.registro}' and
             to_char(sco.time,'YYYY-MM-DD') between '${data_inicial}' AND '${data_final}'
             and sco.id_empresa_grupo = 2
@@ -213,37 +215,24 @@ export default class TelemetriasController {
       `);
 
         response.json({
-          funcionario : {
-            registro : funcionario?.registro
+          funcionario: {
+            registro: funcionario?.registro,
           },
-          events : dados.rows,
-          score : score.rows[0],
-          distance : km_rodados.rows[0],
-          total : {
-            total_evento : total_eventos.rows[0].total_evento
-          }
+          events: dados.rows,
+          score: score.rows[0],
+          distance: km_rodados.rows[0],
+          total: {
+            total_evento: total_eventos.rows[0].total_evento,
+          },
         });
       } else {
-        response.badRequest({error :"Período não informado ou data inválida."});
+        response.badRequest({
+          error: "Período não informado ou data inválida.",
+        });
       }
-
     } catch (error) {
       console.log(error);
-      response.badRequest({error :'Erro interno'});
+      response.badRequest({ error: "Erro interno" });
     }
   }
-
-  private async consultarDadosTelemetria (campos:string, idEvents, data_inicial, data_final) {
-    let retorno = await Database.connection('pg').rawQuery(`
-      SELECT COUNT(events_trip.*) as total
-        FROM ml_int_telemetria_trips trips
-        INNER JOIN ml_int_telemetria_subtrips subtrips ON (subtrips.trip_id = trips.drive_id)
-        INNER JOIN ml_int_telemetria_events_trip events_trip ON (events_trip.trip_id = trips.id_trip)
-        WHERE events_trip.event_type_id IN (${idEvents})
-        and TO_CHAR(trips.date,'YYYY-MM-DD') >= '${data_inicial}' AND TO_CHAR(trips.date,'YYYY-MM-DD') <= '${data_final}'
-    `);
-
-    return retorno;
-  } 
-
 }

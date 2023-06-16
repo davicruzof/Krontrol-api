@@ -7,7 +7,7 @@ import Empresa from "App/Models/Empresa";
 import Database from "@ioc:Adonis/Lucid/Database";
 
 export default class VideosController {
-  public async upload({ request, response, auth }) {
+  public async upload({ request, response }) {
     try {
       await request.validate({
         schema: schema.create({
@@ -90,7 +90,7 @@ export default class VideosController {
     }
   }
 
-  public async getAll({ request, response }: HttpContextContract) {
+  public async getAll({ response }: HttpContextContract) {
     try {
       response.json(await Video.all());
     } catch (error) {

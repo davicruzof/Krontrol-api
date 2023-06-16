@@ -31,12 +31,8 @@ require("reflect-metadata");
 const source_map_support_1 = __importDefault(require("source-map-support"));
 const standalone_1 = require("@adonisjs/core/build/standalone");
 const node_cron_1 = require("node-cron");
-const luxon_1 = require("luxon");
 const api_1 = __importDefault(require("./services/api"));
-const CRON_TIME_MINUTE = "* * * * *";
 const CRON_MIDNIGHT = "0 0 * * *";
-const CRON_DAILY = "0 0 0 1/1 * ? *";
-const date_log = luxon_1.DateTime.now().toFormat("yyyy-MM-dd");
 (0, node_cron_1.schedule)(CRON_MIDNIGHT, async () => {
     const { default: Database } = await Promise.resolve().then(() => __importStar(global[Symbol.for('ioc.use')]("Adonis/Lucid/Database")));
     const { default: KontrolEvento } = await Promise.resolve().then(() => __importStar(global[Symbol.for('ioc.use')]("App/Models/KontrolEvento")));
@@ -57,7 +53,7 @@ const date_log = luxon_1.DateTime.now().toFormat("yyyy-MM-dd");
                 var nextPage = "&" + trips.data.next_page_url;
                 let eventoBusca;
                 await Promise.all(eventsList.map(async (event) => {
-                    eventoBusca = await KontrolEvento.findBy('id_evento_kontrow', event.id);
+                    eventoBusca = await KontrolEvento.findBy("id_evento_kontrow", event.id);
                     if (!eventoBusca) {
                         await KontrolEvento.create({
                             id_empresa: 1,
@@ -73,7 +69,9 @@ const date_log = luxon_1.DateTime.now().toFormat("yyyy-MM-dd");
                     nextPage = "&" + tripsNew.data.next_page_url;
                 }
                 await Promise.all(tripsList.map(async (trip) => {
-                    await Database.connection('pg').table('ml_int_telemetria_trips').insert({
+                    await Database.connection("pg")
+                        .table("ml_int_telemetria_trips")
+                        .insert({
                         id_trip: trip.id,
                         drive_id: trip.drive_id,
                         asset_id: trip.asset_id,
@@ -95,7 +93,9 @@ const date_log = luxon_1.DateTime.now().toFormat("yyyy-MM-dd");
                     });
                     const eventsTrip = (await (0, datalBus_1.getEventsTrip)(trip.id)).data.data;
                     eventsTrip.map(async (event) => {
-                        await Database.connection('pg').table('ml_int_telemetria_events_trip').insert({
+                        await Database.connection("pg")
+                            .table("ml_int_telemetria_events_trip")
+                            .insert({
                             id_trip_event: event.id,
                             trip_id: event.trip_id,
                             event_id: event.event_id,
@@ -111,7 +111,9 @@ const date_log = luxon_1.DateTime.now().toFormat("yyyy-MM-dd");
                         });
                     });
                     trip.subtrips.map(async (subtrip) => {
-                        await Database.connection('pg').table('ml_int_telemetria_subtrips').insert({
+                        await Database.connection("pg")
+                            .table("ml_int_telemetria_subtrips")
+                            .insert({
                             id_subtrip: subtrip.id,
                             trip_id: subtrip.trip_id,
                             asset_id: subtrip.asset_id,
@@ -136,7 +138,7 @@ const date_log = luxon_1.DateTime.now().toFormat("yyyy-MM-dd");
         console.log("CRON finished!");
     }
     else {
-        console.log('erro');
+        console.log("erro");
     }
 });
 source_map_support_1.default.install({ handleUncaughtExceptions: false });

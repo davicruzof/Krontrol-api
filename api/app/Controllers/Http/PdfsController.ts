@@ -2,7 +2,7 @@ import type { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
 import Database from "@ioc:Adonis/Lucid/Database";
 
 export default class PdfsController {
-  public async upload({ request, response }: HttpContextContract) {
+  public async upload({ request }: HttpContextContract) {
     const files = request.files("files");
     return files;
   }
@@ -23,7 +23,7 @@ export default class PdfsController {
     }
   }
 
-  public async getAllConfirmeds({ request, response }) {
+  public async getAllConfirmeds({ response }) {
     let dados = await Database.connection("pg").rawQuery(`
                 SELECT c.*, to_char(c.data_cadastro, 'DD/MM/YYYY HH24:MM:SS') as data_cadastro, f.nome,f.id_funcionario_erp,f.id_empresa,f.registro
                 FROM ml_pdf_confirmed c

@@ -7,16 +7,15 @@ const Schema_1 = __importDefault(global[Symbol.for('ioc.use')]("Adonis/Lucid/Sch
 class default_1 extends Schema_1.default {
     constructor() {
         super(...arguments);
-        this.tableName = 'ml_fol_funcionario';
+        this.tableName = "ml_fol_funcionario";
     }
     async up() {
         this.schema.alterTable(this.tableName, (table) => {
-            table.integer('id_situacao').defaultTo(1).alter();
+            table.integer("id_situacao").defaultTo(1).alter();
         });
     }
     async down() {
-        this.schema.alterTable(this.tableName, (table) => {
-        });
+        this.schema.alterTable(this.tableName, () => { });
     }
 }
 exports.default = default_1;
