@@ -58,7 +58,17 @@ export default class SolicitacoesRespostasController {
             WHERE id_solicitacao=${id_solicitacao}`
       );
 
-      response.json(mensagens.rows);
+      const request = await Solicitacao.findBy(
+        "id_solicitacao",
+        id_solicitacao
+      );
+
+      const responseData = {
+        messages: mensagens.rows,
+        status: request?.status,
+      };
+
+      response.json(responseData);
     } catch (error) {
       response.json(error);
     }
