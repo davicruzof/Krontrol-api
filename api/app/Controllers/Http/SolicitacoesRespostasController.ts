@@ -55,7 +55,8 @@ export default class SolicitacoesRespostasController {
             FROM ml_sac_solicitacao_resposta as MSG
             INNER JOIN ml_fol_funcionario as FUNC
             ON MSG.id_funcionario_resposta = FUNC.id_funcionario
-            WHERE id_solicitacao=${id_solicitacao}`
+            WHERE id_solicitacao=${id_solicitacao}
+            ORDER BY id ASC`
       );
 
       const request = await Solicitacao.findBy(
