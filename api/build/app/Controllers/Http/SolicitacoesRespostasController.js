@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const Validator_1 = global[Symbol.for('ioc.use')]("Adonis/Core/Validator");
+const Database_1 = __importDefault(global[Symbol.for('ioc.use')]("Adonis/Lucid/Database"));
 const Solicitacao_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/Solicitacao"));
 const SolicitacaoResposta_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/SolicitacaoResposta"));
 const Solicitacao_2 = global[Symbol.for('ioc.use')]("App/Schemas/Solicitacao");
@@ -40,17 +41,17 @@ class SolicitacoesRespostasController {
         }
     }
     async getById({ request, response }) {
+        await request.validate({
+            schema: Validator_1.schema.create(Solicitacao_2.SolicitacaoRespostaGetIdSchema),
+        });
         const { id_solicitacao } = request.body();
         try {
-            if (id_solicitacao) {
-                const solicitacao = await SolicitacaoResposta_1.default.query()
-                    .select("*")
-                    .where("id_solicitacao", id_solicitacao);
-                response.json(solicitacao);
-            }
-            else {
-                response.json({ error: "Não é possível enviar essa mensagem" });
-            }
+            const mensagens = await Database_1.default.connection("pg").rawQuery(`SELECT MSG.*, FUNC.nome
+            FROM ml_sac_solicitacao_resposta as MSG
+            INNER JOIN ml_fol_funcionario as FUNC
+            ON MSG.id_funcionario_resposta = FUNC.id_funcionario
+            WHERE id_solicitacao=${id_solicitacao}`);
+            response.json(mensagens.rows);
         }
         catch (error) {
             response.json(error);

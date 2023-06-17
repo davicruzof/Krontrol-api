@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SolicitacaoRespostaSchema = void 0;
+exports.SolicitacaoRespostaGetIdSchema = exports.SolicitacaoRespostaSchema = void 0;
 const Validator_1 = global[Symbol.for('ioc.use')]("Adonis/Core/Validator");
 exports.SolicitacaoRespostaSchema = {
     id_solicitacao: Validator_1.schema.number(),
@@ -9,5 +9,8 @@ exports.SolicitacaoRespostaSchema = {
     id_status_leitura: Validator_1.schema.number(),
     respondido_por: Validator_1.schema.number(),
     url_documento: Validator_1.schema.string.nullableAndOptional(),
+};
+exports.SolicitacaoRespostaGetIdSchema = {
+    id_solicitacao: Validator_1.schema.number(),
 };
 //# sourceMappingURL=Solicitacao.js.map

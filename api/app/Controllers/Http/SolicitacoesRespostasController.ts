@@ -1,8 +1,12 @@
 import type { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
 import { schema } from "@ioc:Adonis/Core/Validator";
+import Database from "@ioc:Adonis/Lucid/Database";
 import Solicitacao from "App/Models/Solicitacao";
 import SolicitacaoResposta from "App/Models/SolicitacaoResposta";
-import { SolicitacaoRespostaSchema } from "App/Schemas/Solicitacao";
+import {
+  SolicitacaoRespostaGetIdSchema,
+  SolicitacaoRespostaSchema,
+} from "App/Schemas/Solicitacao";
 
 export default class SolicitacoesRespostasController {
   public async create({ request, response, auth }: HttpContextContract) {
@@ -39,18 +43,22 @@ export default class SolicitacoesRespostasController {
   }
 
   public async getById({ request, response }: HttpContextContract) {
+    await request.validate({
+      schema: schema.create(SolicitacaoRespostaGetIdSchema),
+    });
+
     const { id_solicitacao } = request.body();
 
     try {
-      if (id_solicitacao) {
-        const solicitacao = await SolicitacaoResposta.query()
-          .select("*")
-          .where("id_solicitacao", id_solicitacao);
+      const mensagens = await Database.connection("pg").rawQuery(
+        `SELECT MSG.*, FUNC.nome
+            FROM ml_sac_solicitacao_resposta as MSG
+            INNER JOIN ml_fol_funcionario as FUNC
+            ON MSG.id_funcionario_resposta = FUNC.id_funcionario
+            WHERE id_solicitacao=${id_solicitacao}`
+      );
 
-        response.json(solicitacao);
-      } else {
-        response.json({ error: "Não é possível enviar essa mensagem" });
-      }
+      response.json(mensagens.rows);
     } catch (error) {
       response.json(error);
     }

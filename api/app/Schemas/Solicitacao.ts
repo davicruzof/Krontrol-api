@@ -13,3 +13,7 @@ export const SolicitacaoRespostaSchema = {
 
   url_documento: schema.string.nullableAndOptional(),
 };
+
+export const SolicitacaoRespostaGetIdSchema = {
+  id_solicitacao: schema.number(),
+};
