@@ -3,18 +3,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.solicitacaoSchema = void 0;
 const Validator_1 = global[Symbol.for('ioc.use')]("Adonis/Core/Validator");
 const Database_1 = __importDefault(global[Symbol.for('ioc.use')]("Adonis/Lucid/Database"));
 const Solicitacao_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/Solicitacao"));
-exports.solicitacaoSchema = {
-    id_area: Validator_1.schema.number(),
-    id_modulo: Validator_1.schema.number(),
-    justificativa: Validator_1.schema.string(),
-};
+const SolicitacaoFerias_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/SolicitacaoFerias"));
+const Solicitacao_2 = global[Symbol.for('ioc.use')]("App/Schemas/Solicitacao");
 class SolicitacoesController {
     async create({ request, response, auth }) {
-        await request.validate({ schema: Validator_1.schema.create(exports.solicitacaoSchema) });
+        await request.validate({ schema: Validator_1.schema.create(Solicitacao_2.solicitacaoSchema) });
         let dados = request.body();
         try {
             await Solicitacao_1.default.create({
@@ -158,6 +154,17 @@ class SolicitacoesController {
             else {
                 response.json({ error: "Erro ao atualizar" });
             }
+    }
+    async getParameter({ response, auth }) {
+        try {
+            if (auth.user) {
+                const parameter = await SolicitacaoFerias_1.default.query().where("id_empresa", auth.user?.id_empresa);
+                response.json(parameter);
+            }
+        }
+        catch (error) {
+            response.json(error);
+        }
     }
 }
 exports.default = SolicitacoesController;

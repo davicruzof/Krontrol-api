@@ -1,5 +1,4 @@
 import { BaseModel, column } from "@ioc:Adonis/Lucid/Orm";
-import { String } from "aws-sdk/clients/batch";
 
 export default class SolicitacaoResposta extends BaseModel {
   static get table() {
@@ -16,10 +15,10 @@ export default class SolicitacaoResposta extends BaseModel {
   public id_funcionario_resposta: number;
 
   @column()
-  public justificativa: String;
+  public justificativa: string;
 
   @column()
-  public dt_resposta: String;
+  public dt_resposta: string;
 
   @column()
   public id_status_leitura: number;

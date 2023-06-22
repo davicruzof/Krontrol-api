@@ -194,6 +194,7 @@ Route.group(() => {
     Route.post("/list", "SolicitacoesController.list");
     Route.post("/listByUser", "SolicitacoesController.listByUser");
     Route.put("/update", "SolicitacoesController.update");
+    Route.get("/getParameter", "SolicitacoesController.getParameter");
   })
     .prefix("/requests")
     .middleware("auth");

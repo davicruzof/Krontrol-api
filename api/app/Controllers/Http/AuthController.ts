@@ -54,6 +54,10 @@ export default class AuthController {
         return response.unauthorized({ error: "Funcionário inválido" });
       }
 
+      if (employee.id_situacao === 2) {
+        return response.unauthorized({ error: "Funcionário Inativo" });
+      }
+
       const user = await this.getUser(employee);
 
       if (!user) {
@@ -66,8 +70,7 @@ export default class AuthController {
         return response.unauthorized({ error: "Dados inválidos" });
       }
 
-      response.json( await auth.use("api").generate(user));
-
+      response.json(await auth.use("api").generate(user));
     } catch (error) {
       response.badRequest(error.messages);
     }

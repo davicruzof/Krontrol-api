@@ -2,12 +2,8 @@ import type { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
 import { schema } from "@ioc:Adonis/Core/Validator";
 import Database from "@ioc:Adonis/Lucid/Database";
 import Solicitacao from "App/Models/Solicitacao";
-
-export const solicitacaoSchema = {
-  id_area: schema.number(),
-  id_modulo: schema.number(),
-  justificativa: schema.string(),
-};
+import SolicitacaoFerias from "App/Models/SolicitacaoFerias";
+import { solicitacaoSchema } from "App/Schemas/Solicitacao";
 
 export default class SolicitacoesController {
   public async create({ request, response, auth }: HttpContextContract) {
@@ -171,5 +167,19 @@ export default class SolicitacoesController {
       } else {
         response.json({ error: "Erro ao atualizar" });
       }
+  }
+
+  public async getParameter({ response, auth }: HttpContextContract) {
+    try {
+      if (auth.user) {
+        const parameter = await SolicitacaoFerias.query().where(
+          "id_empresa",
+          auth.user?.id_empresa
+        );
+        response.json(parameter);
+      }
+    } catch (error) {
+      response.json(error);
+    }
   }
 }

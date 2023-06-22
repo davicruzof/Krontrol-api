@@ -54,6 +54,9 @@ class AuthController {
             if (!employee) {
                 return response.unauthorized({ error: "Funcionário inválido" });
             }
+            if (employee.id_situacao === 2) {
+                return response.unauthorized({ error: "Funcionário Inativo" });
+            }
             const user = await this.getUser(employee);
             if (!user) {
                 return response.unauthorized({ error: "Usuário inválido" });
