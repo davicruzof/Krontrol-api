@@ -202,7 +202,7 @@ Route.group(() => {
   //Rotas Notificações
   Route.group(() => {
     Route.post("/create", "NotificationsController.create");
-    Route.put("/update", "SolicitacoesController.updateReadNotifications");
+    Route.put("/update", "NotificationsController.updateReadNotifications");
     Route.get(
       "/getNotificationsByUser",
       "NotificationsController.getNotificationsByUser"
