@@ -4,6 +4,7 @@ import Database from "@ioc:Adonis/Lucid/Database";
 import Solicitacao from "App/Models/Solicitacao";
 import SolicitacaoFerias from "App/Models/SolicitacaoFerias";
 import { solicitacaoSchema } from "App/Schemas/Solicitacao";
+import Notifications from "App/Models/Notifications";
 
 export default class SolicitacoesController {
   public async create({ request, response, auth }: HttpContextContract) {
@@ -166,6 +167,19 @@ export default class SolicitacoesController {
           solicitacao.id_funcionario_finalizada = auth.user.id_funcionario;
         }
         solicitacao.merge(dados).save();
+
+        let dadoNotify = await Database.connection("pg").rawQuery(`
+            SELECT *
+            FROM ml_ctr_programa_area_modulo
+            WHERE id_modulo = ${solicitacao.id_modulo}
+        `);
+
+        await Notifications.create({
+          message: `A sua solicitação de ${dadoNotify.rows[0].modulo} foi atualizada`,
+          id_funcionario: auth.user?.id_funcionario,
+          type: 1,
+          created_at: new Date().toLocaleString("pt-BR"),
+        });
 
         response.json({ sucess: "Atualizado com sucesso" });
       } else {

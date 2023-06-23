@@ -199,6 +199,18 @@ Route.group(() => {
     .prefix("/requests")
     .middleware("auth");
 
+  //Rotas Notificações
+  Route.group(() => {
+    Route.post("/create", "NotificationsController.create");
+    Route.put("/update", "SolicitacoesController.updateReadNotifications");
+    Route.get(
+      "/getNotificationsByUser",
+      "NotificationsController.getNotificationsByUser"
+    );
+  })
+    .prefix("/notifications")
+    .middleware("auth");
+
   // Rotas Chat Solicitacoes
   Route.group(() => {
     Route.post("/create", "SolicitacoesRespostasController.create");

@@ -118,6 +118,13 @@ Route_1.default.group(() => {
         .prefix("/requests")
         .middleware("auth");
     Route_1.default.group(() => {
+        Route_1.default.post("/create", "NotificationsController.create");
+        Route_1.default.put("/update", "SolicitacoesController.updateReadNotifications");
+        Route_1.default.get("/getNotificationsByUser", "NotificationsController.getNotificationsByUser");
+    })
+        .prefix("/notifications")
+        .middleware("auth");
+    Route_1.default.group(() => {
         Route_1.default.post("/create", "SolicitacoesRespostasController.create");
         Route_1.default.post("/getMessages", "SolicitacoesRespostasController.getById");
     })

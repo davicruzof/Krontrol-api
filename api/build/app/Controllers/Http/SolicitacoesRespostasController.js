@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const Validator_1 = global[Symbol.for('ioc.use')]("Adonis/Core/Validator");
 const Database_1 = __importDefault(global[Symbol.for('ioc.use')]("Adonis/Lucid/Database"));
+const Notifications_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/Notifications"));
 const Solicitacao_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/Solicitacao"));
 const SolicitacaoResposta_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/SolicitacaoResposta"));
 const Solicitacao_2 = global[Symbol.for('ioc.use')]("App/Schemas/Solicitacao");
@@ -25,6 +26,12 @@ class SolicitacoesRespostasController {
                     await SolicitacaoResposta_1.default.create({
                         ...dados,
                         id_funcionario_resposta: auth.user?.id_funcionario,
+                    });
+                    await Notifications_1.default.create({
+                        message: `Uma nova mensagem para uma solicitação`,
+                        id_funcionario: auth.user?.id_funcionario,
+                        type: 1,
+                        created_at: new Date().toLocaleString("pt-BR"),
                     });
                     response.json({ success: "Mensagem enviada!" });
                 }

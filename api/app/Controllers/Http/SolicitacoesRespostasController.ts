@@ -1,6 +1,7 @@
 import type { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
 import { schema } from "@ioc:Adonis/Core/Validator";
 import Database from "@ioc:Adonis/Lucid/Database";
+import Notifications from "App/Models/Notifications";
 import Solicitacao from "App/Models/Solicitacao";
 import SolicitacaoResposta from "App/Models/SolicitacaoResposta";
 import {
@@ -28,6 +29,13 @@ export default class SolicitacoesRespostasController {
           await SolicitacaoResposta.create({
             ...dados,
             id_funcionario_resposta: auth.user?.id_funcionario,
+          });
+
+          await Notifications.create({
+            message: `Uma nova mensagem para uma solicitação`,
+            id_funcionario: auth.user?.id_funcionario,
+            type: 1,
+            created_at: new Date().toLocaleString("pt-BR"),
           });
 
           response.json({ success: "Mensagem enviada!" });

@@ -8,6 +8,7 @@ const Database_1 = __importDefault(global[Symbol.for('ioc.use')]("Adonis/Lucid/D
 const Solicitacao_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/Solicitacao"));
 const SolicitacaoFerias_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/SolicitacaoFerias"));
 const Solicitacao_2 = global[Symbol.for('ioc.use')]("App/Schemas/Solicitacao");
+const Notifications_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/Notifications"));
 class SolicitacoesController {
     async create({ request, response, auth }) {
         await request.validate({ schema: Validator_1.schema.create(Solicitacao_2.solicitacaoSchema) });
@@ -153,6 +154,17 @@ class SolicitacoesController {
                     solicitacao.id_funcionario_finalizada = auth.user.id_funcionario;
                 }
                 solicitacao.merge(dados).save();
+                let dadoNotify = await Database_1.default.connection("pg").rawQuery(`
+            SELECT *
+            FROM ml_ctr_programa_area_modulo
+            WHERE id_modulo = ${solicitacao.id_modulo}
+        `);
+                await Notifications_1.default.create({
+                    message: `A sua solicitação de ${dadoNotify.rows[0].modulo} foi atualizada`,
+                    id_funcionario: auth.user?.id_funcionario,
+                    type: 1,
+                    created_at: new Date().toLocaleString("pt-BR"),
+                });
                 response.json({ sucess: "Atualizado com sucesso" });
             }
             else {
