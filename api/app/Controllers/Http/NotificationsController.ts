@@ -1,7 +1,10 @@
 import type { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
 import { schema } from "@ioc:Adonis/Core/Validator";
 import Notifications from "App/Models/Notifications";
-import { NotificationsSchema } from "App/Schemas/Notifications";
+import {
+  NotificationsSchema,
+  NotificationsUpdateSchema,
+} from "App/Schemas/Notifications";
 
 export default class NotificationsController {
   public async create({ request, response, auth }: HttpContextContract) {
@@ -23,19 +26,19 @@ export default class NotificationsController {
     request,
     response,
   }: HttpContextContract) {
+    await request.validate({
+      schema: schema.create(NotificationsUpdateSchema),
+    });
+
+    let { id_notification } = request.body();
     try {
-      let dados = request.body();
-      if (dados.id_notification) {
-        const notification = await Notifications.findBy(
-          "id",
-          dados.id_notification
-        );
-        if (notification) {
-          notification.merge({ read: true }).save();
-          response.json({ success: "Atualizado com sucesso" });
-        }
-        response.json({ error: "Erro na leitura" });
+      const notification = await Notifications.findBy("id", id_notification);
+
+      if (notification) {
+        notification.merge({ read: true }).save();
+        return response.json({ success: "Atualizado com sucesso" });
       }
+      response.json({ error: "Erro na atualização " });
     } catch (error) {
       response.json(error);
     }

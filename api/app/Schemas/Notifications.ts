@@ -7,3 +7,7 @@ export const NotificationsSchema = {
 
   type: schema.number(),
 };
+
+export const NotificationsUpdateSchema = {
+  id_notification: schema.string(),
+};

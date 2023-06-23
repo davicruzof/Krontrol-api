@@ -22,16 +22,17 @@ class NotificationsController {
         }
     }
     async updateReadNotifications({ request, response, }) {
+        await request.validate({
+            schema: Validator_1.schema.create(Notifications_2.NotificationsUpdateSchema),
+        });
+        let { id_notification } = request.body();
         try {
-            let dados = request.body();
-            if (dados.id_notification) {
-                const notification = await Notifications_1.default.findBy("id", dados.id_notification);
-                if (notification) {
-                    notification.merge({ read: true }).save();
-                    response.json({ success: "Atualizado com sucesso" });
-                }
-                response.json({ error: "Erro na leitura" });
+            const notification = await Notifications_1.default.findBy("id", id_notification);
+            if (notification) {
+                notification.merge({ read: true }).save();
+                return response.json({ success: "Atualizado com sucesso" });
             }
+            response.json({ error: "Erro na atualização " });
         }
         catch (error) {
             response.json(error);
