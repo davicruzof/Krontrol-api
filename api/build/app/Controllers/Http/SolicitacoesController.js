@@ -20,6 +20,7 @@ class SolicitacoesController {
                 id_area: dados.id_area,
                 id_modulo: dados.id_modulo,
                 justificativa: dados.justificativa,
+                dt_informada: dados?.dt_informada,
             });
         }
         catch (error) {
