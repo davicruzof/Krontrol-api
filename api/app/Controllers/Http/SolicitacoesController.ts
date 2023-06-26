@@ -49,6 +49,7 @@ export default class SolicitacoesController {
             sol.id_funcionario_finalizada,
             sol.dt_informada,
             TO_CHAR(sol.dt_cadastro, 'DD-MM-YYYY') as dt_cadastro,
+            sol.dt_cadastro as dt_cadastro_full,
             area.area,
             mod.modulo,
             NOW() - sol.dt_cadastro AS cadastrado_a,
