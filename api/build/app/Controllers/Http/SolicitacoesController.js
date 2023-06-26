@@ -9,6 +9,7 @@ const Solicitacao_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/
 const SolicitacaoFerias_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/SolicitacaoFerias"));
 const Solicitacao_2 = global[Symbol.for('ioc.use')]("App/Schemas/Solicitacao");
 const Notifications_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/Notifications"));
+const luxon_1 = require("luxon");
 class SolicitacoesController {
     async create({ request, response, auth }) {
         await request.validate({ schema: Validator_1.schema.create(Solicitacao_2.solicitacaoSchema) });
@@ -166,7 +167,7 @@ class SolicitacoesController {
                     message: `A sua solicitação de ${dadoNotify.rows[0].modulo} foi atualizada`,
                     id_funcionario: auth.user?.id_funcionario,
                     type: 1,
-                    created_at: new Date().toLocaleString("pt-BR"),
+                    created_at: luxon_1.DateTime.now().toString(),
                 });
                 response.json({ sucess: "Atualizado com sucesso" });
             }

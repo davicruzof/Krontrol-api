@@ -5,6 +5,7 @@ import Solicitacao from "App/Models/Solicitacao";
 import SolicitacaoFerias from "App/Models/SolicitacaoFerias";
 import { solicitacaoSchema } from "App/Schemas/Solicitacao";
 import Notifications from "App/Models/Notifications";
+import { DateTime } from "luxon";
 
 export default class SolicitacoesController {
   public async create({ request, response, auth }: HttpContextContract) {
@@ -181,7 +182,7 @@ export default class SolicitacoesController {
           message: `A sua solicitação de ${dadoNotify.rows[0].modulo} foi atualizada`,
           id_funcionario: auth.user?.id_funcionario,
           type: 1,
-          created_at: new Date().toLocaleString("pt-BR"),
+          created_at: DateTime.now().toString(),
         });
 
         response.json({ sucess: "Atualizado com sucesso" });
