@@ -31,12 +31,13 @@ export default class SolicitacoesRespostasController {
             id_funcionario_resposta: auth.user?.id_funcionario,
           });
 
-          await Notifications.create({
-            message: `Uma nova mensagem para uma solicitação`,
-            id_funcionario: auth.user?.id_funcionario,
-            type: 1,
-            created_at: new Date().toLocaleString("pt-BR"),
-          });
+          dados.respondido_por === "2" &&
+            (await Notifications.create({
+              message: `Uma nova mensagem para uma solicitação`,
+              id_funcionario: auth.user?.id_funcionario,
+              type: 1,
+              created_at: new Date().toLocaleString("pt-BR"),
+            }));
 
           response.json({ success: "Mensagem enviada!" });
         } else {
