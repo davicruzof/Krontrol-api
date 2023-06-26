@@ -9,6 +9,7 @@ const Notifications_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Model
 const Solicitacao_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/Solicitacao"));
 const SolicitacaoResposta_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/SolicitacaoResposta"));
 const Solicitacao_2 = global[Symbol.for('ioc.use')]("App/Schemas/Solicitacao");
+const luxon_1 = require("luxon");
 class SolicitacoesRespostasController {
     async create({ request, response, auth }) {
         await request.validate({
@@ -32,7 +33,7 @@ class SolicitacoesRespostasController {
                             message: `Uma nova mensagem para uma solicitação`,
                             id_funcionario: auth.user?.id_funcionario,
                             type: 1,
-                            created_at: new Date().toLocaleString("pt-BR"),
+                            created_at: luxon_1.DateTime.now().toString(),
                         }));
                     response.json({ success: "Mensagem enviada!" });
                 }

@@ -8,6 +8,7 @@ import {
   SolicitacaoRespostaGetIdSchema,
   SolicitacaoRespostaSchema,
 } from "App/Schemas/Solicitacao";
+import { DateTime } from "luxon";
 
 export default class SolicitacoesRespostasController {
   public async create({ request, response, auth }: HttpContextContract) {
@@ -36,7 +37,7 @@ export default class SolicitacoesRespostasController {
               message: `Uma nova mensagem para uma solicitação`,
               id_funcionario: auth.user?.id_funcionario,
               type: 1,
-              created_at: new Date().toLocaleString("pt-BR"),
+              created_at: DateTime.now().toString(),
             }));
 
           response.json({ success: "Mensagem enviada!" });
