@@ -5,6 +5,7 @@ import User from "App/Models/User";
 import Funcionario from "App/Models/Funcionario";
 import Database from "@ioc:Adonis/Lucid/Database";
 import GlobalController from "./GlobalController";
+import AppVersion from "App/Models/AppVersion";
 
 const userSchema = schema.create({
   cpf: schema.string(),
@@ -46,7 +47,7 @@ export default class AuthController {
     try {
       await request.validate({ schema: userSchema });
 
-      const { cpf, id_empresa, senha } = request.body();
+      const { cpf, id_empresa, senha, version } = request.body();
 
       const employee = await this.getEmployee(cpf, id_empresa);
 
@@ -62,6 +63,13 @@ export default class AuthController {
 
       if (!user) {
         return response.unauthorized({ error: "Usuário inválido" });
+      }
+
+      if (version) {
+        await AppVersion.create({
+          id_funcionario: user.id_funcionario,
+          app_version: version,
+        });
       }
 
       const isValidPassword = await this.verifyPassword(user, senha);

@@ -19,6 +19,7 @@ const crypto_1 = __importDefault(require("crypto"));
 const template_1 = global[Symbol.for('ioc.use')]("App/templates/pdf/template");
 const Funcao_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/Funcao"));
 const GlobalController_1 = __importDefault(require("./GlobalController"));
+const AppVersion_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/AppVersion"));
 class FuncionariosController {
     async create({ request, response }) {
         try {
@@ -211,6 +212,10 @@ class FuncionariosController {
             let dados = request.all();
             if (dados.data) {
                 let funcionario = await Funcionario_1.default.findBy("id_funcionario", auth.user?.id_funcionario);
+                let appUpdate = await AppVersion_1.default.findBy("id_funcionario", auth.user?.id_funcionario);
+                if (!appUpdate) {
+                    return response.badRequest({ error: "app desatualizado" });
+                }
                 let query = await Database_1.default.connection("oracle").rawQuery(`
                                     SELECT DISTINCT
                                     to_char(competficha, 'MM-YYYY') as COMPETFICHA,
@@ -502,6 +507,10 @@ class FuncionariosController {
             let dados = request.body();
             if (dados.data) {
                 let funcionario = await Funcionario_1.default.findBy("id_funcionario", auth.user?.id_funcionario);
+                let appUpdate = await AppVersion_1.default.findBy("id_funcionario", auth.user?.id_funcionario);
+                if (!appUpdate) {
+                    return response.badRequest({ error: "app desatualizado" });
+                }
                 let queryFuncao = await Funcao_1.default.findBy("id_funcao_erp", funcionario?.id_funcao_erp);
                 const data = dados.data.split("-");
                 const periodoInicial = `27-${data[1] - 1}-${data[0]}`;

@@ -22,6 +22,7 @@ import crypto from "crypto";
 import { fichaPonto, templateDotCard } from "App/templates/pdf/template";
 import Funcao from "App/Models/Funcao";
 import GlobalController from "./GlobalController";
+import AppVersion from "App/Models/AppVersion";
 export default class FuncionariosController {
   public async create({ request, response }: HttpContextContract) {
     try {
@@ -276,6 +277,15 @@ export default class FuncionariosController {
           "id_funcionario",
           auth.user?.id_funcionario
         );
+
+        let appUpdate = await AppVersion.findBy(
+          "id_funcionario",
+          auth.user?.id_funcionario
+        );
+
+        if (!appUpdate) {
+          return response.badRequest({ error: "app desatualizado" });
+        }
 
         let query = await Database.connection("oracle").rawQuery(`
                                     SELECT DISTINCT
@@ -607,6 +617,16 @@ export default class FuncionariosController {
           "id_funcionario",
           auth.user?.id_funcionario
         );
+
+        let appUpdate = await AppVersion.findBy(
+          "id_funcionario",
+          auth.user?.id_funcionario
+        );
+
+        if (!appUpdate) {
+          return response.badRequest({ error: "app desatualizado" });
+        }
+
         let queryFuncao = await Funcao.findBy(
           "id_funcao_erp",
           funcionario?.id_funcao_erp
