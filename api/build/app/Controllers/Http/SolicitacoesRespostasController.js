@@ -31,9 +31,8 @@ class SolicitacoesRespostasController {
                     dados.respondido_por === "2" &&
                         (await Notifications_1.default.create({
                             message: `Uma nova mensagem para uma solicitação`,
-                            id_funcionario: auth.user?.id_funcionario,
+                            id_funcionario: solicitacao[0].id_funcionario,
                             type: 1,
-                            id_solicitacao: dados.id_solicitacao,
                             created_at: luxon_1.DateTime.now().toString(),
                         }));
                     response.json({ success: "Mensagem enviada!" });

@@ -25,10 +25,6 @@ __decorate([
 ], Notifications.prototype, "id_funcionario", void 0);
 __decorate([
     (0, Orm_1.column)(),
-    __metadata("design:type", Number)
-], Notifications.prototype, "id_solicitacao", void 0);
-__decorate([
-    (0, Orm_1.column)(),
     __metadata("design:type", String)
 ], Notifications.prototype, "message", void 0);
 __decorate([

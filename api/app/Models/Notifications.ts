@@ -12,9 +12,6 @@ export default class Notifications extends BaseModel {
   public id_funcionario: number;
 
   @column()
-  public id_solicitacao: number;
-
-  @column()
   public message: string;
 
   @column()

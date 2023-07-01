@@ -35,9 +35,8 @@ export default class SolicitacoesRespostasController {
           dados.respondido_por === "2" &&
             (await Notifications.create({
               message: `Uma nova mensagem para uma solicitação`,
-              id_funcionario: auth.user?.id_funcionario,
+              id_funcionario: solicitacao[0].id_funcionario,
               type: 1,
-              id_solicitacao: dados.id_solicitacao,
               created_at: DateTime.now().toString(),
             }));
 

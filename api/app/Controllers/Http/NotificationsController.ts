@@ -44,23 +44,6 @@ export default class NotificationsController {
     }
   }
 
-  public async getNotificationsByRequest({
-    response,
-    request,
-  }: HttpContextContract) {
-    let { id_solicitacao } = request.body();
-    try {
-      if (id_solicitacao) {
-        const notifications = await Notifications.query()
-          .where("id_solicitacao", id_solicitacao)
-          .where("read", false);
-        response.json(notifications);
-      }
-    } catch (error) {
-      response.json(error);
-    }
-  }
-
   public async getNotificationsByUser({ response, auth }: HttpContextContract) {
     try {
       if (auth.user) {
