@@ -20,11 +20,10 @@ export default class SolicitacoesRespostasController {
 
     try {
       if (auth.user?.id_funcionario) {
-        const solicitacao = await Solicitacao.query()
-          .where("id_solicitacao", dados.id_solicitacao)
-          .whereNot("status", "ATENDIDA")
-          .where("id_funcionario", auth.user?.id_funcionario)
-          .orWhere("id_funcionario_analise", auth.user?.id_funcionario);
+        const solicitacao = await Solicitacao.findBy(
+          "id_solicitacao",
+          dados.id_solicitacao
+        );
 
         if (solicitacao) {
           await SolicitacaoResposta.create({

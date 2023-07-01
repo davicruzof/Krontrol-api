@@ -18,11 +18,7 @@ class SolicitacoesRespostasController {
         const dados = request.body();
         try {
             if (auth.user?.id_funcionario) {
-                const solicitacao = await Solicitacao_1.default.query()
-                    .where("id_solicitacao", dados.id_solicitacao)
-                    .whereNot("status", "ATENDIDA")
-                    .where("id_funcionario", auth.user?.id_funcionario)
-                    .orWhere("id_funcionario_analise", auth.user?.id_funcionario);
+                const solicitacao = await Solicitacao_1.default.findBy("id_solicitacao", dados.id_solicitacao);
                 if (solicitacao) {
                     await SolicitacaoResposta_1.default.create({
                         ...dados,
