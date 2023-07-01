@@ -38,7 +38,9 @@ class UsersController {
                 }
             }
             else {
-                response.badRequest({ error: "Funcionário não cadastrado" });
+                response.badRequest({
+                    error: "Funcionário não autorizado a realizar cadastro",
+                });
             }
         }
         catch (error) {

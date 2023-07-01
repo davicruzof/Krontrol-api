@@ -182,6 +182,7 @@ export default class SolicitacoesController {
           message: `A sua solicitação de ${dadoNotify.rows[0].modulo} foi atualizada`,
           id_funcionario: auth.user?.id_funcionario,
           type: 1,
+          id_solicitacao: dados.id_solicitacao,
           created_at: DateTime.now().toString(),
         });
 

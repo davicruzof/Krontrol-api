@@ -38,6 +38,20 @@ class NotificationsController {
             response.json(error);
         }
     }
+    async getNotificationsByRequest({ response, request, }) {
+        let { id_solicitacao } = request.body();
+        try {
+            if (id_solicitacao) {
+                const notifications = await Notifications_1.default.query()
+                    .where("id_solicitacao", id_solicitacao)
+                    .where("read", false);
+                response.json(notifications);
+            }
+        }
+        catch (error) {
+            response.json(error);
+        }
+    }
     async getNotificationsByUser({ response, auth }) {
         try {
             if (auth.user) {

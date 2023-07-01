@@ -33,6 +33,7 @@ class SolicitacoesRespostasController {
                             message: `Uma nova mensagem para uma solicitação`,
                             id_funcionario: auth.user?.id_funcionario,
                             type: 1,
+                            id_solicitacao: dados.id_solicitacao,
                             created_at: luxon_1.DateTime.now().toString(),
                         }));
                     response.json({ success: "Mensagem enviada!" });

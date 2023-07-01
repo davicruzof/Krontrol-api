@@ -38,7 +38,9 @@ export default class UsersController {
           response.json({ sucess: "Usuário cadastrado" });
         }
       } else {
-        response.badRequest({ error: "Funcionário não cadastrado" });
+        response.badRequest({
+          error: "Funcionário não autorizado a realizar cadastro",
+        });
       }
     } catch (error) {
       response.badRequest(error);

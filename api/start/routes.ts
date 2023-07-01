@@ -207,6 +207,10 @@ Route.group(() => {
       "/getNotificationsByUser",
       "NotificationsController.getNotificationsByUser"
     );
+    Route.post(
+      "/getNotificationsByRequest",
+      "NotificationsController.getNotificationsByRequest"
+    );
   })
     .prefix("/notifications")
     .middleware("auth");

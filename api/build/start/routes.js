@@ -121,6 +121,7 @@ Route_1.default.group(() => {
         Route_1.default.post("/create", "NotificationsController.create");
         Route_1.default.put("/update", "NotificationsController.updateReadNotifications");
         Route_1.default.get("/getNotificationsByUser", "NotificationsController.getNotificationsByUser");
+        Route_1.default.post("/getNotificationsByRequest", "NotificationsController.getNotificationsByRequest");
     })
         .prefix("/notifications")
         .middleware("auth");
