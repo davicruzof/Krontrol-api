@@ -66,10 +66,19 @@ export default class AuthController {
       }
 
       if (version) {
-        await AppVersion.create({
-          id_funcionario: user.id_funcionario,
-          app_version: version,
-        });
+        const versionStorage = await AppVersion.findBy(
+          "id_funcionario",
+          user.id_funcionario
+        );
+
+        if (versionStorage) {
+          versionStorage.merge({ app_version: version }).save();
+        } else {
+          await AppVersion.create({
+            id_funcionario: user.id_funcionario,
+            app_version: version,
+          });
+        }
       }
 
       const isValidPassword = await this.verifyPassword(user, senha);

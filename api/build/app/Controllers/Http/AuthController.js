@@ -63,10 +63,16 @@ class AuthController {
                 return response.unauthorized({ error: "Usuário inválido" });
             }
             if (version) {
-                await AppVersion_1.default.create({
-                    id_funcionario: user.id_funcionario,
-                    app_version: version,
-                });
+                const versionStorage = await AppVersion_1.default.findBy("id_funcionario", user.id_funcionario);
+                if (versionStorage) {
+                    versionStorage.merge({ app_version: version }).save();
+                }
+                else {
+                    await AppVersion_1.default.create({
+                        id_funcionario: user.id_funcionario,
+                        app_version: version,
+                    });
+                }
             }
             const isValidPassword = await this.verifyPassword(user, senha);
             if (!isValidPassword) {
