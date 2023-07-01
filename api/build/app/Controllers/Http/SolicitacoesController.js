@@ -165,7 +165,7 @@ class SolicitacoesController {
         `);
                 await Notifications_1.default.create({
                     message: `A sua solicitação de ${dadoNotify.rows[0].modulo} foi atualizada`,
-                    id_funcionario: solicitacao[0].id_funcionario,
+                    id_funcionario: solicitacao.id_funcionario,
                     type: 1,
                     created_at: luxon_1.DateTime.now().toString(),
                 });
