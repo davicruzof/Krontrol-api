@@ -60,11 +60,13 @@ export default class SolicitacoesRespostasController {
 
     try {
       const mensagens = await Database.connection("pg").rawQuery(
-        `SELECT MSG.*, FUNC.nome
-            FROM ml_sac_solicitacao_resposta as MSG
-            INNER JOIN ml_fol_funcionario as FUNC
-            ON MSG.id_funcionario_resposta = FUNC.id_funcionario
-            WHERE id_solicitacao=${id_solicitacao}
+        `SELECT MSG.*, area.area as nome
+            FROM ml_sac_solicitacao sol
+            INNER JOIN ml_sac_solicitacao_resposta as MSG
+            ON MSG.id_solicitacao = sol.id_solicitacao
+            INNER JOIN ml_ctr_programa_area area
+            ON sol.id_area = area.id_area
+            WHERE sol.id_solicitacao=${id_solicitacao}
             ORDER BY id DESC`
       );
 
