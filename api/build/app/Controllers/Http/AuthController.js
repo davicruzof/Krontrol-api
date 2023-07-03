@@ -136,7 +136,7 @@ class AuthController {
                 cpf: dados.cpf,
                 id_empresa: dados.id_empresa,
             })
-                .andWhere("ml_fol_funcionario.id_situacao", "=", 1)
+                .whereNot("ml_fol_funcionario.id_situacao", "=", 2)
                 .select("id_funcionario", "cpf", "nome", "celular", "dt_nascimento")
                 .first();
             if (!funcionario) {
