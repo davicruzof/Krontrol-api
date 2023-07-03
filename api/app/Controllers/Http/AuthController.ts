@@ -21,7 +21,7 @@ export default class AuthController {
     const funcionario = await Funcionario.query()
       .where("cpf", cpf)
       .where("id_empresa", id_empresa)
-      .where("id_situacao", 1)
+      .whereNot("id_situacao", 2)
       .first();
 
     return funcionario;
