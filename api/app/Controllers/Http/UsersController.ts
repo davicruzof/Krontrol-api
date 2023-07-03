@@ -19,7 +19,7 @@ export default class UsersController {
       const funcionario = await Funcionario.query()
         .where("cpf", dados.cpf)
         .where("id_empresa", dados.id_empresa)
-        .where("id_situacao", 1)
+        .whereNot("id_situacao", 2)
         .first();
       if (funcionario) {
         const usuario = await User.findBy(
