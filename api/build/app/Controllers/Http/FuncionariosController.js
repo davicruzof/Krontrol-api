@@ -11,6 +11,7 @@ const pdf_creator_node_1 = __importDefault(require("pdf-creator-node"));
 const fs_1 = __importDefault(require("fs"));
 const S3_1 = global[Symbol.for('ioc.use')]("App/Controllers/Http/S3");
 const FuncionarioArea_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/FuncionarioArea"));
+const moment_1 = __importDefault(require("moment"));
 const Funcionario_2 = global[Symbol.for('ioc.use')]("App/Schemas/Funcionario");
 const Database_1 = __importDefault(global[Symbol.for('ioc.use')]("Adonis/Lucid/Database"));
 const User_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/User"));
@@ -291,7 +292,7 @@ class FuncionariosController {
                                     left join globus.bgm_cadlinhas lin on pon.codintlinha = lin.codintlinha
                                     WHERE
                                         pon.tipodigit = 'F' AND
-                                        pon.dtdigit BETWEEN to_date('${firstDay.toLocaleDateString()}','DD/MM/YYYY') and to_date('${lastDay.toLocaleDateString()}','DD/MM/YYYY')
+                                        pon.dtdigit BETWEEN to_date('${firstDay.toLocaleDateString()}','DD/MM/YYYY') and to_date('${(0, moment_1.default)(lastDay).format('DD/MM/YYYY')}','DD/MM/YYYY')
                                         and func.id_funcionario_erp= '${funcionario?.id_funcionario_erp}'
                                     order by DATA_DIGITACAO ASC
                                     `);
@@ -508,7 +509,7 @@ class FuncionariosController {
             if (dados.data) {
                 let funcionario = await Funcionario_1.default.findBy("id_funcionario", auth.user?.id_funcionario);
                 let appUpdate = await AppVersion_1.default.findBy("id_funcionario", auth.user?.id_funcionario);
-                if (!appUpdate) {
+                if (appUpdate) {
                     return response.badRequest({ error: "app desatualizado" });
                 }
                 let queryFuncao = await Funcao_1.default.findBy("id_funcao_erp", funcionario?.id_funcao_erp);
@@ -516,36 +517,49 @@ class FuncionariosController {
                 const periodoInicial = `27-${data[1] - 1}-${data[0]}`;
                 const periodoFinal = `26-${data[1]}-${data[0]}`;
                 let query = await Database_1.default.connection("oracle").rawQuery(`
-                                    SELECT
-                                    EH.ID_FUNCIONARIO_ERP,
-                                    EH.CHAPA,
-                                    to_char(EH.DATA_MOVIMENTO,'DD-MM-YYYY') as DATA_MOVIMENTO,
-                                    EH.OCORRENCIA,
-                                    EH.ENTRADA,
-                                    EH.I_INI,
-                                    EH.I_FIM,
-                                    EH.SAIDA,
-                                    EH.LINHA,
-                                    EH.TABELA,
-                                    EH.CODOCORR,
-                                    EH.NORMAL,
-                                    EH.EXTRA,
-                                    EH.EXCES,
-                                    EH.OUTRA,
-                                    EH.A_NOT,
-                                    EH.EXTRANOTDM,
-                                    EH.TOTAL AS TOTALF,
-                                    EH.BH_COMPETENCIA,
-                                    EH.CREDITO,
-                                    EH.DEBITO,
-                                    EH.SALDOANTERIOR,
-                                    EH.VALORPAGO
-                                    FROM VW_ML_FRQ_ESPELHODEHORAS EH
+                                    SELECT DISTINCT
+                                    F.ID_FUNCIONARIO_ERP,
+                                    F.REGISTRO,
+                                    to_char(F.DATA_MOVIMENTO,'DD-MM-YYYY') as DATA_MOVIMENTO,
+                                    F.OCORRENCIA,
+                                    F.ENTRADA,
+                                    F.I_INI,
+                                    F.I_FIM,
+                                    F.SAIDA,
+                                    F.LINHA,
+                                    F.TABELA,
+                                    F.CODOCORR,
+                                    F.NORMAL,
+                                    F.EXTRA,
+                                    F.OUTRA,
+                                    F.A_NOT,
+                                    TRIM(F.EXTRANOTDM) AS EXTRANOTDM,
+                                    TRIM(F.TOTAL) AS TOTALF,
+                                    F.BH_COMPETENCIA,
+                                    TRIM(F.CREDITO) AS CREDITO,
+                                    TRIM(F.DEBITO) AS DEBITO,
+                                    TRIM(F.SALDOANTERIOR) AS SALDOANTERIOR,
+                                    TRIM(F.VALORPAGO) AS VALORPAGO,
+                                    TRIM(F.SALDOATUAL) AS SALDOATUAL
+                                    FROM VW_ML_PON_FICHAPONTO F
                                     WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
                                     AND DATA_MOVIMENTO BETWEEN to_date('${periodoInicial}','DD-MM-YYYY') and to_date('${periodoFinal}','DD-MM-YYYY')
-                                `);
+                      `);
+                let resumoFicha = [];
+                try {
+                    resumoFicha = await Database_1.default.connection("oracle").rawQuery(`
+            SELECT DISTINCT *
+            FROM
+              VW_ML_PON_RESUMO_HOLERITE FH
+            WHERE FH.ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
+            AND FH.COMPETENCIA = '${periodoFinal}'
+          `);
+                }
+                catch (error) {
+                    resumoFicha = [];
+                }
                 let empresa = await Empresa_1.default.findBy("id_empresa", auth.user?.id_empresa);
-                let pdfTemp = await this.generatePdf(this.tratarDadosDotCard(query, empresa, funcionario, dados.data, queryFuncao), template_1.fichaPonto);
+                let pdfTemp = await this.generatePdf(this.tratarDadosDotCard(query, empresa, funcionario, dados.data, queryFuncao, resumoFicha), template_1.fichaPonto);
                 let confirmacao = await ConfirmarPdf_1.default.query()
                     .select("*")
                     .where("id_funcionario", "=", `${funcionario?.id_funcionario}`)
@@ -564,10 +578,12 @@ class FuncionariosController {
             }
         }
         catch (error) {
+            console.log(error);
             response.badRequest(error);
         }
     }
-    tratarDadosDotCard(dados, dados_empresa, funcionario, data, queryFuncao) {
+    tratarDadosDotCard(dados, dados_empresa, funcionario, data, queryFuncao, resumoFicha) {
+        const ultimaPosicao = dados.length - 1;
         let dadosTemp = {
             cabecalho: {
                 logo: dados_empresa.logo,
@@ -580,22 +596,19 @@ class FuncionariosController {
                 periodo: data.split("").reverse().join(""),
             },
             rodape: {
-                saldoAnterior: dados[0].SALDOANTERIOR.toFixed(2),
-                credito: dados[0].CREDITO.toFixed(2),
-                debito: dados[0].DEBITO.toFixed(2),
-                valorPago: dados[0].VALORPAGO.toFixed(2),
-                saldoAtual: (dados[0].SALDOANTERIOR +
-                    dados[0].CREDITO -
-                    dados[0].DEBITO -
-                    dados[0].VALORPAGO).toFixed(2),
+                saldoAnterior: dados[ultimaPosicao].SALDOANTERIOR,
+                credito: dados[ultimaPosicao].CREDITO,
+                debito: dados[ultimaPosicao].DEBITO,
+                valorPago: dados[ultimaPosicao].VALORPAGO,
+                saldoAtual: dados[ultimaPosicao].SALDOATUAL
             },
             dadosDias: new Array(),
+            resumo: resumoFicha
         };
         dados.forEach((element) => {
-            element.TOTALF = element.TOTALF.toFixed(2);
-            element.EXCES = element.EXCES.toFixed(2);
-            element.EXTRA = element.EXTRA.toFixed(2);
-            element.OUTRA = element.OUTRA.toFixed(2);
+            element.TOTALF = element.TOTALF;
+            element.EXTRA = element.EXTRA;
+            element.OUTRA = element.OUTRA;
             dadosTemp.dadosDias.push(element);
         });
         return dadosTemp;

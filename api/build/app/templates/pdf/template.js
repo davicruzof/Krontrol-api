@@ -386,7 +386,6 @@ exports.fichaPonto = `
             <td align="center" style= "width:10%;"> Linha </td>
             <td style= "width:6%;"> Normal </td>
             <td> Extra </td>
-            <td> Excess </td>
             <td> Outra </td>
             <td> Total </td>
         </tr>
@@ -399,22 +398,35 @@ exports.fichaPonto = `
                 <td style= "width:10%;">{{this.I_FIM}}</td>
                 <td style= "width:10%;">{{this.SAIDA}}</td>
                 <td style= "width:10%;">{{this.LINHA}}</td>
-                <td style= "width:7%;">{{this.NORMAL}}</td>
-                <td>{{this.EXTRA}}</td>
-                <td>{{this.EXCES}}</td>
-                <td>{{this.OUTRA}}</td>
-                <td>{{this.TOTALF}}</td>
+                <td style= "width:7,5%;">{{this.NORMAL}}</td>
+                <td style= "width:7,5%;">{{this.EXTRA}}</td>
+                <td style= "width:7,5%;">{{this.OUTRA}}</td>
+                <td style= "width:7,5%;">{{this.TOTALF}}</td>
             </tr>
         {{/each}}
     </table>
 
     <hr size="1" style="border:1px dashed #000;">
 
-    <table>
+    <table >
+        <tr style="border: none; display: table-row;">
+            <td align="left" style="width: 50%;">EVENTO</td>
+            <td style="width: 50%;">HR/DIA</td>        
+        </tr>
+        {{#each dados.resumo}}
+            <tr>
+                <td>{{this.EVENTO}}</td>
+                <td>{{this.HR_DIA}}</td>
+            </tr>
+        {{/each}}
+    </table>
+    <hr size="1" style="border:1px dashed #000;">
+
+    <table >
         <tr style="border: none; display: table-row;">
             <td style="width: 25%;"><b>*** BANCO DE HORAS ***</b></td>
             <td style="width: 25%;">
-                COMPETÊNCIA: {{dados.cabecalho.data}}
+                COMPETÊNCIA: {{dados.cabecalho.competencia}}
             </td>
             <td style="width: 25%;">
                 SALDO ANTERIOR: {{dados.rodape.saldoAnterior}}
