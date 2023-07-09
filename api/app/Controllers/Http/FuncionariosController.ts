@@ -7,6 +7,7 @@ import pdf from "pdf-creator-node";
 import fs from "fs";
 import { uploadPdfEmpresa, upload } from "App/Controllers/Http/S3";
 import FuncionarioArea from "App/Models/FuncionarioArea";
+import moment from 'moment';
 import {
   FuncionarioSchemaInsert,
   updateProfileFuncionario,
@@ -354,7 +355,6 @@ export default class FuncionariosController {
           "id_funcionario",
           auth.user?.id_funcionario
         );
-
         let query = await Database.connection("oracle").rawQuery(`
                                   select distinct
                                     func.id_funcionario_erp,
@@ -379,7 +379,7 @@ export default class FuncionariosController {
                                     left join globus.bgm_cadlinhas lin on pon.codintlinha = lin.codintlinha
                                     WHERE
                                         pon.tipodigit = 'F' AND
-                                        pon.dtdigit BETWEEN to_date('${firstDay.toLocaleDateString()}','DD/MM/YYYY') and to_date('${lastDay.toLocaleDateString()}','DD/MM/YYYY')
+                                        pon.dtdigit BETWEEN to_date('${firstDay.toLocaleDateString()}','DD/MM/YYYY') and to_date('${moment(lastDay).format('DD/MM/YYYY')}','DD/MM/YYYY')
                                         and func.id_funcionario_erp= '${
                                           funcionario?.id_funcionario_erp
                                         }'
@@ -623,7 +623,7 @@ export default class FuncionariosController {
           auth.user?.id_funcionario
         );
 
-        if (!appUpdate) {
+        if (appUpdate) {
           return response.badRequest({ error: "app desatualizado" });
         }
 
@@ -632,38 +632,50 @@ export default class FuncionariosController {
           funcionario?.id_funcao_erp
         );
         const data = dados.data.split("-");
-        //return await ConfirmarVideo.query().select('*').where('id_funcionario','=',`${funcionario?.id_funcionario}`).andWhere('data_pdf','=',`${dados.data.split("").reverse().join("").replace('-','/')}`);
+
         const periodoInicial = `27-${data[1] - 1}-${data[0]}`;
         const periodoFinal = `26-${data[1]}-${data[0]}`;
         let query = await Database.connection("oracle").rawQuery(`
-                                    SELECT
-                                    EH.ID_FUNCIONARIO_ERP,
-                                    EH.CHAPA,
-                                    to_char(EH.DATA_MOVIMENTO,'DD-MM-YYYY') as DATA_MOVIMENTO,
-                                    EH.OCORRENCIA,
-                                    EH.ENTRADA,
-                                    EH.I_INI,
-                                    EH.I_FIM,
-                                    EH.SAIDA,
-                                    EH.LINHA,
-                                    EH.TABELA,
-                                    EH.CODOCORR,
-                                    EH.NORMAL,
-                                    EH.EXTRA,
-                                    EH.EXCES,
-                                    EH.OUTRA,
-                                    EH.A_NOT,
-                                    EH.EXTRANOTDM,
-                                    EH.TOTAL AS TOTALF,
-                                    EH.BH_COMPETENCIA,
-                                    EH.CREDITO,
-                                    EH.DEBITO,
-                                    EH.SALDOANTERIOR,
-                                    EH.VALORPAGO
-                                    FROM VW_ML_FRQ_ESPELHODEHORAS EH
+                                    SELECT DISTINCT
+                                    F.ID_FUNCIONARIO_ERP,
+                                    F.REGISTRO,
+                                    to_char(F.DATA_MOVIMENTO,'DD-MM-YYYY') as DATA_MOVIMENTO,
+                                    F.OCORRENCIA,
+                                    F.ENTRADA,
+                                    F.I_INI,
+                                    F.I_FIM,
+                                    F.SAIDA,
+                                    F.LINHA,
+                                    F.TABELA,
+                                    F.CODOCORR,
+                                    F.NORMAL,
+                                    F.EXTRA,
+                                    F.OUTRA,
+                                    F.A_NOT,
+                                    TRIM(F.EXTRANOTDM) AS EXTRANOTDM,
+                                    TRIM(F.TOTAL) AS TOTALF,
+                                    F.BH_COMPETENCIA,
+                                    TRIM(F.CREDITO) AS CREDITO,
+                                    TRIM(F.DEBITO) AS DEBITO,
+                                    TRIM(F.SALDOANTERIOR) AS SALDOANTERIOR,
+                                    TRIM(F.VALORPAGO) AS VALORPAGO,
+                                    TRIM(F.SALDOATUAL) AS SALDOATUAL
+                                    FROM VW_ML_PON_FICHAPONTO F
                                     WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
                                     AND DATA_MOVIMENTO BETWEEN to_date('${periodoInicial}','DD-MM-YYYY') and to_date('${periodoFinal}','DD-MM-YYYY')
-                                `);
+                      `);
+          let resumoFicha = [];
+          try {
+            resumoFicha = await Database.connection("oracle").rawQuery(`
+            SELECT DISTINCT *
+            FROM
+              VW_ML_PON_RESUMO_HOLERITE FH
+            WHERE FH.ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
+            AND FH.COMPETENCIA = '${periodoFinal}'
+          `);
+          } catch (error) {
+            resumoFicha = [];
+          }
 
         let empresa = await Empresa.findBy("id_empresa", auth.user?.id_empresa);
         let pdfTemp = await this.generatePdf(
@@ -672,10 +684,12 @@ export default class FuncionariosController {
             empresa,
             funcionario,
             dados.data,
-            queryFuncao
+            queryFuncao,
+            resumoFicha
           ),
           fichaPonto
         );
+
         let confirmacao = await ConfirmarPdf.query()
           .select("*")
           .where("id_funcionario", "=", `${funcionario?.id_funcionario}`)
@@ -697,6 +711,7 @@ export default class FuncionariosController {
         response.badRequest({ error: "data is required" });
       }
     } catch (error) {
+      console.log(error);
       response.badRequest(error);
     }
   }
@@ -706,8 +721,10 @@ export default class FuncionariosController {
     dados_empresa,
     funcionario,
     data,
-    queryFuncao
+    queryFuncao,
+    resumoFicha
   ) {
+    const ultimaPosicao = dados.length - 1;
     let dadosTemp = {
       cabecalho: {
         logo: dados_empresa.logo,
@@ -720,24 +737,19 @@ export default class FuncionariosController {
         periodo: data.split("").reverse().join(""),
       },
       rodape: {
-        saldoAnterior: dados[0].SALDOANTERIOR.toFixed(2),
-        credito: dados[0].CREDITO.toFixed(2),
-        debito: dados[0].DEBITO.toFixed(2),
-        valorPago: dados[0].VALORPAGO.toFixed(2),
-        saldoAtual: (
-          dados[0].SALDOANTERIOR +
-          dados[0].CREDITO -
-          dados[0].DEBITO -
-          dados[0].VALORPAGO
-        ).toFixed(2),
+        saldoAnterior: dados[ultimaPosicao].SALDOANTERIOR,
+        credito: dados[ultimaPosicao].CREDITO,
+        debito: dados[ultimaPosicao].DEBITO,
+        valorPago: dados[ultimaPosicao].VALORPAGO,
+        saldoAtual: dados[ultimaPosicao].SALDOATUAL
       },
       dadosDias: new Array(),
+      resumo: resumoFicha
     };
     dados.forEach((element) => {
-      element.TOTALF = element.TOTALF.toFixed(2);
-      element.EXCES = element.EXCES.toFixed(2);
-      element.EXTRA = element.EXTRA.toFixed(2);
-      element.OUTRA = element.OUTRA.toFixed(2);
+      element.TOTALF = element.TOTALF;
+      element.EXTRA = element.EXTRA;
+      element.OUTRA = element.OUTRA;
       dadosTemp.dadosDias.push(element);
     });
     return dadosTemp;
