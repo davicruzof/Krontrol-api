@@ -7,7 +7,7 @@ import pdf from "pdf-creator-node";
 import fs from "fs";
 import { uploadPdfEmpresa, upload } from "App/Controllers/Http/S3";
 import FuncionarioArea from "App/Models/FuncionarioArea";
-const moment = require("moment");
+import { format} from "date-fns";
 import {
   FuncionarioSchemaInsert,
   updateProfileFuncionario,
@@ -379,7 +379,7 @@ export default class FuncionariosController {
                                     left join globus.bgm_cadlinhas lin on pon.codintlinha = lin.codintlinha
                                     WHERE
                                         pon.tipodigit = 'F' AND
-                                        pon.dtdigit BETWEEN to_date('${firstDay.toLocaleDateString()}','DD/MM/YYYY') and to_date('${moment(lastDay).format('DD/MM/YYYY')}','DD/MM/YYYY')
+                                        pon.dtdigit BETWEEN to_date('${firstDay.toLocaleDateString()}','DD/MM/YYYY') and to_date('${format(lastDay,'dd/MM/yyyy')}','DD/MM/YYYY')
                                         and func.id_funcionario_erp= '${
                                           funcionario?.id_funcionario_erp
                                         }'
