@@ -11,7 +11,7 @@ const pdf_creator_node_1 = __importDefault(require("pdf-creator-node"));
 const fs_1 = __importDefault(require("fs"));
 const S3_1 = global[Symbol.for('ioc.use')]("App/Controllers/Http/S3");
 const FuncionarioArea_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/FuncionarioArea"));
-const moment_1 = __importDefault(require("moment"));
+const moment = require("moment");
 const Funcionario_2 = global[Symbol.for('ioc.use')]("App/Schemas/Funcionario");
 const Database_1 = __importDefault(global[Symbol.for('ioc.use')]("Adonis/Lucid/Database"));
 const User_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/User"));
@@ -292,7 +292,7 @@ class FuncionariosController {
                                     left join globus.bgm_cadlinhas lin on pon.codintlinha = lin.codintlinha
                                     WHERE
                                         pon.tipodigit = 'F' AND
-                                        pon.dtdigit BETWEEN to_date('${firstDay.toLocaleDateString()}','DD/MM/YYYY') and to_date('${(0, moment_1.default)(lastDay).format('DD/MM/YYYY')}','DD/MM/YYYY')
+                                        pon.dtdigit BETWEEN to_date('${firstDay.toLocaleDateString()}','DD/MM/YYYY') and to_date('${moment(lastDay).format('DD/MM/YYYY')}','DD/MM/YYYY')
                                         and func.id_funcionario_erp= '${funcionario?.id_funcionario_erp}'
                                     order by DATA_DIGITACAO ASC
                                     `);

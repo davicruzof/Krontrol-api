@@ -7,7 +7,7 @@ import pdf from "pdf-creator-node";
 import fs from "fs";
 import { uploadPdfEmpresa, upload } from "App/Controllers/Http/S3";
 import FuncionarioArea from "App/Models/FuncionarioArea";
-import moment from "moment";
+const moment = require("moment");
 import {
   FuncionarioSchemaInsert,
   updateProfileFuncionario,
