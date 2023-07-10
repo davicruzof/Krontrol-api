@@ -43,7 +43,7 @@ Route_1.default.group(() => {
         Route_1.default.post("/confirmPdf", "FuncionariosController.confirmPdf").middleware("auth");
         Route_1.default.get("/getVideos", "FuncionariosController.getVideos").middleware("auth");
         Route_1.default.post("/confirmVideo", "FuncionariosController.confirmarVideo").middleware("auth");
-        Route_1.default.get("/vacationNotice", "FuncionariosController.avisoFerias").middleware("auth");
+        Route_1.default.get('/vacationNotice', 'FuncionariosController.avisoFerias').middleware('auth');
         Route_1.default.get("/params", "FuncionariosController.getParams").middleware("auth");
     }).prefix("/employee");
     Route_1.default.group(() => {

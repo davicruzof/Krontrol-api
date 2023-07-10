@@ -98,12 +98,10 @@ Route.group(() => {
       "/confirmVideo",
       "FuncionariosController.confirmarVideo"
     ).middleware("auth");
-    Route.get(
-      "/vacationNotice",
-      "FuncionariosController.avisoFerias"
-    ).middleware("auth");
+    Route.get('/vacationNotice','FuncionariosController.avisoFerias').middleware('auth');
     Route.get("/params", "FuncionariosController.getParams").middleware("auth");
   }).prefix("/employee");
+
 
   //Rotas Veiculos
   Route.group(() => {
