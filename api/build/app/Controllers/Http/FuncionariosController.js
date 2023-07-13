@@ -510,7 +510,7 @@ class FuncionariosController {
             if (dados.data) {
                 let funcionario = await Funcionario_1.default.findBy("id_funcionario", auth.user?.id_funcionario);
                 let appUpdate = await AppVersion_1.default.findBy("id_funcionario", auth.user?.id_funcionario);
-                if (appUpdate) {
+                if (!appUpdate) {
                     return response.badRequest({ error: "app desatualizado" });
                 }
                 let queryFuncao = await Funcao_1.default.findBy("id_funcao_erp", funcionario?.id_funcao_erp);

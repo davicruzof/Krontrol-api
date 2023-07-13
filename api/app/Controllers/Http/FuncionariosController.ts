@@ -625,7 +625,7 @@ export default class FuncionariosController {
           auth.user?.id_funcionario
         );
 
-        if (appUpdate) {
+        if (!appUpdate) {
           return response.badRequest({ error: "app desatualizado" });
         }
 
