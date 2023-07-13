@@ -7,7 +7,6 @@ import pdf from "pdf-creator-node";
 import fs from "fs";
 import { uploadPdfEmpresa, upload } from "App/Controllers/Http/S3";
 import FuncionarioArea from "App/Models/FuncionarioArea";
-import { format} from "date-fns";
 import {
   FuncionarioSchemaInsert,
   updateProfileFuncionario,
@@ -21,9 +20,12 @@ import User from "App/Models/User";
 import ConfirmaFichaPonto from "App/Models/ConfirmaFichaPonto";
 import crypto from "crypto";
 import { fichaPonto, templateDotCard } from "App/templates/pdf/template";
+import { templateIRPF } from "App/templates/pdf/template_irpf";
 import Funcao from "App/Models/Funcao";
 import GlobalController from "./GlobalController";
 import AppVersion from "App/Models/AppVersion";
+import { format} from "date-fns";
+import {validarAno} from "App/utils/functions";
 export default class FuncionariosController {
   public async create({ request, response }: HttpContextContract) {
     try {
@@ -862,6 +864,69 @@ export default class FuncionariosController {
         select * from ml_pla_parametro where id_empresa = '${auth.user?.id_empresa}'
       `);
       response.json(retorno.rows);
+    } catch (error) {
+      response.badRequest("Erro interno");
+    }
+  }
+
+  public async irpfAvaiables({ response, auth }: HttpContextContract) {
+    try {
+      let funcionario = await Funcionario.findBy(
+        "id_funcionario",
+        auth.user?.id_funcionario
+      );
+
+      let dadosIRPF = await Database.connection("oracle").rawQuery(`
+        SELECT ANO FROM GUDMA.VW_ML_FLP_IRPF WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
+        ORDER BY ANO DESC
+      `);
+
+      response.json(this.tratarIrpfAvaiables(dadosIRPF));
+    } catch (error) {
+      response.badRequest("Erro interno");
+    }
+  }
+  private tratarIrpfAvaiables (dados) {
+    let retorno = [];
+    dados.forEach(element => {
+      retorno.push(element.ANO);
+    });
+    return retorno;
+  }
+
+
+  public async getIrpf({ request, response, auth }: HttpContextContract) {
+    try {
+      let ano = request.params().ano;
+
+      /*if (!validarAno(ano)) {
+        response.badRequest({error: "Ano informado inválido"});
+        return;
+      } */
+
+      let funcionario = await Funcionario.findBy(
+        "id_funcionario",
+        auth.user?.id_funcionario
+      );
+      let dadosIRPF = await Database.connection("oracle").rawQuery(`
+        SELECT * FROM GUDMA.VW_ML_FLP_IRPF 
+        WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
+        AND ANO = '${ano}'
+      `);
+      let empresa = await Empresa.findBy("id_empresa", auth.user?.id_empresa);
+      dadosIRPF[0].NOME_EMPRESA = empresa?.nomeempresarial;
+      dadosIRPF[0].CNPJ_EMPRESA = empresa?.cnpj;
+
+      let pdfTemp = await this.generatePdf(dadosIRPF[0], templateIRPF);
+      let file = await uploadPdfEmpresa(
+        pdfTemp.filename,
+        auth.user?.id_empresa
+      );
+
+      if (file) {
+        fs.unlink(pdfTemp.filename, () => {});
+        response.json({ pdf: file.Location });
+      }
     } catch (error) {
       response.badRequest("Erro interno");
     }

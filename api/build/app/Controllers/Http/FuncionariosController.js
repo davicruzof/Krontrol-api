@@ -11,16 +11,17 @@ const pdf_creator_node_1 = __importDefault(require("pdf-creator-node"));
 const fs_1 = __importDefault(require("fs"));
 const S3_1 = global[Symbol.for('ioc.use')]("App/Controllers/Http/S3");
 const FuncionarioArea_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/FuncionarioArea"));
-const date_fns_1 = require("date-fns");
 const Funcionario_2 = global[Symbol.for('ioc.use')]("App/Schemas/Funcionario");
 const Database_1 = __importDefault(global[Symbol.for('ioc.use')]("Adonis/Lucid/Database"));
 const User_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/User"));
 const ConfirmaFichaPonto_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/ConfirmaFichaPonto"));
 const crypto_1 = __importDefault(require("crypto"));
 const template_1 = global[Symbol.for('ioc.use')]("App/templates/pdf/template");
+const template_irpf_1 = global[Symbol.for('ioc.use')]("App/templates/pdf/template_irpf");
 const Funcao_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/Funcao"));
 const GlobalController_1 = __importDefault(require("./GlobalController"));
 const AppVersion_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/AppVersion"));
+const date_fns_1 = require("date-fns");
 class FuncionariosController {
     async create({ request, response }) {
         try {
@@ -709,6 +710,49 @@ class FuncionariosController {
         select * from ml_pla_parametro where id_empresa = '${auth.user?.id_empresa}'
       `);
             response.json(retorno.rows);
+        }
+        catch (error) {
+            response.badRequest("Erro interno");
+        }
+    }
+    async irpfAvaiables({ response, auth }) {
+        try {
+            let funcionario = await Funcionario_1.default.findBy("id_funcionario", auth.user?.id_funcionario);
+            let dadosIRPF = await Database_1.default.connection("oracle").rawQuery(`
+        SELECT ANO FROM GUDMA.VW_ML_FLP_IRPF WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
+        ORDER BY ANO DESC
+      `);
+            response.json(this.tratarIrpfAvaiables(dadosIRPF));
+        }
+        catch (error) {
+            response.badRequest("Erro interno");
+        }
+    }
+    tratarIrpfAvaiables(dados) {
+        let retorno = [];
+        dados.forEach(element => {
+            retorno.push(element.ANO);
+        });
+        return retorno;
+    }
+    async getIrpf({ request, response, auth }) {
+        try {
+            let ano = request.params().ano;
+            let funcionario = await Funcionario_1.default.findBy("id_funcionario", auth.user?.id_funcionario);
+            let dadosIRPF = await Database_1.default.connection("oracle").rawQuery(`
+        SELECT * FROM GUDMA.VW_ML_FLP_IRPF 
+        WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
+        AND ANO = '${ano}'
+      `);
+            let empresa = await Empresa_1.default.findBy("id_empresa", auth.user?.id_empresa);
+            dadosIRPF[0].NOME_EMPRESA = empresa?.nomeempresarial;
+            dadosIRPF[0].CNPJ_EMPRESA = empresa?.cnpj;
+            let pdfTemp = await this.generatePdf(dadosIRPF[0], template_irpf_1.templateIRPF);
+            let file = await (0, S3_1.uploadPdfEmpresa)(pdfTemp.filename, auth.user?.id_empresa);
+            if (file) {
+                fs_1.default.unlink(pdfTemp.filename, () => { });
+                response.json({ pdf: file.Location });
+            }
         }
         catch (error) {
             response.badRequest("Erro interno");

@@ -58,6 +58,8 @@ Route.group(() => {
     Route.post("/create", "FuncionariosController.create").middleware("auth");
     Route.post("/getById", "FuncionariosController.getById").middleware("auth");
     Route.get("/getAll", "FuncionariosController.getAll").middleware("auth");
+    Route.get("/irpf/:ano", "FuncionariosController.getIrpf").middleware("auth");
+    Route.get("/irpf-avaiables", "FuncionariosController.irpfAvaiables").middleware("auth");
     Route.post("/add-area", "FuncionariosController.addArea").middleware(
       "auth"
     );

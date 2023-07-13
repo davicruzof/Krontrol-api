@@ -30,6 +30,8 @@ Route_1.default.group(() => {
         Route_1.default.post("/create", "FuncionariosController.create").middleware("auth");
         Route_1.default.post("/getById", "FuncionariosController.getById").middleware("auth");
         Route_1.default.get("/getAll", "FuncionariosController.getAll").middleware("auth");
+        Route_1.default.get("/irpf/:ano", "FuncionariosController.getIrpf").middleware("auth");
+        Route_1.default.get("/irpf-avaiables", "FuncionariosController.irpfAvaiables").middleware("auth");
         Route_1.default.post("/add-area", "FuncionariosController.addArea").middleware("auth");
         Route_1.default.post("/remove-area", "FuncionariosController.removeArea").middleware("auth");
         Route_1.default.post("/updateProfile", "FuncionariosController.updateProfile").middleware("auth");
