@@ -380,14 +380,14 @@ exports.fichaPonto = `
         <tr>
             <td style= "width:20%;" > Data </td>
             <td style= "width:10%;" > Entrada </td>
-            <td align="center" style= "width:10%;"> I. Ini.</td>
-            <td align="center" style= "width:10%;"> I. Fim </td>
-            <td align="center" style= "width:10%;"> Saída </td>
-            <td align="center" style= "width:10%;"> Linha </td>
-            <td style= "width:6%;"> Normal </td>
-            <td> Extra </td>
-            <td> Outra </td>
-            <td> Total </td>
+            <td align="left" style= "width:10%;"> I. Ini.</td>
+            <td align="left" style= "width:10%;"> I. Fim </td>
+            <td align="left" style= "width:10%;"> Saída </td>
+            <td align="left" style= "width:10%;"> Linha </td>
+            <td style= "width:10%;"> Normal </td>
+            <td style= "width:10%;"> Extra </td>
+            <td style= "width:10%;"> Outra </td>
+            <td>  </td>
         </tr>
 
         {{#each dados.dadosDias}}
@@ -398,10 +398,10 @@ exports.fichaPonto = `
                 <td style= "width:10%;">{{this.I_FIM}}</td>
                 <td style= "width:10%;">{{this.SAIDA}}</td>
                 <td style= "width:10%;">{{this.LINHA}}</td>
-                <td style= "width:7,5%;">{{this.NORMAL}}</td>
-                <td style= "width:7,5%;">{{this.EXTRA}}</td>
-                <td style= "width:7,5%;">{{this.OUTRA}}</td>
-                <td style= "width:7,5%;">{{this.TOTALF}}</td>
+                <td style= "width:10%;">{{this.NORMAL}}</td>
+                <td style= "width:10%;">{{this.EXTRA}}</td>
+                <td style= "width:10%;">{{this.OUTRA}}</td>
+                <td ></td>
             </tr>
         {{/each}}
     </table>
@@ -411,12 +411,12 @@ exports.fichaPonto = `
     <table >
         <tr style="border: none; display: table-row;">
             <td align="left" style="width: 50%;">EVENTO</td>
-            <td style="width: 50%;">HR/DIA</td>        
+            <td alignt="right">HR/DIA</td>        
         </tr>
         {{#each dados.resumo}}
             <tr>
-                <td>{{this.EVENTO}}</td>
-                <td>{{this.HR_DIA}}</td>
+                <td align="left" >{{this.EVENTO}}</td>
+                <td align="right">{{this.HR_DIA}}</td>
             </tr>
         {{/each}}
     </table>
