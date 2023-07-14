@@ -637,6 +637,8 @@ export default class FuncionariosController {
 
         const periodoInicial = `27-${data[1] - 1}-${data[0]}`;
         const periodoFinal = `26-${data[1]}-${data[0]}`;
+        const competencia = new Date(data[0], data[1]-1, 26);
+
         let query = await Database.connection("oracle").rawQuery(`
                                     SELECT DISTINCT
                                     F.ID_FUNCIONARIO_ERP,
@@ -667,19 +669,21 @@ export default class FuncionariosController {
                                     AND DATA_MOVIMENTO BETWEEN to_date('${periodoInicial}','DD-MM-YYYY') and to_date('${periodoFinal}','DD-MM-YYYY')
                       `);
           let resumoFicha = [];
+
           try {
             resumoFicha = await Database.connection("oracle").rawQuery(`
-            SELECT DISTINCT *
+            SELECT DISTINCT EVENTO, TRIM(HR_DIA) as HR_DIA
             FROM
               VW_ML_PON_RESUMO_HOLERITE FH
             WHERE FH.ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
-            AND FH.COMPETENCIA = '${periodoFinal}'
+            AND FH.COMPETENCIA = '${format(competencia,"MM/yyyy")}'
           `);
           } catch (error) {
             resumoFicha = [];
           }
 
         let empresa = await Empresa.findBy("id_empresa", auth.user?.id_empresa);
+
         let pdfTemp = await this.generatePdf(
           this.tratarDadosDotCard(
             query,
