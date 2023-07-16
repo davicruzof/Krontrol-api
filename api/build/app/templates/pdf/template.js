@@ -387,21 +387,21 @@ exports.fichaPonto = `
             <td style= "width:10%;"> Normal </td>
             <td style= "width:10%;"> Extra </td>
             <td style= "width:10%;"> Outra </td>
-            <td>  </td>
+            <td style= "width:10%;">OCORRÊNCIA</td>
         </tr>
 
         {{#each dados.dadosDias}}
             <tr>
-                <td style= "width:20%; align:center;">{{this.DATA_MOVIMENTO}}</td>
-                <td style= "width:10%;">{{this.ENTRADA}}</td>
-                <td style= "width:10%;">{{this.I_INI}}</td>
-                <td style= "width:10%;">{{this.I_FIM}}</td>
-                <td style= "width:10%;">{{this.SAIDA}}</td>
-                <td style= "width:10%;">{{this.LINHA}}</td>
-                <td style= "width:10%;">{{this.NORMAL}}</td>
-                <td style= "width:10%;">{{this.EXTRA}}</td>
-                <td style= "width:10%;">{{this.OUTRA}}</td>
-                <td ></td>
+                <td style= "width:18%; align:center;">{{this.DATA_MOVIMENTO}}</td>
+                <td style= "width:8%;">{{this.ENTRADA}}</td>
+                <td style= "width:9%;">{{this.I_INI}}</td>
+                <td style= "width:9%;">{{this.I_FIM}}</td>
+                <td style= "width:9%;">{{this.SAIDA}}</td>
+                <td style= "width:9%;">{{this.LINHA}}</td>
+                <td style= "width:9%;">{{this.NORMAL}}</td>
+                <td style= "width:9%;">{{this.EXTRA}}</td>
+                <td style= "width:9%;">{{this.OUTRA}}</td>
+                <td style= "width:10%;">{{this.OCORRENCIA}}</td>
             </tr>
         {{/each}}
     </table>
