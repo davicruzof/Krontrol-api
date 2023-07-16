@@ -644,7 +644,7 @@ export default class FuncionariosController {
                                     F.ID_FUNCIONARIO_ERP,
                                     F.REGISTRO,
                                     to_char(F.DATA_MOVIMENTO,'DD-MM-YYYY') as DATA_MOVIMENTO,
-                                    F.OCORRENCIA,
+                                    TRIM(F.OCORRENCIA) AS OCORRENCIA,
                                     F.ENTRADA,
                                     F.I_INI,
                                     F.I_FIM,
@@ -665,7 +665,7 @@ export default class FuncionariosController {
                                     TRIM(F.VALORPAGO) AS VALORPAGO,
                                     TRIM(F.SALDOATUAL) AS SALDOATUAL
                                     FROM VW_ML_PON_FICHAPONTO F
-                                    WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
+                                    WHERE ID_FUNCIONARIO_ERP = '23364'
                                     AND DATA_MOVIMENTO BETWEEN to_date('${periodoInicial}','DD-MM-YYYY') and to_date('${periodoFinal}','DD-MM-YYYY')
                       `);
           let resumoFicha = [];
@@ -695,7 +695,7 @@ export default class FuncionariosController {
           ),
           fichaPonto
         );
-
+            return pdfTemp;
         let confirmacao = await ConfirmarPdf.query()
           .select("*")
           .where("id_funcionario", "=", `${funcionario?.id_funcionario}`)
