@@ -60,6 +60,7 @@ Route.group(() => {
     Route.get("/getAll", "FuncionariosController.getAll").middleware("auth");
     Route.get("/irpf/:ano", "FuncionariosController.getIrpf").middleware("auth");
     Route.get("/irpf-avaiables", "FuncionariosController.irpfAvaiables").middleware("auth");
+    Route.get("/vacation-pdf/:competencia", "FuncionariosController.vacation").middleware("auth");
     Route.post("/add-area", "FuncionariosController.addArea").middleware(
       "auth"
     );

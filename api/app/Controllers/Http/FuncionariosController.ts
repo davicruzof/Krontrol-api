@@ -21,6 +21,7 @@ import ConfirmaFichaPonto from "App/Models/ConfirmaFichaPonto";
 import crypto from "crypto";
 import { fichaPonto, templateDotCard } from "App/templates/pdf/template";
 import { templateIRPF } from "App/templates/pdf/template_irpf";
+import { templateFERIAS } from "App/templates/pdf/template-ferias";
 import Funcao from "App/Models/Funcao";
 import GlobalController from "./GlobalController";
 import AppVersion from "App/Models/AppVersion";
@@ -665,7 +666,7 @@ export default class FuncionariosController {
                                     TRIM(F.VALORPAGO) AS VALORPAGO,
                                     TRIM(F.SALDOATUAL) AS SALDOATUAL
                                     FROM VW_ML_PON_FICHAPONTO F
-                                    WHERE ID_FUNCIONARIO_ERP = '23364'
+                                    WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
                                     AND DATA_MOVIMENTO BETWEEN to_date('${periodoInicial}','DD-MM-YYYY') and to_date('${periodoFinal}','DD-MM-YYYY')
                       `);
           let resumoFicha = [];
@@ -695,7 +696,6 @@ export default class FuncionariosController {
           ),
           fichaPonto
         );
-            return pdfTemp;
         let confirmacao = await ConfirmarPdf.query()
           .select("*")
           .where("id_funcionario", "=", `${funcionario?.id_funcionario}`)
@@ -934,5 +934,49 @@ export default class FuncionariosController {
     } catch (error) {
       response.badRequest("Erro interno");
     }
+  }
+
+  public async vacation({ request, response, auth }: HttpContextContract) {
+    try {
+      let params = request.params();
+      let competencia = params.competencia.split("-");
+      competencia = competencia[1] + "/" + competencia[0]; 
+
+      
+      let funcionario = await Funcionario.findBy(
+        "id_funcionario",
+        auth.user?.id_funcionario
+      );
+      let dadosFerias = await Database.connection("oracle").rawQuery(`
+        SELECT * FROM VW_ML_FLP_RECIBOFERIAS RF 
+        WHERE RF.ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}' AND RF.COMPETENCIA = '${competencia}'
+      `);
+
+      let dados = this.tratarDadosFerias(dadosFerias);
+      return dados;
+
+      let pdfTemp = await this.generatePdf(dadosFerias[0], templateFERIAS);
+      let file = await uploadPdfEmpresa(
+        pdfTemp.filename,
+        auth.user?.id_empresa
+      );
+
+      if (file) {
+        fs.unlink(pdfTemp.filename, () => {});
+        response.json({ pdf: file.Location });
+      }
+    } catch (error) {
+      console.log(error);
+      response.badRequest("Erro interno",);
+    }
+  }
+
+  private tratarDadosFerias (dados) {
+    let dadosRetorno = [];
+
+    dados.forEach(element => {
+      
+    });
+    return retorno;
   }
 }

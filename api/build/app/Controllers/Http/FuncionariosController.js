@@ -18,6 +18,7 @@ const ConfirmaFichaPonto_1 = __importDefault(global[Symbol.for('ioc.use')]("App/
 const crypto_1 = __importDefault(require("crypto"));
 const template_1 = global[Symbol.for('ioc.use')]("App/templates/pdf/template");
 const template_irpf_1 = global[Symbol.for('ioc.use')]("App/templates/pdf/template_irpf");
+const template_ferias_1 = global[Symbol.for('ioc.use')]("App/templates/pdf/template-ferias");
 const Funcao_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/Funcao"));
 const GlobalController_1 = __importDefault(require("./GlobalController"));
 const AppVersion_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/AppVersion"));
@@ -544,7 +545,7 @@ class FuncionariosController {
                                     TRIM(F.VALORPAGO) AS VALORPAGO,
                                     TRIM(F.SALDOATUAL) AS SALDOATUAL
                                     FROM VW_ML_PON_FICHAPONTO F
-                                    WHERE ID_FUNCIONARIO_ERP = '23364'
+                                    WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
                                     AND DATA_MOVIMENTO BETWEEN to_date('${periodoInicial}','DD-MM-YYYY') and to_date('${periodoFinal}','DD-MM-YYYY')
                       `);
                 let resumoFicha = [];
@@ -562,7 +563,6 @@ class FuncionariosController {
                 }
                 let empresa = await Empresa_1.default.findBy("id_empresa", auth.user?.id_empresa);
                 let pdfTemp = await this.generatePdf(this.tratarDadosDotCard(query, empresa, funcionario, dados.data, queryFuncao, resumoFicha), template_1.fichaPonto);
-                return pdfTemp;
                 let confirmacao = await ConfirmarPdf_1.default.query()
                     .select("*")
                     .where("id_funcionario", "=", `${funcionario?.id_funcionario}`)
@@ -759,6 +759,36 @@ class FuncionariosController {
         catch (error) {
             response.badRequest("Erro interno");
         }
+    }
+    async vacation({ request, response, auth }) {
+        try {
+            let params = request.params();
+            let competencia = params.competencia.split("-");
+            competencia = competencia[1] + "/" + competencia[0];
+            let funcionario = await Funcionario_1.default.findBy("id_funcionario", auth.user?.id_funcionario);
+            let dadosFerias = await Database_1.default.connection("oracle").rawQuery(`
+        SELECT * FROM VW_ML_FLP_RECIBOFERIAS RF 
+        WHERE RF.ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}' AND RF.COMPETENCIA = '${competencia}'
+      `);
+            let dados = this.tratarDadosFerias(dadosFerias);
+            return dados;
+            let pdfTemp = await this.generatePdf(dadosFerias[0], template_ferias_1.templateFERIAS);
+            let file = await (0, S3_1.uploadPdfEmpresa)(pdfTemp.filename, auth.user?.id_empresa);
+            if (file) {
+                fs_1.default.unlink(pdfTemp.filename, () => { });
+                response.json({ pdf: file.Location });
+            }
+        }
+        catch (error) {
+            console.log(error);
+            response.badRequest("Erro interno");
+        }
+    }
+    tratarDadosFerias(dados) {
+        let dadosRetorno = [];
+        dados.forEach(element => {
+        });
+        return retorno;
     }
 }
 exports.default = FuncionariosController;
