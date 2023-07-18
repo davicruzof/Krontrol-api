@@ -668,7 +668,7 @@ export default class FuncionariosController {
                                     FROM VW_ML_PON_FICHAPONTO F
                                     WHERE ID_FUNCIONARIO_ERP = '23364'
                                     AND DATA_MOVIMENTO BETWEEN to_date('${periodoInicial}','DD-MM-YYYY') and to_date('${periodoFinal}','DD-MM-YYYY')
-                                    ORDER BY DATA_MOVIMENTO
+                                    ORDER BY BH_COMPETENCIA
                       `);
           let resumoFicha = [];
 
