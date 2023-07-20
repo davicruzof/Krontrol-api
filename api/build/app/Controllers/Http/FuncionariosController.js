@@ -18,7 +18,6 @@ const ConfirmaFichaPonto_1 = __importDefault(global[Symbol.for('ioc.use')]("App/
 const crypto_1 = __importDefault(require("crypto"));
 const template_1 = global[Symbol.for('ioc.use')]("App/templates/pdf/template");
 const template_irpf_1 = global[Symbol.for('ioc.use')]("App/templates/pdf/template_irpf");
-const template_ferias_1 = global[Symbol.for('ioc.use')]("App/templates/pdf/template-ferias");
 const Funcao_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/Funcao"));
 const GlobalController_1 = __importDefault(require("./GlobalController"));
 const AppVersion_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/AppVersion"));
@@ -733,9 +732,7 @@ class FuncionariosController {
     }
     tratarIrpfAvaiables(dados) {
         let retorno = [];
-        dados.forEach(element => {
-            retorno.push(element.ANO);
-        });
+        dados.map((element) => retorno.push(element.ANO));
         return retorno;
     }
     async getIrpf({ request, response, auth }) {
@@ -743,7 +740,7 @@ class FuncionariosController {
             let ano = request.params().ano;
             let funcionario = await Funcionario_1.default.findBy("id_funcionario", auth.user?.id_funcionario);
             let dadosIRPF = await Database_1.default.connection("oracle").rawQuery(`
-        SELECT * FROM GUDMA.VW_ML_FLP_IRPF 
+        SELECT * FROM GUDMA.VW_ML_FLP_IRPF
         WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
         AND ANO = '${ano}'
       `);
@@ -768,17 +765,11 @@ class FuncionariosController {
             competencia = competencia[1] + "/" + competencia[0];
             let funcionario = await Funcionario_1.default.findBy("id_funcionario", auth.user?.id_funcionario);
             let dadosFerias = await Database_1.default.connection("oracle").rawQuery(`
-        SELECT * FROM VW_ML_FLP_RECIBOFERIAS RF 
+        SELECT * FROM VW_ML_FLP_RECIBOFERIAS RF
         WHERE RF.ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}' AND RF.COMPETENCIA = '${competencia}'
       `);
             let dados = this.tratarDadosFerias(dadosFerias);
             return dados;
-            let pdfTemp = await this.generatePdf(dadosFerias[0], template_ferias_1.templateFERIAS);
-            let file = await (0, S3_1.uploadPdfEmpresa)(pdfTemp.filename, auth.user?.id_empresa);
-            if (file) {
-                fs_1.default.unlink(pdfTemp.filename, () => { });
-                response.json({ pdf: file.Location });
-            }
         }
         catch (error) {
             console.log(error);
@@ -786,10 +777,8 @@ class FuncionariosController {
         }
     }
     tratarDadosFerias(dados) {
-        let dadosRetorno = [];
-        dados.forEach(element => {
-        });
-        return retorno;
+        let dadosRetorno = [dados];
+        return dadosRetorno;
     }
 }
 exports.default = FuncionariosController;

@@ -145,22 +145,22 @@ export const templateDotCard = `
     <table style="width: 100%">
         <tr>
             <th style="
-                    border: 1px solid black; 
+                    border: 1px solid black;
                     width: 40%;">
                 Descrição
             </th>
             <th style="
-                    border: 1px solid black; 
+                    border: 1px solid black;
                     width: 20%;">
                 Referência
             </th>
             <th style="
-                    border: 1px solid black; 
+                    border: 1px solid black;
                     width: 20%;">
                 Vencimentos
             </th>
             <th style="
-                    border: 1px solid black; 
+                    border: 1px solid black;
                     width: 20%;">
                 Descontos
             </th>
@@ -168,13 +168,13 @@ export const templateDotCard = `
         {{#each dados.descricao}}
             <tr>
                 <td style="
-                        border: 1px solid black; 
+                        border: 1px solid black;
                         width: 40%;"><span>{{this.DESCEVEN}}</span>
                 </td>
                 <td
                     align="right"
                     style="
-                        border: 1px solid black; 
+                        border: 1px solid black;
                         width: 20%;">
                         <span>
                         {{#ifCond this.REFERENCIA "!=" '0'}}
@@ -182,10 +182,10 @@ export const templateDotCard = `
                         {{/ifCond}}
                         </span>
                 </td>
-                <td 
+                <td
                     align="right"
                     style="
-                        border: 1px solid black; 
+                        border: 1px solid black;
                         width: 20%;">
                         <span>
                         {{#ifCond this.TIPOEVEN "!=" 'D'}}
@@ -193,10 +193,10 @@ export const templateDotCard = `
                         {{/ifCond}}
                         </span>
                 </td>
-                <td 
+                <td
                     align="right"
                     style="
-                        border: 1px solid black; 
+                        border: 1px solid black;
                         width: 20%;">
                         <span>
                         {{#ifCond this.TIPOEVEN "==" 'D' }}
@@ -211,23 +211,23 @@ export const templateDotCard = `
             <th style="width: 40%; border: 1px solid black; ">
                 Total
             </th>
-            <td 
+            <td
                 style="
-                    border: 1px solid black; 
+                    border: 1px solid black;
                     width: 20%;">
                 --
             </td>
-            <td 
+            <td
                 align="right"
                 style="
-                    border: 1px solid black; 
+                    border: 1px solid black;
                     width: 20%;">
                 {{dados.totais.PROVENTOS}}
             </td>
-            <td 
+            <td
                 align="right"
                 style="
-                    border: 1px solid black; 
+                    border: 1px solid black;
                     width: 20%;">
                 {{dados.totais.DESCONTOS}}
             </td>
@@ -238,64 +238,64 @@ export const templateDotCard = `
     <table style="width: 100%; margin-top: 5%;">
         <tr>
             <th style="
-                        border: 1px solid black; 
+                        border: 1px solid black;
                         width: 20%;">
                 Base FGTS
             </th>
             <th style="
-                        border: 1px solid black; 
+                        border: 1px solid black;
                         width: 20%;">
                 FGTS
             </th>
             <th style="
-                        border: 1px solid black; 
+                        border: 1px solid black;
                         width: 20%;">
                 Base IRRF
             </th>
             <th style="
-                        border: 1px solid black; 
+                        border: 1px solid black;
                         width: 20%;">
                 Base INSS
             </th>
             <th style="
-                        border: 1px solid black; 
+                        border: 1px solid black;
                         width: 20%;">
                 LIQUIDO
             </th>
         </tr>
         <tr>
-            <td 
+            <td
                 align="right"
                 style="
-                        border: 1px solid black; 
+                        border: 1px solid black;
                         width: 20%;">
                 {{ dados.bases.BASE_FGTS_FOLHA }}
             </td>
-            <td 
+            <td
                 align="right"
                 style="
-                        border: 1px solid black; 
+                        border: 1px solid black;
                         width: 20%;">
                 {{dados.bases.FGTS_FOLHA}}
             </td>
             <td
                 align="right"
                  style="
-                        border: 1px solid black; 
+                        border: 1px solid black;
                         width: 20%;">
                 {{dados.bases.BASE_IRRF_FOLHA}}
             </td>
             <td
             align="right"
                 style="
-                        border: 1px solid black; 
+                        border: 1px solid black;
                         width: 20%;">
                 {{dados.bases.BASE_INSS_FOLHA}}
             </td>
-            <td 
+            <td
                 align="right"
                 style="
-                        border: 1px solid black; 
+                        border: 1px solid black;
                         width: 20%;">
                 {{dados.totais.LIQUIDO}}
             </td>
@@ -399,7 +399,7 @@ export const fichaPonto = `
                 <td style= "width:9%;">{{this.NORMAL}}</td>
                 <td style= "width:9%;">{{this.EXTRA}}</td>
                 <td style= "width:9%;">{{this.OUTRA}}</td>
-                <td style= "width:15%;">{{this.OCORRENCIA}}</td>
+                <td style= "width:15%; fontSize: 12;">{{this.OCORRENCIA}}</td>
             </tr>
         {{/each}}
     </table>
@@ -409,7 +409,7 @@ export const fichaPonto = `
     <table >
         <tr style="border: none; display: table-row;">
             <td align="left" style="width: 50%;">EVENTO</td>
-            <td alignt="right">HR/DIA</td>        
+            <td alignt="right">HR/DIA</td>
         </tr>
         {{#each dados.resumo}}
             <tr>
@@ -431,7 +431,7 @@ export const fichaPonto = `
             </td>
             <td style="width: 25%;">
                 SALDO ATUAL: {{dados.rodape.saldoAtual}}
-            </td>          
+            </td>
         </tr>
         <tr style="border: none;display: table-row">
             <td style="width: 25%;"><span><b></b></span></td>
