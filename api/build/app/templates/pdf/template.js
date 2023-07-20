@@ -401,7 +401,7 @@ exports.fichaPonto = `
                 <td style= "width:9%;">{{this.NORMAL}}</td>
                 <td style= "width:9%;">{{this.EXTRA}}</td>
                 <td style= "width:9%;">{{this.OUTRA}}</td>
-                <td style= "width:15%; fontSize: 12;">{{this.OCORRENCIA}}</td>
+                <td style= "width:15%; fontSize: 12px;">{{this.OCORRENCIA}}</td>
             </tr>
         {{/each}}
     </table>
