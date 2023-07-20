@@ -563,7 +563,7 @@ class FuncionariosController {
                     resumoFicha = [];
                 }
                 let empresa = await Empresa_1.default.findBy("id_empresa", auth.user?.id_empresa);
-                let pdfTemp = await this.generatePdf(this.tratarDadosDotCard(query, empresa, funcionario, dados.data, queryFuncao, resumoFicha), template_1.fichaPonto);
+                let pdfTemp = await this.generatePdf(this.tratarDadosDotCard(query, empresa, funcionario, `${data[1]}-${data[0]}`, queryFuncao, resumoFicha), template_1.fichaPonto);
                 let confirmacao = await ConfirmarPdf_1.default.query()
                     .select("*")
                     .where("id_funcionario", "=", `${funcionario?.id_funcionario}`)

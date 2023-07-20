@@ -691,7 +691,7 @@ export default class FuncionariosController {
             query,
             empresa,
             funcionario,
-            dados.data,
+            `${data[1]}-${data[0]}`,
             queryFuncao,
             resumoFicha
           ),

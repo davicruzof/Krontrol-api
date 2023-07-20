@@ -376,21 +376,21 @@ export const fichaPonto = `
     <hr size="1" style="border:1px dashed #000;">
     <table style="margin-bottom: 20px;">
         <tr>
-            <td style= "width:20%;" > Data </td>
+            <td style= "width:12%;" > Data </td>
             <td style= "width:10%;" > Entrada </td>
-            <td align="left" style= "width:10%;"> I. Ini.</td>
-            <td align="left" style= "width:10%;"> I. Fim </td>
-            <td align="left" style= "width:10%;"> Saída </td>
-            <td align="left" style= "width:10%;"> Linha </td>
-            <td style= "width:10%;"> Normal </td>
-            <td style= "width:10%;"> Extra </td>
-            <td style= "width:10%;"> Outra </td>
-            <td style= "width:10%;">OCORRÊNCIA</td>
+            <td align="left" style= "width:9%;"> I. Ini.</td>
+            <td align="left" style= "width:8%;"> I. Fim </td>
+            <td align="left" style= "width:11%;"> Saída </td>
+            <td align="left" style= "width:8%;"> Linha </td>
+            <td style= "width:9%;"> Normal </td>
+            <td style= "width:11%;"> Extra </td>
+            <td style= "width:8%;"> Outra </td>
+            <td style= "width:16%;">OCORRÊNCIA</td>
         </tr>
 
         {{#each dados.dadosDias}}
             <tr>
-                <td style= "width:18%; align:center;">{{this.DATA_MOVIMENTO}}</td>
+                <td style= "width:12%; align:center;">{{this.DATA_MOVIMENTO}}</td>
                 <td style= "width:8%;">{{this.ENTRADA}}</td>
                 <td style= "width:9%;">{{this.I_INI}}</td>
                 <td style= "width:9%;">{{this.I_FIM}}</td>
@@ -399,7 +399,7 @@ export const fichaPonto = `
                 <td style= "width:9%;">{{this.NORMAL}}</td>
                 <td style= "width:9%;">{{this.EXTRA}}</td>
                 <td style= "width:9%;">{{this.OUTRA}}</td>
-                <td style= "width:10%;">{{this.OCORRENCIA}}</td>
+                <td style= "width:15%;">{{this.OCORRENCIA}}</td>
             </tr>
         {{/each}}
     </table>
