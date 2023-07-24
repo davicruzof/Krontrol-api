@@ -293,7 +293,7 @@ class FuncionariosController {
                                     left join globus.bgm_cadlinhas lin on pon.codintlinha = lin.codintlinha
                                     WHERE
                                         pon.tipodigit = 'F' AND
-                                        pon.dtdigit BETWEEN to_date('${firstDay.toLocaleDateString()}','DD/MM/YYYY') and to_date('${(0, date_fns_1.format)(lastDay, 'dd/MM/yyyy')}','DD/MM/YYYY')
+                                        pon.dtdigit BETWEEN to_date('${firstDay.toLocaleDateString()}','DD/MM/YYYY') and to_date('${(0, date_fns_1.format)(lastDay, "dd/MM/yyyy")}','DD/MM/YYYY')
                                         and func.id_funcionario_erp= '${funcionario?.id_funcionario_erp}'
                                     order by DATA_DIGITACAO ASC
                                     `);
@@ -538,8 +538,9 @@ class FuncionariosController {
                                     TRIM(F.EXTRANOTDM) AS EXTRANOTDM,
                                     TRIM(F.TOTAL) AS TOTALF,
                                     F.BH_COMPETENCIA,
-                                    TRIM(F.CREDITO) AS CREDITO,
-                                    TRIM(F.DEBITO) AS DEBITO,
+                                    TRIM(F.BH_CREDITO) AS CREDITO,
+                                    TRIM(F.BH_DEBITO) AS DEBITO,
+                                    TRIM(F.A_NOT) AS NOTURNO,
                                     TRIM(F.SALDOANTERIOR) AS SALDOANTERIOR,
                                     TRIM(F.VALORPAGO) AS VALORPAGO,
                                     TRIM(F.SALDOATUAL) AS SALDOATUAL
@@ -603,10 +604,10 @@ class FuncionariosController {
                 credito: dados[ultimaPosicao].CREDITO,
                 debito: dados[ultimaPosicao].DEBITO,
                 valorPago: dados[ultimaPosicao].VALORPAGO,
-                saldoAtual: dados[ultimaPosicao].SALDOATUAL
+                saldoAtual: dados[ultimaPosicao].SALDOATUAL,
             },
             dadosDias: new Array(),
-            resumo: resumoFicha
+            resumo: resumoFicha,
         };
         dados.forEach((element) => {
             element.TOTALF = element.TOTALF;

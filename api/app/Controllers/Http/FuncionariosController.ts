@@ -24,7 +24,7 @@ import { templateIRPF } from "App/templates/pdf/template_irpf";
 import Funcao from "App/Models/Funcao";
 import GlobalController from "./GlobalController";
 import AppVersion from "App/Models/AppVersion";
-import { format} from "date-fns";
+import { format } from "date-fns";
 export default class FuncionariosController {
   public async create({ request, response }: HttpContextContract) {
     try {
@@ -380,7 +380,10 @@ export default class FuncionariosController {
                                     left join globus.bgm_cadlinhas lin on pon.codintlinha = lin.codintlinha
                                     WHERE
                                         pon.tipodigit = 'F' AND
-                                        pon.dtdigit BETWEEN to_date('${firstDay.toLocaleDateString()}','DD/MM/YYYY') and to_date('${format(lastDay,'dd/MM/yyyy')}','DD/MM/YYYY')
+                                        pon.dtdigit BETWEEN to_date('${firstDay.toLocaleDateString()}','DD/MM/YYYY') and to_date('${format(
+          lastDay,
+          "dd/MM/yyyy"
+        )}','DD/MM/YYYY')
                                         and func.id_funcionario_erp= '${
                                           funcionario?.id_funcionario_erp
                                         }'
@@ -636,7 +639,7 @@ export default class FuncionariosController {
 
         const periodoInicial = `27-${data[1] - 1}-${data[0]}`;
         const periodoFinal = `26-${data[1]}-${data[0]}`;
-        const competencia = new Date(data[0], data[1]-1, 26);
+        const competencia = new Date(data[0], data[1] - 1, 26);
 
         let query = await Database.connection("oracle").rawQuery(`
                                     SELECT DISTINCT
@@ -658,8 +661,9 @@ export default class FuncionariosController {
                                     TRIM(F.EXTRANOTDM) AS EXTRANOTDM,
                                     TRIM(F.TOTAL) AS TOTALF,
                                     F.BH_COMPETENCIA,
-                                    TRIM(F.CREDITO) AS CREDITO,
-                                    TRIM(F.DEBITO) AS DEBITO,
+                                    TRIM(F.BH_CREDITO) AS CREDITO,
+                                    TRIM(F.BH_DEBITO) AS DEBITO,
+                                    TRIM(F.A_NOT) AS NOTURNO,
                                     TRIM(F.SALDOANTERIOR) AS SALDOANTERIOR,
                                     TRIM(F.VALORPAGO) AS VALORPAGO,
                                     TRIM(F.SALDOATUAL) AS SALDOATUAL
@@ -668,19 +672,19 @@ export default class FuncionariosController {
                                     AND DATA_MOVIMENTO BETWEEN to_date('${periodoInicial}','DD-MM-YYYY') and to_date('${periodoFinal}','DD-MM-YYYY')
                                     ORDER BY BH_COMPETENCIA
                       `);
-          let resumoFicha = [];
+        let resumoFicha = [];
 
-          try {
-            resumoFicha = await Database.connection("oracle").rawQuery(`
+        try {
+          resumoFicha = await Database.connection("oracle").rawQuery(`
             SELECT DISTINCT EVENTO, TRIM(HR_DIA) as HR_DIA
             FROM
               VW_ML_PON_RESUMO_HOLERITE FH
             WHERE FH.ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
-            AND FH.COMPETENCIA = '${format(competencia,"MM/yyyy")}'
+            AND FH.COMPETENCIA = '${format(competencia, "MM/yyyy")}'
           `);
-          } catch (error) {
-            resumoFicha = [];
-          }
+        } catch (error) {
+          resumoFicha = [];
+        }
 
         let empresa = await Empresa.findBy("id_empresa", auth.user?.id_empresa);
 
@@ -746,10 +750,10 @@ export default class FuncionariosController {
         credito: dados[ultimaPosicao].CREDITO,
         debito: dados[ultimaPosicao].DEBITO,
         valorPago: dados[ultimaPosicao].VALORPAGO,
-        saldoAtual: dados[ultimaPosicao].SALDOATUAL
+        saldoAtual: dados[ultimaPosicao].SALDOATUAL,
       },
       dadosDias: new Array(),
-      resumo: resumoFicha
+      resumo: resumoFicha,
     };
     dados.forEach((element) => {
       element.TOTALF = element.TOTALF;
@@ -889,12 +893,11 @@ export default class FuncionariosController {
       response.badRequest("Erro interno");
     }
   }
-  private tratarIrpfAvaiables (dados) {
+  private tratarIrpfAvaiables(dados) {
     let retorno: any = [];
     dados.map((element) => retorno.push(element.ANO));
     return retorno;
   }
-
 
   public async getIrpf({ request, response, auth }: HttpContextContract) {
     try {
@@ -939,7 +942,6 @@ export default class FuncionariosController {
       let competencia = params.competencia.split("-");
       competencia = competencia[1] + "/" + competencia[0];
 
-
       let funcionario = await Funcionario.findBy(
         "id_funcionario",
         auth.user?.id_funcionario
@@ -964,11 +966,11 @@ export default class FuncionariosController {
       // }
     } catch (error) {
       console.log(error);
-      response.badRequest("Erro interno",);
+      response.badRequest("Erro interno");
     }
   }
 
-  private tratarDadosFerias (dados) {
+  private tratarDadosFerias(dados) {
     let dadosRetorno = [dados];
 
     // dados.forEach(element => {
