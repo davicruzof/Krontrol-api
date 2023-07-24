@@ -645,12 +645,11 @@ export default class FuncionariosController {
 
         let query = await Database.connection("oracle").rawQuery(`
                                     SELECT DISTINCT
+                                    F.*,
                                     to_char(F.DATA_MOVIMENTO,'DD-MM-YYYY') as DATA_MOVIMENTO,
                                     TRIM(F.OCORRENCIA) AS OCORRENCIA,
-                                    F.*,
                                     TRIM(F.EXTRANOTDM) AS EXTRANOTDM,
                                     TRIM(F.TOTAL) AS TOTALF,
-                                    F.BH_COMPETENCIA,
                                     TRIM(F.CREDITO) AS CREDITO,
                                     TRIM(F.DEBITO) AS DEBITO,
                                     TRIM(F.SALDOANTERIOR) AS SALDOANTERIOR,

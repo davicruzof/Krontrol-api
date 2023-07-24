@@ -520,12 +520,11 @@ class FuncionariosController {
                 const competencia = new Date(data[0], data[1] - 1, 26);
                 let query = await Database_1.default.connection("oracle").rawQuery(`
                                     SELECT DISTINCT
+                                    F.*,
                                     to_char(F.DATA_MOVIMENTO,'DD-MM-YYYY') as DATA_MOVIMENTO,
                                     TRIM(F.OCORRENCIA) AS OCORRENCIA,
-                                    F.*,
                                     TRIM(F.EXTRANOTDM) AS EXTRANOTDM,
                                     TRIM(F.TOTAL) AS TOTALF,
-                                    F.BH_COMPETENCIA,
                                     TRIM(F.CREDITO) AS CREDITO,
                                     TRIM(F.DEBITO) AS DEBITO,
                                     TRIM(F.SALDOANTERIOR) AS SALDOANTERIOR,
