@@ -518,6 +518,7 @@ class FuncionariosController {
                 const periodoInicial = `27-${data[1] - 1}-${data[0]}`;
                 const periodoFinal = `26-${data[1]}-${data[0]}`;
                 const competencia = new Date(data[0], data[1] - 1, 26);
+                console.log();
                 let query = await Database_1.default.connection("oracle").rawQuery(`
                                     SELECT DISTINCT
                                     F.ID_FUNCIONARIO_ERP,
@@ -535,7 +536,7 @@ class FuncionariosController {
                                     F.EXTRA,
                                     F.OUTRA,
                                     F.A_NOT,
-                                    F.BH_DEBITO,
+                                    F.BD_DEBITO,
                                     F.BH_CREDITO,
                                     TRIM(F.EXTRANOTDM) AS EXTRANOTDM,
                                     TRIM(F.TOTAL) AS TOTALF,
