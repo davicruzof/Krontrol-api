@@ -616,6 +616,7 @@ export default class FuncionariosController {
   public async dotCardPdf({ request, response, auth }: HttpContextContract) {
     try {
       let dados = request.body();
+
       if (dados.data) {
         let funcionario = await Funcionario.findBy(
           "id_funcionario",
@@ -635,6 +636,7 @@ export default class FuncionariosController {
           "id_funcao_erp",
           funcionario?.id_funcao_erp
         );
+
         const data = dados.data.split("-");
 
         const periodoInicial = `27-${data[1] - 1}-${data[0]}`;
@@ -643,27 +645,14 @@ export default class FuncionariosController {
 
         let query = await Database.connection("oracle").rawQuery(`
                                     SELECT DISTINCT
-                                    F.ID_FUNCIONARIO_ERP,
-                                    F.REGISTRO,
                                     to_char(F.DATA_MOVIMENTO,'DD-MM-YYYY') as DATA_MOVIMENTO,
                                     TRIM(F.OCORRENCIA) AS OCORRENCIA,
-                                    F.ENTRADA,
-                                    F.I_INI,
-                                    F.I_FIM,
-                                    F.SAIDA,
-                                    F.LINHA,
-                                    F.TABELA,
-                                    F.CODOCORR,
-                                    F.NORMAL,
-                                    F.EXTRA,
-                                    F.OUTRA,
-                                    F.A_NOT,
+                                    F.*,
                                     TRIM(F.EXTRANOTDM) AS EXTRANOTDM,
                                     TRIM(F.TOTAL) AS TOTALF,
                                     F.BH_COMPETENCIA,
-                                    TRIM(F.BH_CREDITO) AS CREDITO,
-                                    TRIM(F.BH_DEBITO) AS DEBITO,
-                                    TRIM(F.A_NOT) AS NOTURNO,
+                                    TRIM(F.CREDITO) AS CREDITO,
+                                    TRIM(F.DEBITO) AS DEBITO,
                                     TRIM(F.SALDOANTERIOR) AS SALDOANTERIOR,
                                     TRIM(F.VALORPAGO) AS VALORPAGO,
                                     TRIM(F.SALDOATUAL) AS SALDOATUAL
@@ -672,6 +661,7 @@ export default class FuncionariosController {
                                     AND DATA_MOVIMENTO BETWEEN to_date('${periodoInicial}','DD-MM-YYYY') and to_date('${periodoFinal}','DD-MM-YYYY')
                                     ORDER BY BH_COMPETENCIA
                       `);
+
         let resumoFicha = [];
 
         try {

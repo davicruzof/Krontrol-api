@@ -401,9 +401,9 @@ export const fichaPonto = `
                 <td style= "width:10%;font-size: 10px;">{{this.LINHA}}</td>
                 <td style= "width:7%;font-size: 10px;">{{this.NORMAL}}</td>
                 <td style= "width:6%;font-size: 10px;">{{this.EXTRA}}</td>
-                <td style= "width:6%;font-size: 10px;">{{this.NOTURNO}}</td>
-                <td style= "width:7%;font-size: 10px;">{{this.DEBITO}}</td>
-                <td style= "width:7%;font-size: 10px;">{{this.CREDITO}}</td>
+                <td style= "width:6%;font-size: 10px;">{{this.A_NOT}}</td>
+                <td style= "width:7%;font-size: 10px;">{{this.BH_DEBITO}}</td>
+                <td style= "width:7%;font-size: 10px;">{{this.BH_CREDITO}}</td>
                 <td style= "width:6%;font-size: 10px;">{{this.OUTRA}}</td>
                 <td style= "width:14%; font-size: 10px;">{{this.OCORRENCIA}}</td>
             </tr>
