@@ -540,8 +540,6 @@ class FuncionariosController {
                                     TRIM(F.EXTRANOTDM) AS EXTRANOTDM,
                                     TRIM(F.TOTAL) AS TOTALF,
                                     F.BH_COMPETENCIA,
-                                    TRIM(F.CREDITO) AS CREDITO,
-                                    TRIM(F.DEBITO) AS DEBITO,
                                     TRIM(F.SALDOANTERIOR) AS SALDOANTERIOR,
                                     TRIM(F.VALORPAGO) AS VALORPAGO,
                                     TRIM(F.SALDOATUAL) AS SALDOATUAL
