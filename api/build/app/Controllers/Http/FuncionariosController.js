@@ -520,7 +520,6 @@ class FuncionariosController {
                 const competencia = new Date(data[0], data[1] - 1, 26);
                 let query = await Database_1.default.connection("oracle").rawQuery(`
                                     SELECT DISTINCT
-                                    F.*,
                                     to_char(F.DATA_MOVIMENTO,'DD-MM-YYYY') as DATA_MOVIMENTO,
                                     TRIM(F.OCORRENCIA) AS OCORRENCIA,
                                     TRIM(F.EXTRANOTDM) AS EXTRANOTDM,
@@ -530,6 +529,7 @@ class FuncionariosController {
                                     TRIM(F.SALDOANTERIOR) AS SALDOANTERIOR,
                                     TRIM(F.VALORPAGO) AS VALORPAGO,
                                     TRIM(F.SALDOATUAL) AS SALDOATUAL
+                                    F.*,
                                     FROM VW_ML_PON_FICHAPONTO F
                                     WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
                                     AND DATA_MOVIMENTO BETWEEN to_date('${periodoInicial}','DD-MM-YYYY') and to_date('${periodoFinal}','DD-MM-YYYY')
