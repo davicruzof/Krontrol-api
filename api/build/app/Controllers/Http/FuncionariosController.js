@@ -600,8 +600,8 @@ class FuncionariosController {
             },
             rodape: {
                 saldoAnterior: dados[ultimaPosicao].SALDOANTERIOR,
-                credito: dados[ultimaPosicao].CREDITO,
-                debito: dados[ultimaPosicao].DEBITO,
+                credito: dados[ultimaPosicao].BH_CREDITO,
+                debito: dados[ultimaPosicao].BH_DEBITO,
                 valorPago: dados[ultimaPosicao].VALORPAGO,
                 saldoAtual: dados[ultimaPosicao].SALDOATUAL,
             },
