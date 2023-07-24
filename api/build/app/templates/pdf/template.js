@@ -383,14 +383,14 @@ exports.fichaPonto = `
             <td style="width:7%;">I. Ini.</td>
             <td style="width:7%;">I. Fim </td>
             <td style="width:6%;">Saída </td>
-            <td style="width:8%;">Linha </td>
-            <td style="width:7%;">Normal </td>
-            <td style="width:6%;"> Extra </td>
-            <td style="width:6%;">A.N </td>
+            <td style="width:8%;padding-left: 8px;">Linha </td>
+            <td style="width:7%;padding-left: 8px;">Normal </td>
+            <td style="width:6%;padding-left: 4px;">Extra </td>
+            <td style="width:6%;padding-left: 8px;">A.N </td>
             <td style="width:7%;">Debito </td>
             <td style="width:7%;">Credito </td>
             <td style="width:6%;">Outra </td>
-            <td style="width:14%;">OCORRÊNCIA </td>
+            <td style="width:14%;">Ocorrência </td>
         </tr>
 
         {{#each dados.dadosDias}}
