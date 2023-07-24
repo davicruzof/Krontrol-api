@@ -663,6 +663,8 @@ export default class FuncionariosController {
                                     TRIM(F.EXTRANOTDM) AS EXTRANOTDM,
                                     TRIM(F.TOTAL) AS TOTALF,
                                     F.BH_COMPETENCIA,
+                                    TRIM(F.CREDITO) AS CREDITO,
+                                    TRIM(F.DEBITO) AS DEBITO,
                                     TRIM(F.SALDOANTERIOR) AS SALDOANTERIOR,
                                     TRIM(F.VALORPAGO) AS VALORPAGO,
                                     TRIM(F.SALDOATUAL) AS SALDOATUAL
@@ -746,8 +748,8 @@ export default class FuncionariosController {
       },
       rodape: {
         saldoAnterior: dados[ultimaPosicao].SALDOANTERIOR,
-        credito: dados[ultimaPosicao].BH_CREDITO,
-        debito: dados[ultimaPosicao].BH_DEBITO,
+        credito: dados[ultimaPosicao].CREDITO,
+        debito: dados[ultimaPosicao].DEBITO,
         valorPago: dados[ultimaPosicao].VALORPAGO,
         saldoAtual: dados[ultimaPosicao].SALDOATUAL,
       },
