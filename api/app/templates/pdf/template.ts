@@ -394,12 +394,12 @@ export const fichaPonto = `
         {{#each dados.dadosDias}}
             <tr>
                 <td style="width:12%;">{{this.DATA_MOVIMENTO}} </td>
-                <td style="width:7%;">{{this.ENTRADA}} </td>
-                <td style="width:7%;">{{this.I_INI}} </td>
-                <td style="width:7%;">{{this.I_FIM}} </td>
-                <td style="width:6%;">{{this.SAIDA}} </td>
-                <td style="width:8%;margin-left: 4px;">{{this.LINHA}} </td>
-                <td style="width:7%;">{{this.NORMAL}} </td>
+                <td style="width:7%;margin-left: 4px;">{{this.ENTRADA}} </td>
+                <td style="width:7%;margin-left: 8px;">{{this.I_INI}} </td>
+                <td style="width:7%;margin-left: 8px;">{{this.I_FIM}} </td>
+                <td style="width:6%;margin-left: 8px;">{{this.SAIDA}} </td>
+                <td style="width:8%;margin-left: 16px;">{{this.LINHA}} </td>
+                <td style="width:7%;margin-left: 16px;">{{this.NORMAL}} </td>
                 <td style="width:6%;"> {{this.EXTRA}} </td>
                 <td style="width:6%;">{{this.A_NOT}} </td>
                 <td style="width:7%;">{{this.BD_DEBITO}} </td>
