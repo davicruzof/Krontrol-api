@@ -41,5 +41,5 @@
   "testProviders": [
     "@japa/preset-adonis/TestsProvider"
   ],
-  "lastCompiledAt": "2023-07-24T10:04:39.668Z"
+  "lastCompiledAt": "2023-07-24T10:06:21.411Z"
 }

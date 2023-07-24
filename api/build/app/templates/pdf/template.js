@@ -378,12 +378,12 @@ exports.fichaPonto = `
     <hr size="1" style="border:1px dashed #000;">
     <table style="margin-bottom: 20px;">
         <tr>
-            <td style="width:10%;" >Data </td>
+            <td style="width:12%;" >Data </td>
             <td style="width:7%;" >Entrada </td>
             <td style="width:7%;">I. Ini.</td>
             <td style="width:7%;">I. Fim </td>
             <td style="width:6%;">Saída </td>
-            <td style="width:10%;">Linha </td>
+            <td style="width:8%;">Linha </td>
             <td style="width:7%;">Normal </td>
             <td style="width:6%;">Extra </td>
             <td style="width:6%;">A.N </td>
@@ -395,12 +395,12 @@ exports.fichaPonto = `
 
         {{#each dados.dadosDias}}
             <tr>
-                <td style="width:10%;">{{this.DATA_MOVIMENTO}} </td>
+                <td style="width:12%;">{{this.DATA_MOVIMENTO}} </td>
                 <td style="width:7%;">{{this.ENTRADA}} </td>
                 <td style="width:7%;">{{this.I_INI}} </td>
                 <td style="width:7%;">{{this.I_FIM}} </td>
                 <td style="width:6%;">{{this.SAIDA}} </td>
-                <td style="width:10%;">{{this.LINHA}} </td>
+                <td style="width:8%;">{{this.LINHA}} </td>
                 <td style="width:7%;">{{this.NORMAL}} </td>
                 <td style="width:6%;">{{this.EXTRA}} </td>
                 <td style="width:6%;">{{this.A_NOT}} </td>
