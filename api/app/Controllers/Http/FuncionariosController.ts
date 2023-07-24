@@ -641,8 +641,6 @@ export default class FuncionariosController {
         const periodoFinal = `26-${data[1]}-${data[0]}`;
         const competencia = new Date(data[0], data[1] - 1, 26);
 
-        console.log();
-
         let query = await Database.connection("oracle").rawQuery(`
                                     SELECT DISTINCT
                                     F.ID_FUNCIONARIO_ERP,
