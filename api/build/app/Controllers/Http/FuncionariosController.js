@@ -293,7 +293,7 @@ class FuncionariosController {
                                     left join globus.bgm_cadlinhas lin on pon.codintlinha = lin.codintlinha
                                     WHERE
                                         pon.tipodigit = 'F' AND
-                                        pon.dtdigit BETWEEN to_date('${firstDay.toLocaleDateString()}','DD/MM/YYYY') and to_date('${(0, date_fns_1.format)(lastDay, 'dd/MM/yyyy')}','DD/MM/YYYY')
+                                        pon.dtdigit BETWEEN to_date('${firstDay.toLocaleDateString()}','DD/MM/YYYY') and to_date('${(0, date_fns_1.format)(lastDay, "dd/MM/yyyy")}','DD/MM/YYYY')
                                         and func.id_funcionario_erp= '${funcionario?.id_funcionario_erp}'
                                     order by DATA_DIGITACAO ASC
                                     `);
@@ -535,6 +535,8 @@ class FuncionariosController {
                                     F.EXTRA,
                                     F.OUTRA,
                                     F.A_NOT,
+                                    F.BH_DEBITO,
+                                    F.BH_CREDITO,
                                     TRIM(F.EXTRANOTDM) AS EXTRANOTDM,
                                     TRIM(F.TOTAL) AS TOTALF,
                                     F.BH_COMPETENCIA,
@@ -603,10 +605,10 @@ class FuncionariosController {
                 credito: dados[ultimaPosicao].CREDITO,
                 debito: dados[ultimaPosicao].DEBITO,
                 valorPago: dados[ultimaPosicao].VALORPAGO,
-                saldoAtual: dados[ultimaPosicao].SALDOATUAL
+                saldoAtual: dados[ultimaPosicao].SALDOATUAL,
             },
             dadosDias: new Array(),
-            resumo: resumoFicha
+            resumo: resumoFicha,
         };
         dados.forEach((element) => {
             element.TOTALF = element.TOTALF;
