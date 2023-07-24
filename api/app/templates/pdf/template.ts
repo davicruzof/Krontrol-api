@@ -376,35 +376,35 @@ export const fichaPonto = `
     <hr size="1" style="border:1px dashed #000;">
     <table style="margin-bottom: 20px;">
         <tr>
-            <td style= "width:10%;font-size: 10px;" >Data </td>
-            <td style"width:7%;font-size: 10px;" >Entrada </td>
-            <td style"width:7%;font-size: 10px;">I. Ini.</td>
-            <td style= "width:7%;font-size: 10px;">I. Fim </td>
-            <td style= "width:6%;font-size: 10px;">Saída </td>
-            <td style= "width:10%;font-size: 10px;">Linha </td>
-            <td style= "width:7%;font-size: 10px;">Normal </td>
-            <td style= "width:6%;font-size: 10px;">Extra </td>
-            <td style= "width:6%;font-size: 10px;">A.N </td>
-            <td style= "width:7%;font-size: 10px;">Debito </td>
-            <td style= "width:7%;font-size: 10px;">Credito </td>
-            <td style= "width:6%;font-size: 10px;">Outra </td>
-            <td style= "width:14%;font-size: 10px;">OCORRÊNCIA </td>
+            <td style= "width:10%;" >Data </td>
+            <td style"width:7%;fo>Entrada </td>
+            <td style"width:7%;fon. Ini.</td>
+            <td style="width:7%;">I. Fim </td>
+            <td style="width:6%;">Saída </td>
+            <td style="width:10%;">Linha </td>
+            <td style="width:7%;">Normal </td>
+            <td style="width:6%;">Extra </td>
+            <td style="width:6%;">A.N </td>
+            <td style="width:7%;">Debito </td>
+            <td style="width:7%;">Credito </td>
+            <td style="width:6%;">Outra </td>
+            <td style="width:14%;">OCORRÊNCIA </td>
         </tr>
 
         {{#each dados.dadosDias}}
             <tr>
-                <td style= "width:10%;font-size: 10px;">{{this.DATA_MOVIMENTO}} </td>
-                <td style= "width:7%;font-size: 10px;">{{this.ENTRADA}} </td>
-                <td style= "width:7%;font-size: 10px;">{{this.I_INI}} </td>
-                <td style= "width:7%;font-size: 10px;">{{this.I_FIM}} </td>
-                <td style= "width:6%;font-size: 10px;">{{this.SAIDA}} </td>
-                <td style= "width:10%;font-size: 10px;">{{this.LINHA}} </td>
-                <td style= "width:7%;font-size: 10px;">{{this.NORMAL}} </td>
-                <td style= "width:6%;font-size: 10px;">{{this.EXTRA}} </td>
-                <td style= "width:6%;font-size: 10px;">{{this.A_NOT}} </td>
-                <td style= "width:7%;font-size: 10px;">{{this.BD_DEBITO}} </td>
-                <td style= "width:7%;font-size: 10px;">{{this.BH_CREDITO}} </td>
-                <td style= "width:6%;font-size: 10px;">{{this.OUTRA}} </td>
+                <td style= "width:10%;">{{this.DATA_MOVIMENTO}} </td>
+                <td style= "width:7%;">{{this.ENTRADA}} </td>
+                <td style= "width:7%;">{{this.I_INI}} </td>
+                <td style= "width:7%;">{{this.I_FIM}} </td>
+                <td style= "width:6%;">{{this.SAIDA}} </td>
+                <td style= "width:10%;">{{this.LINHA}} </td>
+                <td style= "width:7%;">{{this.NORMAL}} </td>
+                <td style= "width:6%;">{{this.EXTRA}} </td>
+                <td style= "width:6%;">{{this.A_NOT}} </td>
+                <td style= "width:7%;">{{this.BD_DEBITO}} </td>
+                <td style= "width:7%;">{{this.BH_CREDITO}} </td>
+                <td style= "width:6%;">{{this.OUTRA}} </td>
                 <td style= "width:14%; font-size: 10px;">{{this.OCORRENCIA}}</td>
             </tr>
         {{/each}}
