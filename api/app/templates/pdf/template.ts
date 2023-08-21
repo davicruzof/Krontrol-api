@@ -354,7 +354,7 @@ export const fichaPonto = `
 <span>
     <hr size="1" style="border:1px dashed #000;">
     <span>
-        LISTAGEM DE MOVIMENTOS DA FREQUÊNCIA REFERENTE A {{dados.DATA_MOVIMENTO}}
+        LISTAGEM DE MOVIMENTOS DA FREQUÊNCIA REFERENTE A {{this.DATA_MOVIMENTO}}
     </span>
     <hr size="1" style="border:1px dashed #000;">
     <div>
