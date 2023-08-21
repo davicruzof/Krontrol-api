@@ -651,7 +651,6 @@ export default class FuncionariosController {
                                     NVL(F.I_INI, '-----') AS I_INI,
                                     NVL(F.I_FIM, '-----') AS I_FIM,
                                     NVL(F.SAIDA, '-----') AS SAIDA,
-                                    NVL(F.LINHA, '-----') AS LINHA,
                                     NVL(F.TABELA, '-----') AS TABELA,
                                     F.CODOCORR,
                                     NVL(F.NORMAL, '-----') AS NORMAL,
