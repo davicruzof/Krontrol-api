@@ -383,14 +383,13 @@ exports.fichaPonto = `
             <td style="width:7%;padding-left: 8px;">I. Ini.</td>
             <td style="width:7%;">I. Fim </td>
             <td style="width:6%;">Saída </td>
-            <td style="width:8%;padding-left: 10px;">Linha </td>
-            <td style="width:7%;padding-left: 16px;">Normal </td>
-            <td style="width:6%;padding-left: 4px;">Extra </td>
-            <td style="width:6%;padding-left: 8px;">A.N </td>
-            <td style="width:7%;">Debito </td>
-            <td style="width:7%;">Credito </td>
+            <td style="width:8%;padding-left: 16px;">Normal </td>
+            <td style="width:7%;padding-left: 4px;">Extra </td>
+            <td style="width:7%;padding-left: 8px;">A.N </td>
+            <td style="width:9%;">Debito </td>
+            <td style="width:9%;">Credito </td>
             <td style="width:6%;">Outra </td>
-            <td style="width:14%;">Ocorrência </td>
+            <td style="width:15%;">Ocorrência </td>
         </tr>
 
         {{#each dados.dadosDias}}
@@ -400,14 +399,13 @@ exports.fichaPonto = `
                 <td style="width:7%;padding-left: 8px;">{{this.I_INI}} </td>
                 <td style="width:7%;padding-left: 4px;">{{this.I_FIM}} </td>
                 <td style="width:6%;padding-left: 4px;">{{this.SAIDA}} </td>
-                <td style="width:8%;padding-left: 8px;">{{this.LINHA}} </td>
-                <td style="width:7%;padding-left: 8px;">{{this.NORMAL}} </td>
-                <td style="width:6%;padding-left: 8px;"> {{this.EXTRA}} </td>
-                <td style="width:6%;padding-left: 8px;">{{this.A_NOT}} </td>
-                <td style="width:7%;">{{this.BD_DEBITO}} </td>
-                <td style="width:7%;">{{this.BH_CREDITO}} </td>
+                <td style="width:8%;padding-left: 8px;">{{this.NORMAL}} </td>
+                <td style="width:7%;padding-left: 8px;"> {{this.EXTRA}} </td>
+                <td style="width:7%;padding-left: 8px;">{{this.A_NOT}} </td>
+                <td style="width:9%;">{{this.BD_DEBITO}} </td>
+                <td style="width:9%;">{{this.BH_CREDITO}} </td>
                 <td style="width:6%;">{{this.OUTRA}} </td>
-                <td style="width:14%; font-size: 10px;">{{this.OCORRENCIA}}</td>
+                <td style="width:15%; font-size: 10px;">{{this.OCORRENCIA}}</td>
             </tr>
         {{/each}}
     </table>
