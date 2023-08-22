@@ -507,13 +507,18 @@ class FuncionariosController {
     async dotCardPdf({ request, response, auth }) {
         try {
             let dados = request.body();
-            if (dados.data) {
+            if (dados.data && auth.user) {
                 let funcionario = await Funcionario_1.default.findBy("id_funcionario", auth.user?.id_funcionario);
                 let appUpdate = await AppVersion_1.default.findBy("id_funcionario", auth.user?.id_funcionario);
                 if (!appUpdate) {
                     return response.badRequest({ error: "app desatualizado" });
                 }
-                let queryFuncao = await Funcao_1.default.findBy("id_funcao_erp", funcionario?.id_funcao_erp);
+                if (!funcionario) {
+                    return response.badRequest({ error: "funcionario não encontrado!" });
+                }
+                let queryFuncao = await Funcao_1.default.query()
+                    .where("id_funcionario", auth.user?.id_funcionario)
+                    .where("id_funcao_erp", funcionario?.id_funcao_erp);
                 const data = dados.data.split("-");
                 const periodoInicial = `27-${data[1] - 1}-${data[0]}`;
                 const periodoFinal = `26-${data[1]}-${data[0]}`;
