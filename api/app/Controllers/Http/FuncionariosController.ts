@@ -698,7 +698,7 @@ export default class FuncionariosController {
             empresa,
             funcionario,
             `${data[1]}-${data[0]}`,
-            queryFuncao,
+            queryFuncao[0].funcao,
             resumoFicha
           ),
           fichaPonto
@@ -744,7 +744,7 @@ export default class FuncionariosController {
         nomeEmpresa: dados_empresa.nomeempresarial,
         cnpj: dados_empresa.cnpj,
         nome: funcionario.nome,
-        funcao: queryFuncao.funcao,
+        funcao: queryFuncao,
         competencia: data,
         endereco: dados_empresa.logradouro,
         periodo: data.split("").reverse().join(""),

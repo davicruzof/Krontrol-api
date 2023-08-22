@@ -568,7 +568,7 @@ class FuncionariosController {
                     resumoFicha = [];
                 }
                 let empresa = await Empresa_1.default.findBy("id_empresa", auth.user?.id_empresa);
-                let pdfTemp = await this.generatePdf(this.tratarDadosDotCard(query, empresa, funcionario, `${data[1]}-${data[0]}`, queryFuncao, resumoFicha), template_1.fichaPonto);
+                let pdfTemp = await this.generatePdf(this.tratarDadosDotCard(query, empresa, funcionario, `${data[1]}-${data[0]}`, queryFuncao[0].funcao, resumoFicha), template_1.fichaPonto);
                 let confirmacao = await ConfirmarPdf_1.default.query()
                     .select("*")
                     .where("id_funcionario", "=", `${funcionario?.id_funcionario}`)
@@ -599,7 +599,7 @@ class FuncionariosController {
                 nomeEmpresa: dados_empresa.nomeempresarial,
                 cnpj: dados_empresa.cnpj,
                 nome: funcionario.nome,
-                funcao: queryFuncao.funcao,
+                funcao: queryFuncao,
                 competencia: data,
                 endereco: dados_empresa.logradouro,
                 periodo: data.split("").reverse().join(""),
