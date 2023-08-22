@@ -636,7 +636,7 @@ export default class FuncionariosController {
         }
 
         let queryFuncao = await Funcao.query()
-          .where("id_funcionario", auth.user?.id_funcionario)
+          .where("id_empresa", auth.user?.id_empresa)
           .where("id_funcao_erp", funcionario?.id_funcao_erp);
 
         const data = dados.data.split("-");

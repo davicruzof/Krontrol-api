@@ -517,7 +517,7 @@ class FuncionariosController {
                     return response.badRequest({ error: "funcionario não encontrado!" });
                 }
                 let queryFuncao = await Funcao_1.default.query()
-                    .where("id_funcionario", auth.user?.id_funcionario)
+                    .where("id_empresa", auth.user?.id_empresa)
                     .where("id_funcao_erp", funcionario?.id_funcao_erp);
                 const data = dados.data.split("-");
                 const periodoInicial = `27-${data[1] - 1}-${data[0]}`;
