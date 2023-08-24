@@ -77,7 +77,7 @@ export default class EscalasController {
                   WHERE to_char(esc.dat_escala, 'YYYY-MM-DD') = '${data}' and :tipo = '${funcionario?.id_funcionario_erp}'`;
     query = query.replace(':tipo', tipo);
 
-    let result1 = await Database.connection("oracle").rawQuery(campos + query);
+    let result1 = await Database.connection("oracle").rawQuery(campos + query.replace(':tipo', tipo));
 
     campos = ` SELECT 
       pre.prefixoveic AS prefixo,
@@ -90,8 +90,9 @@ export default class EscalasController {
     `;
     tipo = " esc.cod_cobrador  ";
     query = query.replace(':tipo', tipo);
-    let result2 = await Database.connection("oracle").rawQuery(campos + query);
+
+    let result2 = await Database.connection("oracle").rawQuery(campos + query.replace(':tipo', tipo));
     return result1.concat(result2)
-    }
+
   }
 }
