@@ -45,12 +45,12 @@ export default class EscalasController {
     response.json(result);
   }
 
-  public async getList({ request }: HttpContextContract) {
+  public async getList({ request, auth, response }: HttpContextContract) {
     let data = request.params().data;
-    // let funcionario = await Funcionario.findBy(
-    //   "id_funcionario",
-    //   auth.user?.id_funcionario
-    // );
+    let funcionario = await Funcionario.findBy(
+       "id_funcionario",
+       auth.user?.id_funcionario
+    );
     let query: string;
     let campos: string;
     let tipo: string;
@@ -75,7 +75,6 @@ export default class EscalasController {
                   left  join globus.t_esc_localidade locm on esc.COD_PEG_MOT = locm.COD_LOCALIDADE
                   left  join globus.t_esc_localidade locc on esc.COD_PEG_COB = locc.COD_LOCALIDADE
                   WHERE to_char(esc.dat_escala, 'YYYY-MM-DD') = '${data}' and :tipo = '23218'`;
-    query = query.replace(":tipo", tipo);
 
     let result1 = await Database.connection("oracle").rawQuery(
       campos + query.replace(":tipo", tipo)
@@ -91,11 +90,10 @@ export default class EscalasController {
       to_char(esc.hor_fim_cobrador, 'HH24:MI:SS') AS fim
     `;
     tipo = " esc.cod_cobrador  ";
-    query = query.replace(":tipo", tipo);
 
     let result2 = await Database.connection("oracle").rawQuery(
       campos + query.replace(":tipo", tipo)
     );
-    return result1.concat(result2);
+    response.json(result1.concat(result2));
   }
 }
