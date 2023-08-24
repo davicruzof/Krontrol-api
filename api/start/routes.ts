@@ -166,6 +166,7 @@ Route.group(() => {
   //Rotas da escala
   Route.group(() => {
     Route.post("/list", "EscalasController.list");
+    Route.get("/list/:data", "EscalasController.getList");
   })
     .prefix("/scale")
     .middleware("auth");
