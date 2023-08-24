@@ -96,6 +96,7 @@ Route_1.default.group(() => {
         .middleware("auth");
     Route_1.default.group(() => {
         Route_1.default.post("/list", "EscalasController.list");
+        Route_1.default.get("/list/:data", "EscalasController.getList");
     })
         .prefix("/scale")
         .middleware("auth");
