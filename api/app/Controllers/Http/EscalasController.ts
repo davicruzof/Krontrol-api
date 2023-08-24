@@ -45,17 +45,17 @@ export default class EscalasController {
     response.json(result);
   }
 
-  public async getList ({ request, response, auth }: HttpContextContract) {
+  public async getList({ request }: HttpContextContract) {
     let data = request.params().data;
-    let funcionario = await Funcionario.findBy(
-      "id_funcionario",
-      auth.user?.id_funcionario
-    );
+    // let funcionario = await Funcionario.findBy(
+    //   "id_funcionario",
+    //   auth.user?.id_funcionario
+    // );
     let query: string;
     let campos: string;
     let tipo: string;
     campos = `
-      SELECT 
+      SELECT
         pre.prefixoveic AS prefixo,
         lin.CODIGOLINHA AS linha,
         esc.cod_servdiaria AS tabela,
@@ -74,25 +74,28 @@ export default class EscalasController {
                   left join globus.vw_funcionarios func on esc.cod_cobrador = func.CODINTFUNC
                   left  join globus.t_esc_localidade locm on esc.COD_PEG_MOT = locm.COD_LOCALIDADE
                   left  join globus.t_esc_localidade locc on esc.COD_PEG_COB = locc.COD_LOCALIDADE
-                  WHERE to_char(esc.dat_escala, 'YYYY-MM-DD') = '${data}' and :tipo = '${funcionario?.id_funcionario_erp}'`;
-    query = query.replace(':tipo', tipo);
+                  WHERE to_char(esc.dat_escala, 'YYYY-MM-DD') = '${data}' and :tipo = '23218'`;
+    query = query.replace(":tipo", tipo);
 
-    let result1 = await Database.connection("oracle").rawQuery(campos + query.replace(':tipo', tipo));
+    let result1 = await Database.connection("oracle").rawQuery(
+      campos + query.replace(":tipo", tipo)
+    );
 
-    campos = ` SELECT 
+    campos = ` SELECT
       pre.prefixoveic AS prefixo,
       lin.CODIGOLINHA AS linha,
       esc.cod_servdiaria AS tabela,
       to_char(esc.dat_escala, 'YYYY-MM-DD') as data_escala,
       locc.DESC_LOCALIDADE AS pegada,
       to_char(esc.hor_inicio_cobrador, 'HH24:MI:SS') AS inicio,
-      to_char(esc.hor_fim_cobrador, 'HH24:MI:SS') AS fim 
+      to_char(esc.hor_fim_cobrador, 'HH24:MI:SS') AS fim
     `;
     tipo = " esc.cod_cobrador  ";
-    query = query.replace(':tipo', tipo);
+    query = query.replace(":tipo", tipo);
 
-    let result2 = await Database.connection("oracle").rawQuery(campos + query.replace(':tipo', tipo));
-    return result1.concat(result2)
-
+    let result2 = await Database.connection("oracle").rawQuery(
+      campos + query.replace(":tipo", tipo)
+    );
+    return result1.concat(result2);
   }
 }
