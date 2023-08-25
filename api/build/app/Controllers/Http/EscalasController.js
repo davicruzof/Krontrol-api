@@ -36,9 +36,8 @@ class EscalasController {
         let result = await Database_1.default.connection("oracle").rawQuery(query);
         response.json(result);
     }
-    async getList({ request, auth, response }) {
+    async getList({ request, response }) {
         let data = request.params().data;
-        let funcionario = await Funcionario_1.default.findBy("id_funcionario", auth.user?.id_funcionario);
         let query;
         let campos;
         let tipo;
@@ -62,7 +61,7 @@ class EscalasController {
                   left join globus.vw_funcionarios func on esc.cod_cobrador = func.CODINTFUNC
                   left  join globus.t_esc_localidade locm on esc.COD_PEG_MOT = locm.COD_LOCALIDADE
                   left  join globus.t_esc_localidade locc on esc.COD_PEG_COB = locc.COD_LOCALIDADE
-                  WHERE to_char(esc.dat_escala, 'YYYY-MM-DD') = '${data}' and :tipo = '23218'`;
+                  WHERE to_char(esc.dat_escala, 'YYYY-MM-DD') = '${data}' and :tipo = '21657'`;
         let result1 = await Database_1.default.connection("oracle").rawQuery(campos + query.replace(":tipo", tipo));
         campos = ` SELECT
       pre.prefixoveic AS prefixo,
