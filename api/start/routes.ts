@@ -58,9 +58,17 @@ Route.group(() => {
     Route.post("/create", "FuncionariosController.create").middleware("auth");
     Route.post("/getById", "FuncionariosController.getById").middleware("auth");
     Route.get("/getAll", "FuncionariosController.getAll").middleware("auth");
-    Route.get("/irpf/:ano", "FuncionariosController.getIrpf").middleware("auth");
-    Route.get("/irpf-avaiables", "FuncionariosController.irpfAvaiables").middleware("auth");
-    Route.get("/vacation-pdf/:competencia", "FuncionariosController.vacation").middleware("auth");
+    Route.get("/irpf/:ano", "FuncionariosController.getIrpf").middleware(
+      "auth"
+    );
+    Route.get(
+      "/irpf-avaiables",
+      "FuncionariosController.irpfAvaiables"
+    ).middleware("auth");
+    Route.get(
+      "/vacation-pdf/:competencia",
+      "FuncionariosController.vacation"
+    ).middleware("auth");
     Route.post("/add-area", "FuncionariosController.addArea").middleware(
       "auth"
     );
@@ -101,10 +109,19 @@ Route.group(() => {
       "/confirmVideo",
       "FuncionariosController.confirmarVideo"
     ).middleware("auth");
-    Route.get('/vacationNotice','FuncionariosController.avisoFerias').middleware('auth');
+    Route.get(
+      "/vacationNotice",
+      "FuncionariosController.avisoFerias"
+    ).middleware("auth");
     Route.get("/params", "FuncionariosController.getParams").middleware("auth");
   }).prefix("/employee");
 
+  //Rotas Funcionario 2
+  Route.group(() => {
+    Route.post("/dotCardPdf", "FuncionariosController.dotCardPdf").middleware(
+      "auth"
+    );
+  }).prefix("/employee2");
 
   //Rotas Veiculos
   Route.group(() => {
