@@ -255,6 +255,10 @@ export default class Receipts {
                                     ORDER BY BH_COMPETENCIA
                       `);
 
+      if(query.length === 0){
+        return response.badRequest({ error: "Nenhum dado de ficha ponto foi encontrado!" });
+      }
+
       let resumoFicha = [];
 
       try {
@@ -276,7 +280,7 @@ export default class Receipts {
           funcionario,
           `${data[1]}-${data[0]}`,
           resumoFicha,
-          funcao
+          funcao.funcao
         ),
         fichaPonto
       );

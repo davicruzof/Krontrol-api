@@ -225,6 +225,9 @@ class Receipts {
                                     AND DATA_MOVIMENTO BETWEEN to_date('${periodoInicial}','DD-MM-YYYY') and to_date('${periodoFinal}','DD-MM-YYYY')
                                     ORDER BY BH_COMPETENCIA
                       `);
+            if (query.length === 0) {
+                return response.badRequest({ error: "Nenhum dado de ficha ponto foi encontrado!" });
+            }
             let resumoFicha = [];
             try {
                 resumoFicha = await Database_1.default.connection("oracle").rawQuery(`
@@ -238,7 +241,7 @@ class Receipts {
             catch (error) {
                 resumoFicha = [];
             }
-            const pdfTemp = await this.generatePdf(this.tratarDadosDotCard(query, empresa, funcionario, `${data[1]}-${data[0]}`, resumoFicha, funcao), template_1.fichaPonto);
+            const pdfTemp = await this.generatePdf(this.tratarDadosDotCard(query, empresa, funcionario, `${data[1]}-${data[0]}`, resumoFicha, funcao.funcao), template_1.fichaPonto);
             if (!pdfTemp) {
                 return response.badRequest({ error: "Erro ao gerar pdf!" });
             }
