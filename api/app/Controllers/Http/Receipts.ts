@@ -179,7 +179,7 @@ export default class Receipts {
                                 and hol.TIPOFOLHA = 1
                                 order by hol.tipoeven desc,hol.desceven
                                 `);
-    return query.length > 0 ? query[0] : null;
+    return query.length > 0 ? query : null;
   }
 
   private tratarDadosEvents(dados, dados_empresa) {
@@ -416,7 +416,7 @@ export default class Receipts {
         return response.badRequest({ error: "Erro ao pegar empresa!" });
       }
 
-      payStub.registro = funcionario?.registro;
+      payStub[0].registro = funcionario?.registro;
 
       const pdfTemp = await this.generatePdf(
         this.tratarDadosEvents(payStub, empresa),
