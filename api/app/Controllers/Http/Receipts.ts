@@ -254,8 +254,6 @@ export default class Receipts {
                                     AND DATA_MOVIMENTO BETWEEN to_date('${periodoInicial}','DD-MM-YYYY') and to_date('${periodoFinal}','DD-MM-YYYY')
                                     ORDER BY BH_COMPETENCIA
                       `);
-
-      response.json({ error: query });
       
       if(query.length === 0){
         return response.badRequest({ error: "Nenhum dado de ficha ponto foi encontrado!" });
