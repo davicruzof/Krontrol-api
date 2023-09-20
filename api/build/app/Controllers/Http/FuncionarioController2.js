@@ -145,7 +145,6 @@ class FuncionariosController2 {
             const periodoFinal = `26-${data.reverse().join("-")}`;
             const competencia = new Date(data[0], data[1] - 1, 26);
             const liberacaoPdf = await this.isMonthFreedom(auth.user?.id_empresa, 1, data.reverse().join("-"));
-            console.log({ liberacaoPdf });
             if (!liberacaoPdf) {
                 return response.badRequest({
                     error: "Empresa não liberou para gerar o recibo",
@@ -160,25 +159,43 @@ class FuncionariosController2 {
                 return response.badRequest({ error: "app desatualizado" });
             }
             let query = await this.getFotCard(funcionario?.id_funcionario_erp, periodoInicial, periodoFinal);
+            if (!query?.rows) {
+                return response.badRequest({ error: "Erro ao pegar ficha ponto!" });
+            }
             let resumoFicha = await this.getResumeDotCard(funcionario?.id_funcionario_erp, competencia);
+            if (!resumoFicha) {
+                return response.badRequest({ error: "Erro ao pegar resumo!" });
+            }
             let empresa = await Empresa_1.default.findBy("id_empresa", auth.user?.id_empresa);
+            if (!empresa) {
+                return response.badRequest({ error: "Erro ao pegar empresa!" });
+            }
             const funcao = await this.getEmployeeFunction(auth.user?.id_empresa, funcionario.id_funcao_erp);
+            if (!funcao) {
+                return response.badRequest({ error: "Erro ao pegar função!" });
+            }
             let pdfTemp = await this.generatePdf(this.tratarDadosDotCard(query, empresa, funcionario, `${data[1]}-${data[0]}`, resumoFicha, funcao), template_1.fichaPonto);
+            if (!pdfTemp) {
+                return response.badRequest({ error: "Erro ao gerar pdf!" });
+            }
             let confirmacao = await ConfirmarPdf_1.default.query()
                 .select("*")
                 .where("id_funcionario", "=", `${funcionario?.id_funcionario}`)
                 .andWhere("data_pdf", "=", `${dados.data}`);
-            let file = await (0, S3_1.uploadPdfEmpresa)(pdfTemp.filename, auth.user?.id_empresa);
-            if (file) {
-                fs_1.default.unlink(pdfTemp.filename, () => { });
-                response.json({
-                    pdf: file.Location,
-                    confirmado: confirmacao[0] ? true : false,
-                });
+            if (!confirmacao) {
+                return response.badRequest({ error: "Erro ao aplicar confirmação!" });
             }
+            let file = await (0, S3_1.uploadPdfEmpresa)(pdfTemp.filename, auth.user?.id_empresa);
+            if (!file) {
+                return response.badRequest({ error: "Erro ao gerar url do pdf!" });
+            }
+            fs_1.default.unlink(pdfTemp.filename, () => { });
+            response.json({
+                pdf: file.Location,
+                confirmado: confirmacao[0] ? true : false,
+            });
         }
         catch (error) {
-            console.log(error);
             response.badRequest(error);
         }
     }
