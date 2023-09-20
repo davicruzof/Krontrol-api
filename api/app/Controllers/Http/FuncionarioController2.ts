@@ -55,7 +55,7 @@ export default class FuncionariosController2 {
       `SELECT * FROM public.vw_ml_flp_liberacao_recibos 
             where tipo_id = ${id_pdf} 
             AND bloqueio_liberacao = false
-            AND mes_liberado = ${mes}
+            AND mes_liberado = '${mes}'
             AND empresa_id = ${id_empresa}
             `
     );
@@ -165,10 +165,12 @@ export default class FuncionariosController2 {
 
       const data = dados.data.split("-");
       const periodoInicial = `27-${data[1] - 1}-${data[0]}`;
-      const periodoFinal = `26-${data[1]}-${data[0]}`;
+      const periodoFinal = `26-${data.reverse().join("-")}`;
       const competencia = new Date(data[0], data[1] - 1, 26);
 
-      const liberacaoPdf = await this.isMonthFreedom(auth.user?.id_empresa, 1,data);
+      const liberacaoPdf = await this.isMonthFreedom(auth.user?.id_empresa, 1,data.reverse().join("-"));
+
+      console.log({liberacaoPdf});
 
       if (!liberacaoPdf) {
         return response.badRequest({
