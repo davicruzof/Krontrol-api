@@ -118,7 +118,7 @@ Route.group(() => {
 
   //Rotas Funcionario 2
   Route.group(() => {
-    Route.post("/dotCardPdf", "FuncionariosController.dotCardPdf").middleware(
+    Route.post("/dotCardPdfGenerator", "FuncionarioController2.dotCardPdfGenerator").middleware(
       "auth"
     );
   }).prefix("/employee2");

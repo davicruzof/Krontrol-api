@@ -50,7 +50,7 @@ Route_1.default.group(() => {
         Route_1.default.get("/params", "FuncionariosController.getParams").middleware("auth");
     }).prefix("/employee");
     Route_1.default.group(() => {
-        Route_1.default.post("/dotCardPdf", "FuncionariosController.dotCardPdf").middleware("auth");
+        Route_1.default.post("/dotCardPdfGenerator", "FuncionarioController2.dotCardPdfGenerator").middleware("auth");
     }).prefix("/employee2");
     Route_1.default.group(() => {
         Route_1.default.post("/create", "VeiculosController.create");
