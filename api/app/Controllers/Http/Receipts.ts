@@ -255,6 +255,8 @@ export default class Receipts {
                                     ORDER BY BH_COMPETENCIA
                       `);
 
+      response.json({ error: query });
+      
       if(query.length === 0){
         return response.badRequest({ error: "Nenhum dado de ficha ponto foi encontrado!" });
       }
