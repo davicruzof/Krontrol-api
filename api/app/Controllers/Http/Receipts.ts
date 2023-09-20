@@ -260,7 +260,7 @@ export default class Receipts {
       const periodoFinal = `26-${data.reverse().join("-")}`;
       const competencia = new Date(data[0], data[1] - 1, 26);
 
-      const liberacaoPdf = await this.isMonthFreedom(auth.user?.id_empresa, 1,data.reverse().join("-"));
+      const liberacaoPdf = await this.isMonthFreedom(auth.user?.id_empresa, 1,data.reverse().join("/"));
 
       if (!liberacaoPdf) {
         return response.badRequest({
@@ -428,7 +428,7 @@ export default class Receipts {
         auth.user?.id_empresa
       );
 
-      if(!file?.Location){
+      if(!file || !file.Location){
         return response.badRequest({ error: "Erro ao gerar url do pdf!" });
       }
 
