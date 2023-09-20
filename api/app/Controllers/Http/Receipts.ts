@@ -428,13 +428,12 @@ export default class Receipts {
         auth.user?.id_empresa
       );
 
-      if(!file || !file.Location){
+      if (file) {
+        fs.unlink(pdfTemp.filename, () => {});
+        response.json({ pdf: file.Location });
+      }else{
         return response.badRequest({ error: "Erro ao gerar url do pdf!" });
       }
-
-      fs.unlink(pdfTemp.filename, () => {});
-      response.json({ pdf: file.Location });
-      
     } catch (error) {
       response.json(error);
     }
