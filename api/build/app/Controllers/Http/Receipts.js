@@ -74,32 +74,6 @@ class Receipts {
     `);
             return resumoFicha;
         };
-        this.getPayStub = async (competficha, id_funcionario_erp) => {
-            let query = await Database_1.default.connection("oracle").rawQuery(`
-                                    SELECT DISTINCT
-                                    to_char(competficha, 'MM-YYYY') as COMPETFICHA,
-                                    CODINTFUNC,
-                                    to_char(VALORFICHA, 'FM999G999G999D90', 'nls_numeric_characters='',.''') AS VALORFICHA,
-                                    REFERENCIA,
-                                    NOMEFUNC,
-                                    DESCEVEN,
-                                    RSOCIALEMPRESA,
-                                    INSCRICAOEMPRESA,
-                                    DESCFUNCAO,
-                                    CIDADEFL,
-                                    IESTADUALFL,
-                                    ENDERECOFL,
-                                    NUMEROENDFL,
-                                    COMPLENDFL,
-                                    TIPOEVEN
-                                    FROM  globus.vw_flp_fichaeventosrecibo hol
-                                WHERE
-                                hol.codintfunc = ${id_funcionario_erp} and to_char(competficha, 'YYYY-MM') = '${competficha}'
-                                and hol.TIPOFOLHA = 1
-                                order by hol.tipoeven desc,hol.desceven
-                                `);
-            return query;
-        };
     }
     async generatePdf(dados, template) {
         try {
@@ -316,7 +290,29 @@ class Receipts {
             if (!appUpdate) {
                 return response.badRequest({ error: "app desatualizado" });
             }
-            let payStub = await this.getPayStub(funcionario?.id_funcionario_erp, dados.data);
+            let payStub = await Database_1.default.connection("oracle").rawQuery(`
+                                    SELECT DISTINCT
+                                    to_char(competficha, 'MM-YYYY') as COMPETFICHA,
+                                    CODINTFUNC,
+                                    to_char(VALORFICHA, 'FM999G999G999D90', 'nls_numeric_characters='',.''') AS VALORFICHA,
+                                    REFERENCIA,
+                                    NOMEFUNC,
+                                    DESCEVEN,
+                                    RSOCIALEMPRESA,
+                                    INSCRICAOEMPRESA,
+                                    DESCFUNCAO,
+                                    CIDADEFL,
+                                    IESTADUALFL,
+                                    ENDERECOFL,
+                                    NUMEROENDFL,
+                                    COMPLENDFL,
+                                    TIPOEVEN
+                                    FROM  globus.vw_flp_fichaeventosrecibo hol
+                                WHERE
+                                hol.codintfunc = ${funcionario?.id_funcionario_erp} and to_char(competficha, 'YYYY-MM') = '${dados.data}'
+                                and hol.TIPOFOLHA = 1
+                                order by hol.tipoeven desc,hol.desceven
+                                `);
             const empresa = await Empresa_1.default.findBy("id_empresa", auth.user?.id_empresa);
             if (!empresa) {
                 return response.badRequest({ error: "Erro ao pegar empresa!" });
