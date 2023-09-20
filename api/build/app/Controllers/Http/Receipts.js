@@ -316,7 +316,7 @@ class Receipts {
             if (!appUpdate) {
                 return response.badRequest({ error: "app desatualizado" });
             }
-            const payStub = await this.getPayStub(funcionario.id_funcionario_erp, dados.data);
+            let payStub = await this.getPayStub(funcionario?.id_funcionario_erp, dados.data);
             const empresa = await Empresa_1.default.findBy("id_empresa", auth.user?.id_empresa);
             if (!empresa) {
                 return response.badRequest({ error: "Erro ao pegar empresa!" });

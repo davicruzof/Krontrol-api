@@ -404,7 +404,7 @@ export default class Receipts {
         return response.badRequest({ error: "app desatualizado" });
       }
 
-      const payStub = await this.getPayStub(funcionario.id_funcionario_erp, dados.data);
+      let payStub = await this.getPayStub(funcionario?.id_funcionario_erp, dados.data);
 
       const empresa = await Empresa.findBy("id_empresa", auth.user?.id_empresa);
 
