@@ -418,22 +418,8 @@ export default class Receipts {
 
       payStub.registro = funcionario?.registro;
 
-      const pdfTemp = await this.generatePdf(
-        this.tratarDadosEvents(payStub, empresa),
-        templateDotCard
-      );
+      return response.json({payStub});
 
-      const file = await uploadPdfEmpresa(
-        pdfTemp.filename,
-        auth.user?.id_empresa
-      );
-
-      if (file) {
-        fs.unlink(pdfTemp.filename, () => {});
-        response.json({ pdf: file.Location });
-      }else{
-        return response.badRequest({ error: "Erro ao gerar url do pdf!" });
-      }
     } catch (error) {
       response.json(error);
     }
