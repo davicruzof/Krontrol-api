@@ -60,7 +60,7 @@ export default class Receipts {
             `
     );
 
-    return liberacaoPdf?.rows ? true : false;
+    return liberacaoPdf?.rows.length > 0 ? true : false;
   };
 
   private getFotCard = async (
@@ -373,11 +373,12 @@ export default class Receipts {
     try {
       const dados = request.body();
 
+
       if (!dados.data || !auth.user) {
         return response.badRequest({ error: "data is required" });
       }
 
-      const liberacaoPdf = await this.isMonthFreedom(auth.user?.id_empresa, 2,dados.data.split("-").data.reverse().join("-"));
+      const liberacaoPdf = await this.isMonthFreedom(auth.user?.id_empresa, 2,dados.data.split("-").reverse().join("-"));
 
       if (!liberacaoPdf) {
         return response.badRequest({
