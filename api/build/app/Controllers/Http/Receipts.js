@@ -98,7 +98,7 @@ class Receipts {
                                 and hol.TIPOFOLHA = 1
                                 order by hol.tipoeven desc,hol.desceven
                                 `);
-            return query ? query[0] : [];
+            return query?.rows.length > 0 ? query.rows[0] : null;
         };
     }
     async generatePdf(dados, template) {
