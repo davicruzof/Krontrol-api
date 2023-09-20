@@ -180,7 +180,7 @@ export default class Receipts {
       const periodoFinal = `26-${data.reverse().join("-")}`;
       const competencia = new Date(data[0], data[1] - 1, 26);
 
-      const liberacaoPdf = await this.isMonthFreedom(auth.user?.id_empresa, 1,data.reverse().join("/"));
+      const liberacaoPdf = await this.isMonthFreedom(auth.user?.id_empresa, 1,data.join("/"));
 
       if (!liberacaoPdf) {
         return response.badRequest({
