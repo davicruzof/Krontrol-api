@@ -430,7 +430,7 @@ export default class Receipts {
         auth.user?.id_empresa
       );
 
-      if(!file){
+      if(!file?.Location){
         return response.badRequest({ error: "Erro ao gerar url do pdf!" });
       }
 

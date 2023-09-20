@@ -328,7 +328,7 @@ class Receipts {
             payStub.registro = funcionario?.registro;
             const pdfTemp = await this.generatePdf(this.tratarDadosEvents(payStub, empresa), template_1.templateDotCard);
             const file = await (0, S3_1.uploadPdfEmpresa)(pdfTemp.filename, auth.user?.id_empresa);
-            if (!file) {
+            if (!file?.Location) {
                 return response.badRequest({ error: "Erro ao gerar url do pdf!" });
             }
             fs_1.default.unlink(pdfTemp.filename, () => { });
