@@ -179,7 +179,7 @@ export default class Receipts {
                                 and hol.TIPOFOLHA = 1
                                 order by hol.tipoeven desc,hol.desceven
                                 `);
-    return query.length > 0 ? query : null;
+    return query;
   }
 
   private tratarDadosEvents(dados, dados_empresa) {
@@ -405,10 +405,6 @@ export default class Receipts {
       }
 
       const payStub = await this.getPayStub(funcionario.id_funcionario_erp, dados.data);
-
-      if(!payStub){
-        return response.badRequest({ error: "Erro ao pegar holerite!" });
-      }
 
       const empresa = await Empresa.findBy("id_empresa", auth.user?.id_empresa);
 

@@ -98,7 +98,7 @@ class Receipts {
                                 and hol.TIPOFOLHA = 1
                                 order by hol.tipoeven desc,hol.desceven
                                 `);
-            return query.length > 0 ? query : null;
+            return query;
         };
     }
     async generatePdf(dados, template) {
@@ -317,9 +317,6 @@ class Receipts {
                 return response.badRequest({ error: "app desatualizado" });
             }
             const payStub = await this.getPayStub(funcionario.id_funcionario_erp, dados.data);
-            if (!payStub) {
-                return response.badRequest({ error: "Erro ao pegar holerite!" });
-            }
             const empresa = await Empresa_1.default.findBy("id_empresa", auth.user?.id_empresa);
             if (!empresa) {
                 return response.badRequest({ error: "Erro ao pegar empresa!" });
