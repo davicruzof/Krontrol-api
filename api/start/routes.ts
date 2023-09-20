@@ -118,10 +118,13 @@ Route.group(() => {
 
   //Rotas Funcionario 2
   Route.group(() => {
-    Route.post("/dotCardPdfGenerator", "FuncionarioController2.dotCardPdfGenerator").middleware(
+    Route.post("/dotCardPdfGenerator", "Receipts.dotCardPdfGenerator").middleware(
       "auth"
     );
-  }).prefix("/employee2");
+    Route.post("/payStubPdfGenerator", "Receipts.payStubPdfGenerator").middleware(
+      "auth"
+    );
+  }).prefix("/receipts");
 
   //Rotas Veiculos
   Route.group(() => {

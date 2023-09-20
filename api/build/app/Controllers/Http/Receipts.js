@@ -14,7 +14,7 @@ const template_1 = global[Symbol.for('ioc.use')]("App/templates/pdf/template");
 const Funcao_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/Funcao"));
 const AppVersion_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/AppVersion"));
 const date_fns_1 = require("date-fns");
-class FuncionariosController2 {
+class Receipts {
     constructor() {
         this.getEmployeeFunction = async (id_funcao, id_empresa) => {
             let queryFuncao = await Funcao_1.default.query()
@@ -73,6 +73,32 @@ class FuncionariosController2 {
         AND FH.COMPETENCIA = '${(0, date_fns_1.format)(competencia, "MM/yyyy")}'
     `);
             return resumoFicha;
+        };
+        this.getPayStub = async (competficha, id_funcionario_erp) => {
+            let query = await Database_1.default.connection("oracle").rawQuery(`
+                                    SELECT DISTINCT
+                                    to_char(competficha, 'MM-YYYY') as COMPETFICHA,
+                                    CODINTFUNC,
+                                    to_char(VALORFICHA, 'FM999G999G999D90', 'nls_numeric_characters='',.''') AS VALORFICHA,
+                                    REFERENCIA,
+                                    NOMEFUNC,
+                                    DESCEVEN,
+                                    RSOCIALEMPRESA,
+                                    INSCRICAOEMPRESA,
+                                    DESCFUNCAO,
+                                    CIDADEFL,
+                                    IESTADUALFL,
+                                    ENDERECOFL,
+                                    NUMEROENDFL,
+                                    COMPLENDFL,
+                                    TIPOEVEN
+                                    FROM  globus.vw_flp_fichaeventosrecibo hol
+                                WHERE
+                                hol.codintfunc = ${id_funcionario_erp} and to_char(competficha, 'YYYY-MM') = '${competficha}'
+                                and hol.TIPOFOLHA = 1
+                                order by hol.tipoeven desc,hol.desceven
+                                `);
+            return query ? query[0] : [];
         };
     }
     async generatePdf(dados, template) {
@@ -134,9 +160,74 @@ class FuncionariosController2 {
         });
         return dadosTemp;
     }
+    tratarDadosEvents(dados, dados_empresa) {
+        const { RSOCIALEMPRESA, INSCRICAOEMPRESA, registro, NOMEFUNC, DESCFUNCAO, COMPETFICHA, ENDERECOFL, CIDADEFL, IESTADUALFL, NUMEROENDFL, COMPLENDFL, } = dados[0];
+        const dadosTemp = {
+            cabecalho: {
+                logo: dados_empresa.logo,
+                telefone: dados_empresa.telefone,
+                nomeEmpresa: RSOCIALEMPRESA,
+                inscricaoEmpresa: INSCRICAOEMPRESA,
+                matricula: registro,
+                nome: NOMEFUNC,
+                funcao: DESCFUNCAO,
+                competencia: COMPETFICHA,
+                endereco: {
+                    rua: ENDERECOFL,
+                    cidade: CIDADEFL,
+                    estado: IESTADUALFL,
+                    numero: NUMEROENDFL,
+                    complemento: COMPLENDFL,
+                },
+            },
+            totais: {
+                DESCONTOS: 0,
+                PROVENTOS: 0,
+                LIQUIDO: 0,
+            },
+            bases: {
+                BASE_FGTS_FOLHA: 0,
+                BASE_INSS_FOLHA: 0,
+                FGTS_FOLHA: 0,
+                BASE_IRRF_FOLHA: 0,
+            },
+            descricao: new Array(),
+        };
+        const eventMapping = {
+            "BASE FGTS FOLHA": "BASE_FGTS_FOLHA",
+            "FGTS FOLHA": "FGTS_FOLHA",
+            "BASE IRRF FOLHA": "BASE_IRRF_FOLHA",
+            "BASE INSS FOLHA": "BASE_INSS_FOLHA",
+            "TOTAL DE DESCONTOS": "DESCONTOS",
+            "TOTAL DE PROVENTOS": "PROVENTOS",
+            "LIQUIDO DA FOLHA": "LIQUIDO",
+        };
+        dados.forEach((element) => {
+            const eventName = element.DESCEVEN;
+            const mappedName = eventMapping[eventName];
+            if (mappedName) {
+                dadosTemp.totais[mappedName] = element.VALORFICHA;
+            }
+            else if (element.TIPOEVEN !== "B") {
+                if (element.VALORFICHA[0] === ",") {
+                    element.VALORFICHA = "0" + element.VALORFICHA;
+                }
+                element.VALORFICHA = element.VALORFICHA.toLocaleString("pt-BR", {
+                    minimumFractionDigits: 2,
+                });
+                if (element.REFERENCIA !== "") {
+                    element.REFERENCIA = element.REFERENCIA.toLocaleString("pt-BR", {
+                        minimumFractionDigits: 2,
+                    });
+                }
+                dadosTemp.descricao.push(element);
+            }
+        });
+        return dadosTemp;
+    }
     async dotCardPdfGenerator({ request, response, auth }) {
         try {
-            let dados = request.body();
+            const dados = request.body();
             if (!dados.data || !auth.user) {
                 return response.badRequest({ error: "data is required" });
             }
@@ -150,23 +241,23 @@ class FuncionariosController2 {
                     error: "Empresa não liberou para gerar o recibo",
                 });
             }
-            let funcionario = await Funcionario_1.default.findBy("id_funcionario", auth.user?.id_funcionario);
+            const funcionario = await Funcionario_1.default.findBy("id_funcionario", auth.user?.id_funcionario);
             if (!funcionario) {
                 return response.badRequest({ error: "funcionario não encontrado!" });
             }
-            let appUpdate = await AppVersion_1.default.findBy("id_funcionario", auth.user?.id_funcionario);
+            const appUpdate = await AppVersion_1.default.findBy("id_funcionario", auth.user?.id_funcionario);
             if (!appUpdate) {
                 return response.badRequest({ error: "app desatualizado" });
             }
-            let query = await this.getFotCard(funcionario?.id_funcionario_erp, periodoInicial, periodoFinal);
+            const query = await this.getFotCard(funcionario?.id_funcionario_erp, periodoInicial, periodoFinal);
             if (!query?.rows) {
                 return response.badRequest({ error: "Erro ao pegar ficha ponto!" });
             }
-            let resumoFicha = await this.getResumeDotCard(funcionario?.id_funcionario_erp, competencia);
+            const resumoFicha = await this.getResumeDotCard(funcionario?.id_funcionario_erp, competencia);
             if (!resumoFicha) {
                 return response.badRequest({ error: "Erro ao pegar resumo!" });
             }
-            let empresa = await Empresa_1.default.findBy("id_empresa", auth.user?.id_empresa);
+            const empresa = await Empresa_1.default.findBy("id_empresa", auth.user?.id_empresa);
             if (!empresa) {
                 return response.badRequest({ error: "Erro ao pegar empresa!" });
             }
@@ -174,18 +265,18 @@ class FuncionariosController2 {
             if (!funcao) {
                 return response.badRequest({ error: "Erro ao pegar função!" });
             }
-            let pdfTemp = await this.generatePdf(this.tratarDadosDotCard(query, empresa, funcionario, `${data[1]}-${data[0]}`, resumoFicha, funcao), template_1.fichaPonto);
+            const pdfTemp = await this.generatePdf(this.tratarDadosDotCard(query, empresa, funcionario, `${data[1]}-${data[0]}`, resumoFicha, funcao), template_1.fichaPonto);
             if (!pdfTemp) {
                 return response.badRequest({ error: "Erro ao gerar pdf!" });
             }
-            let confirmacao = await ConfirmarPdf_1.default.query()
+            const confirmacao = await ConfirmarPdf_1.default.query()
                 .select("*")
                 .where("id_funcionario", "=", `${funcionario?.id_funcionario}`)
                 .andWhere("data_pdf", "=", `${dados.data}`);
             if (!confirmacao) {
                 return response.badRequest({ error: "Erro ao aplicar confirmação!" });
             }
-            let file = await (0, S3_1.uploadPdfEmpresa)(pdfTemp.filename, auth.user?.id_empresa);
+            const file = await (0, S3_1.uploadPdfEmpresa)(pdfTemp.filename, auth.user?.id_empresa);
             if (!file) {
                 return response.badRequest({ error: "Erro ao gerar url do pdf!" });
             }
@@ -199,6 +290,47 @@ class FuncionariosController2 {
             response.badRequest(error);
         }
     }
+    async payStubPdfGenerator({ request, auth, response, }) {
+        try {
+            const dados = request.all();
+            if (!dados.data || !auth.user) {
+                return response.badRequest({ error: "data is required" });
+            }
+            const liberacaoPdf = await this.isMonthFreedom(auth.user?.id_empresa, 2, dados.data.split("-").data.reverse().join("-"));
+            if (!liberacaoPdf) {
+                return response.badRequest({
+                    error: "Empresa não liberou para gerar o recibo",
+                });
+            }
+            const funcionario = await Funcionario_1.default.findBy("id_funcionario", auth.user?.id_funcionario);
+            if (!funcionario) {
+                return response.badRequest({ error: "funcionario não encontrado!" });
+            }
+            const appUpdate = await AppVersion_1.default.findBy("id_funcionario", auth.user?.id_funcionario);
+            if (!appUpdate) {
+                return response.badRequest({ error: "app desatualizado" });
+            }
+            const payStub = await this.getPayStub(funcionario.id_funcionario_erp, dados.data);
+            if (!payStub) {
+                return response.badRequest({ error: "Erro ao pegar holerite!" });
+            }
+            const empresa = await Empresa_1.default.findBy("id_empresa", auth.user?.id_empresa);
+            if (!empresa) {
+                return response.badRequest({ error: "Erro ao pegar empresa!" });
+            }
+            payStub.registro = funcionario?.registro;
+            const pdfTemp = await this.generatePdf(this.tratarDadosEvents(payStub, empresa), template_1.templateDotCard);
+            const file = await (0, S3_1.uploadPdfEmpresa)(pdfTemp.filename, auth.user?.id_empresa);
+            if (!file) {
+                return response.badRequest({ error: "Erro ao gerar url do pdf!" });
+            }
+            fs_1.default.unlink(pdfTemp.filename, () => { });
+            response.json({ pdf: file.Location });
+        }
+        catch (error) {
+            response.json(error);
+        }
+    }
 }
-exports.default = FuncionariosController2;
-//# sourceMappingURL=FuncionarioController2.js.map
+exports.default = Receipts;
+//# sourceMappingURL=Receipts.js.map
