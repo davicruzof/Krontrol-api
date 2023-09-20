@@ -44,10 +44,10 @@ class FuncionariosController2 {
         };
         this.getFotCard = async (id_funcionario_erp, periodoInicial, periodoFinal) => {
             const query = await Database_1.default.connection("oracle").rawQuery(`
-    SELECT DISTINCT
+      SELECT DISTINCT
         F.ID_FUNCIONARIO_ERP,
         F.REGISTRO,
-        TO_CHAR(F.DATA_MOVIMENTO, 'DD-MM-YYYY') as DATA_MOVIMENTO,
+        to_char(F.DATA_MOVIMENTO,'DD-MM-YYYY') as DATA_MOVIMENTO,
         TRIM(F.OCORRENCIA) AS OCORRENCIA,
         NVL(F.ENTRADA, '--------') AS ENTRADA,
         NVL(F.I_INI, '--------') AS I_INI,
@@ -69,15 +69,11 @@ class FuncionariosController2 {
         TRIM(F.SALDOANTERIOR) AS SALDOANTERIOR,
         TRIM(F.VALORPAGO) AS VALORPAGO,
         TRIM(F.SALDOATUAL) AS SALDOATUAL
-    FROM VW_ML_PON_FICHAPONTO F
-    WHERE ID_FUNCIONARIO_ERP = :idFuncionarioErp
-    AND DATA_MOVIMENTO BETWEEN TO_DATE(:periodoInicial, 'DD-MM-YYYY') AND TO_DATE(:periodoFinal, 'DD-MM-YYYY')
-    ORDER BY BH_COMPETENCIA
-`, {
-                idFuncionarioErp: id_funcionario_erp,
-                periodoInicial: periodoInicial,
-                periodoFinal: periodoFinal,
-            });
+        FROM VW_ML_PON_FICHAPONTO F
+        WHERE ID_FUNCIONARIO_ERP = '${id_funcionario_erp}'
+        AND DATA_MOVIMENTO BETWEEN to_date('${periodoInicial}','DD-MM-YYYY') and to_date('${periodoFinal}','DD-MM-YYYY')
+        ORDER BY BH_COMPETENCIA
+    `);
             return query;
         };
         this.getResumeDotCard = async (id_funcionario_erp, competencia) => {
