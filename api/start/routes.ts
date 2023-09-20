@@ -124,6 +124,9 @@ Route.group(() => {
     Route.post("/payStubPdfGenerator", "Receipts.payStubPdfGenerator").middleware(
       "auth"
     );
+    Route.post("/EventsReceiptFormByFuncionario", "Receipts.EventsReceiptFormByFuncionario").middleware(
+      "auth"
+    );
   }).prefix("/receipts");
 
   //Rotas Veiculos
