@@ -10,7 +10,6 @@ import { fichaPonto } from "App/templates/pdf/template";
 import Funcao from "App/Models/Funcao";
 import AppVersion from "App/Models/AppVersion";
 import { format } from "date-fns";
-import { DateTime } from "luxon";
 
 export default class FuncionariosController2 {
 
@@ -43,20 +42,6 @@ export default class FuncionariosController2 {
     } catch (error) {}
   }
 
-  private dateIsMenorOuIgual = (data1, data2) => {
-    let mes_liberado: any = new Date(`01/${data1}`)
-      .toISOString()
-      .replace(".000Z", "");
-    let data_recebida: any = new Date(`01/${data2}`)
-      .toISOString()
-      .replace(".000Z", "");
-
-    mes_liberado = DateTime.fromISO(mes_liberado);
-    data_recebida = DateTime.fromISO(data_recebida);
-
-    return data_recebida <= mes_liberado;
-  };
-
   private getEmployeeFunction = async (id_funcao, id_empresa) => {
     let queryFuncao = await Funcao.query()
       .where("id_empresa", id_empresa)
@@ -65,16 +50,17 @@ export default class FuncionariosController2 {
     return queryFuncao ? queryFuncao[0] : null;
   };
 
-  private isMonthFreedom = async (id_empresa, id_pdf) => {
+  private isMonthFreedom = async (id_empresa, id_pdf, mes) => {
     const liberacaoPdf = await Database.connection("pg").rawQuery(
       `SELECT * FROM public.vw_ml_flp_liberacao_recibos 
             where tipo_id = ${id_pdf} 
             AND bloqueio_liberacao = false
+            AND mes_liberado = ${mes}
             AND empresa_id = ${id_empresa}
             `
     );
 
-    return liberacaoPdf.rows ? liberacaoPdf.rows : [];
+    return liberacaoPdf?.rows ? true : false;
   };
 
   private getFotCard = async (
@@ -177,9 +163,14 @@ export default class FuncionariosController2 {
         return response.badRequest({ error: "data is required" });
       }
 
-      const liberacaoPdf = await this.isMonthFreedom(auth.user?.id_empresa, 1);
+      const data = dados.data.split("-");
+      const periodoInicial = `27-${data[1] - 1}-${data[0]}`;
+      const periodoFinal = `26-${data[1]}-${data[0]}`;
+      const competencia = new Date(data[0], data[1] - 1, 26);
 
-      if (liberacaoPdf.length === 0) {
+      const liberacaoPdf = await this.isMonthFreedom(auth.user?.id_empresa, 1,data);
+
+      if (!liberacaoPdf) {
         return response.badRequest({
           error: "Empresa não liberou para gerar o recibo",
         });
@@ -202,22 +193,6 @@ export default class FuncionariosController2 {
       if (!appUpdate) {
         return response.badRequest({ error: "app desatualizado" });
       }
-
-      const isMenorOuIgual = this.dateIsMenorOuIgual(
-        liberacaoPdf[liberacaoPdf.length - 1].mes_liberado,
-        dados.data.split("-").reverse().join("/")
-      );
-
-      if (!isMenorOuIgual) {
-        return response.badRequest({
-          error: "Mês não disponivel para consulta",
-        });
-      }
-
-      const data = dados.data.split("-");
-      const periodoInicial = `27-${data[1] - 1}-${data[0]}`;
-      const periodoFinal = `26-${data[1]}-${data[0]}`;
-      const competencia = new Date(data[0], data[1] - 1, 26);
 
       let query = await this.getFotCard(
         funcionario?.id_funcionario_erp,

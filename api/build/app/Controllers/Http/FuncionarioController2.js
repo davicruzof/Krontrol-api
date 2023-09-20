@@ -14,33 +14,22 @@ const template_1 = global[Symbol.for('ioc.use')]("App/templates/pdf/template");
 const Funcao_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/Funcao"));
 const AppVersion_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/AppVersion"));
 const date_fns_1 = require("date-fns");
-const luxon_1 = require("luxon");
 class FuncionariosController2 {
     constructor() {
-        this.dateIsMenorOuIgual = (data1, data2) => {
-            let mes_liberado = new Date(`01/${data1}`)
-                .toISOString()
-                .replace(".000Z", "");
-            let data_recebida = new Date(`01/${data2}`)
-                .toISOString()
-                .replace(".000Z", "");
-            mes_liberado = luxon_1.DateTime.fromISO(mes_liberado);
-            data_recebida = luxon_1.DateTime.fromISO(data_recebida);
-            return data_recebida <= mes_liberado;
-        };
         this.getEmployeeFunction = async (id_funcao, id_empresa) => {
             let queryFuncao = await Funcao_1.default.query()
                 .where("id_empresa", id_empresa)
                 .where("id_funcao_erp", id_funcao);
             return queryFuncao ? queryFuncao[0] : null;
         };
-        this.isMonthFreedom = async (id_empresa, id_pdf) => {
+        this.isMonthFreedom = async (id_empresa, id_pdf, mes) => {
             const liberacaoPdf = await Database_1.default.connection("pg").rawQuery(`SELECT * FROM public.vw_ml_flp_liberacao_recibos 
             where tipo_id = ${id_pdf} 
             AND bloqueio_liberacao = false
+            AND mes_liberado = ${mes}
             AND empresa_id = ${id_empresa}
             `);
-            return liberacaoPdf.rows ? liberacaoPdf.rows : [];
+            return liberacaoPdf?.rows ? true : false;
         };
         this.getFotCard = async (id_funcionario_erp, periodoInicial, periodoFinal) => {
             const query = await Database_1.default.connection("oracle").rawQuery(`
@@ -151,8 +140,12 @@ class FuncionariosController2 {
             if (!dados.data || !auth.user) {
                 return response.badRequest({ error: "data is required" });
             }
-            const liberacaoPdf = await this.isMonthFreedom(auth.user?.id_empresa, 1);
-            if (liberacaoPdf.length === 0) {
+            const data = dados.data.split("-");
+            const periodoInicial = `27-${data[1] - 1}-${data[0]}`;
+            const periodoFinal = `26-${data[1]}-${data[0]}`;
+            const competencia = new Date(data[0], data[1] - 1, 26);
+            const liberacaoPdf = await this.isMonthFreedom(auth.user?.id_empresa, 1, data);
+            if (!liberacaoPdf) {
                 return response.badRequest({
                     error: "Empresa não liberou para gerar o recibo",
                 });
@@ -165,16 +158,6 @@ class FuncionariosController2 {
             if (!appUpdate) {
                 return response.badRequest({ error: "app desatualizado" });
             }
-            const isMenorOuIgual = this.dateIsMenorOuIgual(liberacaoPdf[liberacaoPdf.length - 1].mes_liberado, dados.data.split("-").reverse().join("/"));
-            if (!isMenorOuIgual) {
-                return response.badRequest({
-                    error: "Mês não disponivel para consulta",
-                });
-            }
-            const data = dados.data.split("-");
-            const periodoInicial = `27-${data[1] - 1}-${data[0]}`;
-            const periodoFinal = `26-${data[1]}-${data[0]}`;
-            const competencia = new Date(data[0], data[1] - 1, 26);
             let query = await this.getFotCard(funcionario?.id_funcionario_erp, periodoInicial, periodoFinal);
             let resumoFicha = await this.getResumeDotCard(funcionario?.id_funcionario_erp, competencia);
             let empresa = await Empresa_1.default.findBy("id_empresa", auth.user?.id_empresa);
