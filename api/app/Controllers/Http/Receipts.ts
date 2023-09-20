@@ -179,7 +179,7 @@ export default class Receipts {
                                 and hol.TIPOFOLHA = 1
                                 order by hol.tipoeven desc,hol.desceven
                                 `);
-    return query?.rows.length > 0 ? query.rows[0] : null;
+    return query.length > 0 ? query[0] : null;
   }
 
   private tratarDadosEvents(dados, dados_empresa) {
@@ -418,8 +418,23 @@ export default class Receipts {
 
       payStub.registro = funcionario?.registro;
 
-      return response.json({payStub});
+      const pdfTemp = await this.generatePdf(
+        this.tratarDadosEvents(payStub, empresa),
+        templateDotCard
+      );
 
+      const file = await uploadPdfEmpresa(
+        pdfTemp.filename,
+        auth.user?.id_empresa
+      );
+
+      if(!file || !file.Location){
+        return response.badRequest({ error: "Erro ao gerar url do pdf!" });
+      }
+
+      fs.unlink(pdfTemp.filename, () => {});
+      response.json({ pdf: file.Location });
+      
     } catch (error) {
       response.json(error);
     }
