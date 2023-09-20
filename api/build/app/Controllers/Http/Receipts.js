@@ -31,49 +31,6 @@ class Receipts {
             `);
             return liberacaoPdf?.rows.length > 0 ? true : false;
         };
-        this.getFotCard = async (id_funcionario_erp, periodoInicial, periodoFinal) => {
-            const query = await Database_1.default.connection("oracle").rawQuery(`
-        SELECT DISTINCT
-        F.ID_FUNCIONARIO_ERP,
-        F.REGISTRO,
-        to_char(F.DATA_MOVIMENTO,'DD-MM-YYYY') as DATA_MOVIMENTO,
-        TRIM(F.OCORRENCIA) AS OCORRENCIA,
-        NVL(F.ENTRADA, '--------') AS ENTRADA,
-        NVL(F.I_INI, '--------') AS I_INI,
-        NVL(F.I_FIM, '--------') AS I_FIM,
-        NVL(F.SAIDA, '--------') AS SAIDA,
-        NVL(F.TABELA, '--------') AS TABELA,
-        F.CODOCORR,
-        NVL(F.NORMAL, '--------') AS NORMAL,
-        NVL(F.EXTRA, '--------') AS EXTRA,
-        NVL(F.OUTRA, '--------') AS OUTRA,
-        NVL(F.A_NOT, '--------') AS A_NOT,
-        NVL(F.BD_DEBITO, '--------') AS BD_DEBITO,
-        NVL(F.BH_CREDITO, '--------') AS BH_CREDITO,
-        TRIM(F.EXTRANOTDM) AS EXTRANOTDM,
-        TRIM(F.TOTAL) AS TOTALF,
-        F.BH_COMPETENCIA,
-        TRIM(F.CREDITO) AS CREDITO,
-        TRIM(F.DEBITO) AS DEBITO,
-        TRIM(F.SALDOANTERIOR) AS SALDOANTERIOR,
-        TRIM(F.VALORPAGO) AS VALORPAGO,
-        TRIM(F.SALDOATUAL) AS SALDOATUAL
-        FROM VW_ML_PON_FICHAPONTO F
-        WHERE ID_FUNCIONARIO_ERP = '${id_funcionario_erp}'
-        AND DATA_MOVIMENTO BETWEEN to_date('${periodoInicial}','DD-MM-YYYY') and to_date('${periodoFinal}','DD-MM-YYYY')
-        ORDER BY BH_COMPETENCIA
-    `);
-            return query;
-        };
-        this.getResumeDotCard = async (id_funcionario_erp, competencia) => {
-            const resumoFicha = await Database_1.default.connection("oracle").rawQuery(`
-        SELECT DISTINCT EVENTO, TRIM(HR_DIA) as HR_DIA
-        FROM VW_ML_PON_RESUMO_HOLERITE FH
-        WHERE FH.ID_FUNCIONARIO_ERP = '${id_funcionario_erp}'
-        AND FH.COMPETENCIA = '${(0, date_fns_1.format)(competencia, "MM/yyyy")}'
-    `);
-            return resumoFicha;
-        };
     }
     async generatePdf(dados, template) {
         try {
@@ -229,13 +186,49 @@ class Receipts {
             if (!appUpdate) {
                 return response.badRequest({ error: "app desatualizado" });
             }
-            const query = await this.getFotCard(funcionario?.id_funcionario_erp, periodoInicial, periodoFinal);
-            if (!query?.rows) {
-                return response.badRequest({ error: "Erro ao pegar ficha ponto!" });
+            const query = await Database_1.default.connection("oracle").rawQuery(`
+                                    SELECT DISTINCT
+                                    F.ID_FUNCIONARIO_ERP,
+                                    F.REGISTRO,
+                                    to_char(F.DATA_MOVIMENTO,'DD-MM-YYYY') as DATA_MOVIMENTO,
+                                    TRIM(F.OCORRENCIA) AS OCORRENCIA,
+                                    NVL(F.ENTRADA, '--------') AS ENTRADA,
+                                    NVL(F.I_INI, '--------') AS I_INI,
+                                    NVL(F.I_FIM, '--------') AS I_FIM,
+                                    NVL(F.SAIDA, '--------') AS SAIDA,
+                                    NVL(F.TABELA, '--------') AS TABELA,
+                                    F.CODOCORR,
+                                    NVL(F.NORMAL, '--------') AS NORMAL,
+                                    NVL(F.EXTRA, '--------') AS EXTRA,
+                                    NVL(F.OUTRA, '--------') AS OUTRA,
+                                    NVL(F.A_NOT, '--------') AS A_NOT,
+                                    NVL(F.BD_DEBITO, '--------') AS BD_DEBITO,
+                                    NVL(F.BH_CREDITO, '--------') AS BH_CREDITO,
+                                    TRIM(F.EXTRANOTDM) AS EXTRANOTDM,
+                                    TRIM(F.TOTAL) AS TOTALF,
+                                    F.BH_COMPETENCIA,
+                                    TRIM(F.CREDITO) AS CREDITO,
+                                    TRIM(F.DEBITO) AS DEBITO,
+                                    TRIM(F.SALDOANTERIOR) AS SALDOANTERIOR,
+                                    TRIM(F.VALORPAGO) AS VALORPAGO,
+                                    TRIM(F.SALDOATUAL) AS SALDOATUAL
+                                    FROM VW_ML_PON_FICHAPONTO F
+                                    WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
+                                    AND DATA_MOVIMENTO BETWEEN to_date('${periodoInicial}','DD-MM-YYYY') and to_date('${periodoFinal}','DD-MM-YYYY')
+                                    ORDER BY BH_COMPETENCIA
+                      `);
+            let resumoFicha = [];
+            try {
+                resumoFicha = await Database_1.default.connection("oracle").rawQuery(`
+          SELECT DISTINCT EVENTO, TRIM(HR_DIA) as HR_DIA
+          FROM
+            VW_ML_PON_RESUMO_HOLERITE FH
+          WHERE FH.ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
+          AND FH.COMPETENCIA = '${(0, date_fns_1.format)(competencia, "MM/yyyy")}'
+        `);
             }
-            const resumoFicha = await this.getResumeDotCard(funcionario?.id_funcionario_erp, competencia);
-            if (!resumoFicha) {
-                return response.badRequest({ error: "Erro ao pegar resumo!" });
+            catch (error) {
+                resumoFicha = [];
             }
             const empresa = await Empresa_1.default.findBy("id_empresa", auth.user?.id_empresa);
             if (!empresa) {
@@ -325,61 +318,6 @@ class Receipts {
             }
             fs_1.default.unlink(pdfTemp.filename, () => { });
             response.json({ pdf: file.Location });
-        }
-        catch (error) {
-            response.json(error);
-        }
-    }
-    async EventsReceiptFormByFuncionario({ request, auth, response, }) {
-        try {
-            let dados = request.all();
-            if (dados.data) {
-                let funcionario = await Funcionario_1.default.findBy("id_funcionario", auth.user?.id_funcionario);
-                let appUpdate = await AppVersion_1.default.findBy("id_funcionario", auth.user?.id_funcionario);
-                if (!appUpdate) {
-                    return response.badRequest({ error: "app desatualizado" });
-                }
-                const liberacaoPdf = await this.isMonthFreedom(auth.user?.id_empresa, 2, dados.data.split("-").reverse().join("/"));
-                if (!liberacaoPdf) {
-                    return response.badRequest({
-                        error: "Empresa não liberou para gerar o recibo",
-                    });
-                }
-                let query = await Database_1.default.connection("oracle").rawQuery(`
-                                    SELECT DISTINCT
-                                    to_char(competficha, 'MM-YYYY') as COMPETFICHA,
-                                    CODINTFUNC,
-                                    to_char(VALORFICHA, 'FM999G999G999D90', 'nls_numeric_characters='',.''') AS VALORFICHA,
-                                    REFERENCIA,
-                                    NOMEFUNC,
-                                    DESCEVEN,
-                                    RSOCIALEMPRESA,
-                                    INSCRICAOEMPRESA,
-                                    DESCFUNCAO,
-                                    CIDADEFL,
-                                    IESTADUALFL,
-                                    ENDERECOFL,
-                                    NUMEROENDFL,
-                                    COMPLENDFL,
-                                    TIPOEVEN
-                                    FROM  globus.vw_flp_fichaeventosrecibo hol
-                                WHERE
-                                hol.codintfunc = ${funcionario?.id_funcionario_erp} and to_char(competficha, 'YYYY-MM') = '${dados.data}'
-                                and hol.TIPOFOLHA = 1
-                                order by hol.tipoeven desc,hol.desceven
-                                `);
-                let empresa = await Empresa_1.default.findBy("id_empresa", auth.user?.id_empresa);
-                query[0].registro = funcionario?.registro;
-                let pdfTemp = await this.generatePdf(this.tratarDadosEvents(query, empresa), template_1.templateDotCard);
-                let file = await (0, S3_1.uploadPdfEmpresa)(pdfTemp.filename, auth.user?.id_empresa);
-                if (file) {
-                    fs_1.default.unlink(pdfTemp.filename, () => { });
-                    response.json({ pdf: file.Location });
-                }
-            }
-            else {
-                response.badRequest({ error: "data is required" });
-            }
         }
         catch (error) {
             response.json(error);
