@@ -44,7 +44,7 @@ class FuncionariosController2 {
         };
         this.getFotCard = async (id_funcionario_erp, periodoInicial, periodoFinal) => {
             const query = await Database_1.default.connection("oracle").rawQuery(`
-      SELECT DISTINCT
+        SELECT DISTINCT
         F.ID_FUNCIONARIO_ERP,
         F.REGISTRO,
         to_char(F.DATA_MOVIMENTO,'DD-MM-YYYY') as DATA_MOVIMENTO,
@@ -80,12 +80,9 @@ class FuncionariosController2 {
             const resumoFicha = await Database_1.default.connection("oracle").rawQuery(`
         SELECT DISTINCT EVENTO, TRIM(HR_DIA) as HR_DIA
         FROM VW_ML_PON_RESUMO_HOLERITE FH
-        WHERE FH.ID_FUNCIONARIO_ERP = :idFuncionarioErp
-        AND FH.COMPETENCIA = :competencia
-    `, {
-                idFuncionarioErp: id_funcionario_erp,
-                competencia: (0, date_fns_1.format)(competencia, "MM/yyyy"),
-            });
+        WHERE FH.ID_FUNCIONARIO_ERP = '${id_funcionario_erp}'
+        AND FH.COMPETENCIA = '${(0, date_fns_1.format)(competencia, "MM/yyyy")}'
+    `);
             return resumoFicha;
         };
     }

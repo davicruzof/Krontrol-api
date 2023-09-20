@@ -84,7 +84,7 @@ export default class FuncionariosController2 {
   ) => {
     const query = await Database.connection("oracle").rawQuery(
       `
-      SELECT DISTINCT
+        SELECT DISTINCT
         F.ID_FUNCIONARIO_ERP,
         F.REGISTRO,
         to_char(F.DATA_MOVIMENTO,'DD-MM-YYYY') as DATA_MOVIMENTO,
@@ -123,14 +123,9 @@ export default class FuncionariosController2 {
       `
         SELECT DISTINCT EVENTO, TRIM(HR_DIA) as HR_DIA
         FROM VW_ML_PON_RESUMO_HOLERITE FH
-        WHERE FH.ID_FUNCIONARIO_ERP = :idFuncionarioErp
-        AND FH.COMPETENCIA = :competencia
-    `,
-      {
-        idFuncionarioErp: id_funcionario_erp,
-        competencia: format(competencia, "MM/yyyy"),
-      }
-    );
+        WHERE FH.ID_FUNCIONARIO_ERP = '${id_funcionario_erp}'
+        AND FH.COMPETENCIA = '${format(competencia, "MM/yyyy")}'
+    `);
 
     return resumoFicha;
   };
