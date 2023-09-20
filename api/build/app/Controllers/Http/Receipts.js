@@ -186,6 +186,14 @@ class Receipts {
             if (!appUpdate) {
                 return response.badRequest({ error: "app desatualizado" });
             }
+            const empresa = await Empresa_1.default.findBy("id_empresa", auth.user?.id_empresa);
+            if (!empresa) {
+                return response.badRequest({ error: "Erro ao pegar empresa!" });
+            }
+            const funcao = await this.getEmployeeFunction(funcionario.id_funcao_erp, auth.user?.id_empresa);
+            if (!funcao) {
+                return response.badRequest({ error: "Erro ao pegar função!" });
+            }
             const query = await Database_1.default.connection("oracle").rawQuery(`
                                     SELECT DISTINCT
                                     F.ID_FUNCIONARIO_ERP,
@@ -229,14 +237,6 @@ class Receipts {
             }
             catch (error) {
                 resumoFicha = [];
-            }
-            const empresa = await Empresa_1.default.findBy("id_empresa", auth.user?.id_empresa);
-            if (!empresa) {
-                return response.badRequest({ error: "Erro ao pegar empresa!" });
-            }
-            const funcao = await this.getEmployeeFunction(auth.user?.id_empresa, funcionario.id_funcao_erp);
-            if (!funcao) {
-                return response.badRequest({ error: "Erro ao pegar função!" });
             }
             const pdfTemp = await this.generatePdf(this.tratarDadosDotCard(query, empresa, funcionario, `${data[1]}-${data[0]}`, resumoFicha, funcao), template_1.fichaPonto);
             if (!pdfTemp) {

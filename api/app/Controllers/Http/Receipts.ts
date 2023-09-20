@@ -182,6 +182,7 @@ export default class Receipts {
 
       const liberacaoPdf = await this.isMonthFreedom(auth.user?.id_empresa, 1,data.join("/"));
 
+      
       if (!liberacaoPdf) {
         return response.badRequest({
           error: "Empresa não liberou para gerar o recibo",
@@ -205,6 +206,22 @@ export default class Receipts {
       if (!appUpdate) {
         return response.badRequest({ error: "app desatualizado" });
       }
+
+      const empresa = await Empresa.findBy("id_empresa", auth.user?.id_empresa);
+
+      if(!empresa){
+        return response.badRequest({ error: "Erro ao pegar empresa!" });
+      }
+
+      const funcao = await this.getEmployeeFunction(
+        funcionario.id_funcao_erp,
+        auth.user?.id_empresa
+      );
+
+      if(!funcao){
+        return response.badRequest({ error: "Erro ao pegar função!" });
+      }
+
 
       const query = await Database.connection("oracle").rawQuery(`
                                     SELECT DISTINCT
@@ -250,21 +267,6 @@ export default class Receipts {
         `);
       } catch (error) {
         resumoFicha = [];
-      }
-
-      const empresa = await Empresa.findBy("id_empresa", auth.user?.id_empresa);
-
-      if(!empresa){
-        return response.badRequest({ error: "Erro ao pegar empresa!" });
-      }
-
-      const funcao = await this.getEmployeeFunction(
-        auth.user?.id_empresa,
-        funcionario.id_funcao_erp
-      );
-
-      if(!funcao){
-        return response.badRequest({ error: "Erro ao pegar função!" });
       }
 
       const pdfTemp = await this.generatePdf(
