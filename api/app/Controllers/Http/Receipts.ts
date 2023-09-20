@@ -183,85 +183,68 @@ export default class Receipts {
   }
 
   private tratarDadosEvents(dados, dados_empresa) {
-  const {
-    RSOCIALEMPRESA,
-    INSCRICAOEMPRESA,
-    registro,
-    NOMEFUNC,
-    DESCFUNCAO,
-    COMPETFICHA,
-    ENDERECOFL,
-    CIDADEFL,
-    IESTADUALFL,
-    NUMEROENDFL,
-    COMPLENDFL,
-  } = dados[0];
-
-  const dadosTemp = {
-    cabecalho: {
-      logo: dados_empresa.logo,
-      telefone: dados_empresa.telefone,
-      nomeEmpresa: RSOCIALEMPRESA,
-      inscricaoEmpresa: INSCRICAOEMPRESA,
-      matricula: registro,
-      nome: NOMEFUNC,
-      funcao: DESCFUNCAO,
-      competencia: COMPETFICHA,
-      endereco: {
-        rua: ENDERECOFL,
-        cidade: CIDADEFL,
-        estado: IESTADUALFL,
-        numero: NUMEROENDFL,
-        complemento: COMPLENDFL,
+    let dadosTemp = {
+      cabecalho: {
+        logo: dados_empresa.logo,
+        telefone: dados_empresa.telefone,
+        nomeEmpresa: dados[0].RSOCIALEMPRESA,
+        inscricaoEmpresa: dados[0].INSCRICAOEMPRESA,
+        matricula: dados[0].registro,
+        nome: dados[0].NOMEFUNC,
+        funcao: dados[0].DESCFUNCAO,
+        competencia: dados[0].COMPETFICHA,
+        endereco: {
+          rua: dados[0].ENDERECOFL,
+          cidade: dados[0].CIDADEFL,
+          estado: dados[0].IESTADUALFL,
+          numero: dados[0].NUMEROENDFL,
+          complemento: dados[0].COMPLENDFL,
+        },
       },
-    },
-    totais: {
-      DESCONTOS: 0,
-      PROVENTOS: 0,
-      LIQUIDO: 0,
-    },
-    bases: {
-      BASE_FGTS_FOLHA: 0,
-      BASE_INSS_FOLHA: 0,
-      FGTS_FOLHA: 0,
-      BASE_IRRF_FOLHA: 0,
-    },
-    descricao: new Array(),
-  };
-
-  const eventMapping = {
-    "BASE FGTS FOLHA": "BASE_FGTS_FOLHA",
-    "FGTS FOLHA": "FGTS_FOLHA",
-    "BASE IRRF FOLHA": "BASE_IRRF_FOLHA",
-    "BASE INSS FOLHA": "BASE_INSS_FOLHA",
-    "TOTAL DE DESCONTOS": "DESCONTOS",
-    "TOTAL DE PROVENTOS": "PROVENTOS",
-    "LIQUIDO DA FOLHA": "LIQUIDO",
-  };
-
-  dados.forEach((element) => {
-    const eventName = element.DESCEVEN;
-    const mappedName = eventMapping[eventName];
-
-    if (mappedName) {
-      dadosTemp.totais[mappedName] = element.VALORFICHA;
-    } else if (element.TIPOEVEN !== "B") {
-      if (element.VALORFICHA[0] === ",") {
-        element.VALORFICHA = "0" + element.VALORFICHA;
-      }
-      element.VALORFICHA = element.VALORFICHA.toLocaleString("pt-BR", {
-        minimumFractionDigits: 2,
-      });
-      if (element.REFERENCIA !== "") {
-        element.REFERENCIA = element.REFERENCIA.toLocaleString("pt-BR", {
+      totais: {
+        DESCONTOS: 0,
+        PROVENTOS: 0,
+        LIQUIDO: 0,
+      },
+      bases: {
+        BASE_FGTS_FOLHA: 0,
+        BASE_INSS_FOLHA: 0,
+        FGTS_FOLHA: 0,
+        BASE_IRRF_FOLHA: 0,
+      },
+      descricao: new Array(),
+    };
+    dados.forEach((element) => {
+      if (element.DESCEVEN == "BASE FGTS FOLHA") {
+        dadosTemp.bases.BASE_FGTS_FOLHA = element.VALORFICHA;
+      } else if (element.DESCEVEN == "FGTS FOLHA") {
+        dadosTemp.bases.FGTS_FOLHA = element.VALORFICHA;
+      } else if (element.DESCEVEN == "BASE IRRF FOLHA") {
+        dadosTemp.bases.BASE_IRRF_FOLHA = element.VALORFICHA;
+      } else if (element.DESCEVEN == "BASE INSS FOLHA") {
+        dadosTemp.bases.BASE_INSS_FOLHA = element.VALORFICHA;
+      } else if (element.DESCEVEN == "TOTAL DE DESCONTOS") {
+        dadosTemp.totais.DESCONTOS = element.VALORFICHA;
+      } else if (element.DESCEVEN == "TOTAL DE PROVENTOS") {
+        dadosTemp.totais.PROVENTOS = element.VALORFICHA;
+      } else if (element.DESCEVEN == "LIQUIDO DA FOLHA") {
+        dadosTemp.totais.LIQUIDO = element.VALORFICHA;
+      } else if (element.TIPOEVEN != "B") {
+        if (element.VALORFICHA[0] == ",") {
+          element.VALORFICHA = "0" + element.VALORFICHA;
+        }
+        element.VALORFICHA = element.VALORFICHA.toLocaleString("pt-BR", {
           minimumFractionDigits: 2,
         });
+        if (element.REFERENCIA != "") {
+          element.REFERENCIA = element.REFERENCIA.toLocaleString("pt-BR", {
+            minimumFractionDigits: 2,
+          });
+        }
+        dadosTemp.descricao.push(element);
       }
-      dadosTemp.descricao.push(element);
-    }
-  });
-
-  return dadosTemp;
+    });
+    return dadosTemp;
   }
 
   public async dotCardPdfGenerator({ request, response, auth }: HttpContextContract) {
@@ -388,7 +371,7 @@ export default class Receipts {
     response,
   }: HttpContextContract) {
     try {
-      const dados = request.all();
+      const dados = request.body();
 
       if (!dados.data || !auth.user) {
         return response.badRequest({ error: "data is required" });
