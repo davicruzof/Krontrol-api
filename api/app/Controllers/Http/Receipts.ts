@@ -9,7 +9,7 @@ import Database from "@ioc:Adonis/Lucid/Database";
 import { fichaPonto, templateDotCard } from "App/templates/pdf/template";
 import Funcao from "App/Models/Funcao";
 import AppVersion from "App/Models/AppVersion";
-import { format } from "date-fns";
+import { DateTime } from "luxon";
 
 export default class Receipts {
 
@@ -39,7 +39,7 @@ export default class Receipts {
           return error;
         });
       return await file;
-    } catch (error) {}
+    } catch (error) { }
   }
 
   private getEmployeeFunction = async (id_funcao, id_empresa) => {
@@ -176,13 +176,15 @@ export default class Receipts {
       }
 
       const data = dados.data.split("-");
-      const periodoInicial = `27-${data[1] - 1}-${data[0]}`;
-      const periodoFinal = `26-${data.reverse().join("-")}`;
-      const competencia = new Date(data[0], data[1] - 1, 26);
 
-      const liberacaoPdf = await this.isMonthFreedom(auth.user?.id_empresa, 1,data.join("/"));
+      const dateRequestInitial = DateTime.fromISO(new Date(`${dados.data}-27`).toISOString().replace(".000Z", "")).minus({ months: 1 }).toFormat("dd/LL/yyyy").toString();
+      const competencia = DateTime.fromISO(new Date(`${dados.data}-01`).toISOString().replace(".000Z", "")).toFormat("LL/yyyy").toString();
+      const dateRequestFinish = DateTime.fromISO(new Date(`${dados.data}-26`).toISOString().replace(".000Z", "")).toFormat("dd/LL/yyyy").toString();
 
       
+      const liberacaoPdf = await this.isMonthFreedom(auth.user?.id_empresa, 1, competencia);
+
+
       if (!liberacaoPdf) {
         return response.badRequest({
           error: "Empresa não liberou para gerar o recibo",
@@ -209,7 +211,7 @@ export default class Receipts {
 
       const empresa = await Empresa.findBy("id_empresa", auth.user?.id_empresa);
 
-      if(!empresa){
+      if (!empresa) {
         return response.badRequest({ error: "Erro ao pegar empresa!" });
       }
 
@@ -218,10 +220,9 @@ export default class Receipts {
         auth.user?.id_empresa
       );
 
-      if(!funcao){
+      if (!funcao) {
         return response.badRequest({ error: "Erro ao pegar função!" });
       }
-
 
       const query = await Database.connection("oracle").rawQuery(`
                                     SELECT DISTINCT
@@ -251,11 +252,11 @@ export default class Receipts {
                                     TRIM(F.SALDOATUAL) AS SALDOATUAL
                                     FROM VW_ML_PON_FICHAPONTO F
                                     WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
-                                    AND DATA_MOVIMENTO BETWEEN to_date('${periodoInicial}','DD-MM-YYYY') and to_date('${periodoFinal}','DD-MM-YYYY')
+                                    AND DATA_MOVIMENTO BETWEEN to_date('${dateRequestInitial}','DD-MM-YYYY') and to_date('${dateRequestFinish}','DD-MM-YYYY')
                                     ORDER BY BH_COMPETENCIA
                       `);
-      
-      if(query.length === 0){
+
+      if (query.length === 0) {
         return response.badRequest({ error: "Nenhum dado de ficha ponto foi encontrado!" });
       }
 
@@ -267,7 +268,7 @@ export default class Receipts {
           FROM
             VW_ML_PON_RESUMO_HOLERITE FH
           WHERE FH.ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
-          AND FH.COMPETENCIA = '${format(competencia, "MM/yyyy")}'
+          AND FH.COMPETENCIA = '${competencia}'
         `);
       } catch (error) {
         resumoFicha = [];
@@ -285,7 +286,7 @@ export default class Receipts {
         fichaPonto
       );
 
-      if(!pdfTemp){
+      if (!pdfTemp) {
         return response.badRequest({ error: "Erro ao gerar pdf!" });
       }
 
@@ -294,7 +295,7 @@ export default class Receipts {
         .where("id_funcionario", "=", `${funcionario?.id_funcionario}`)
         .andWhere("data_pdf", "=", `${dados.data}`);
 
-      if(!confirmacao){
+      if (!confirmacao) {
         return response.badRequest({ error: "Erro ao aplicar confirmação!" });
       }
 
@@ -303,16 +304,16 @@ export default class Receipts {
         auth.user?.id_empresa
       );
 
-      if(!file){
+      if (!file) {
         return response.badRequest({ error: "Erro ao gerar url do pdf!" });
       }
 
-      fs.unlink(pdfTemp.filename, () => {});
+      fs.unlink(pdfTemp.filename, () => { });
       response.json({
         pdf: file.Location,
         confirmado: confirmacao[0] ? true : false,
       });
-      
+
     } catch (error) {
       response.badRequest(error);
     }
@@ -383,7 +384,7 @@ export default class Receipts {
 
       const empresa = await Empresa.findBy("id_empresa", auth.user?.id_empresa);
 
-      if(!empresa){
+      if (!empresa) {
         return response.badRequest({ error: "Erro ao pegar empresa!" });
       }
 
@@ -399,13 +400,13 @@ export default class Receipts {
         auth.user?.id_empresa
       );
 
-      if(!file || !file.Location){
+      if (!file || !file.Location) {
         return response.badRequest({ error: "Erro ao gerar url do pdf!" });
       }
 
-      fs.unlink(pdfTemp.filename, () => {});
+      fs.unlink(pdfTemp.filename, () => { });
       response.json({ pdf: file.Location });
-      
+
     } catch (error) {
       response.json(error);
     }

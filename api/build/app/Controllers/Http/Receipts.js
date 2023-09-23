@@ -13,7 +13,7 @@ const Database_1 = __importDefault(global[Symbol.for('ioc.use')]("Adonis/Lucid/D
 const template_1 = global[Symbol.for('ioc.use')]("App/templates/pdf/template");
 const Funcao_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/Funcao"));
 const AppVersion_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/AppVersion"));
-const date_fns_1 = require("date-fns");
+const luxon_1 = require("luxon");
 class Receipts {
     constructor() {
         this.getEmployeeFunction = async (id_funcao, id_empresa) => {
@@ -169,10 +169,10 @@ class Receipts {
                 return response.badRequest({ error: "data is required" });
             }
             const data = dados.data.split("-");
-            const periodoInicial = `27-${data[1] - 1}-${data[0]}`;
-            const periodoFinal = `26-${data.reverse().join("-")}`;
-            const competencia = new Date(data[0], data[1] - 1, 26);
-            const liberacaoPdf = await this.isMonthFreedom(auth.user?.id_empresa, 1, data.join("/"));
+            const dateRequestInitial = luxon_1.DateTime.fromISO(new Date(`${dados.data}-27`).toISOString().replace(".000Z", "")).minus({ months: 1 }).toFormat("dd/LL/yyyy").toString();
+            const competencia = luxon_1.DateTime.fromISO(new Date(`${dados.data}-01`).toISOString().replace(".000Z", "")).toFormat("LL/yyyy").toString();
+            const dateRequestFinish = luxon_1.DateTime.fromISO(new Date(`${dados.data}-26`).toISOString().replace(".000Z", "")).toFormat("dd/LL/yyyy").toString();
+            const liberacaoPdf = await this.isMonthFreedom(auth.user?.id_empresa, 1, competencia);
             if (!liberacaoPdf) {
                 return response.badRequest({
                     error: "Empresa não liberou para gerar o recibo",
@@ -222,7 +222,7 @@ class Receipts {
                                     TRIM(F.SALDOATUAL) AS SALDOATUAL
                                     FROM VW_ML_PON_FICHAPONTO F
                                     WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
-                                    AND DATA_MOVIMENTO BETWEEN to_date('${periodoInicial}','DD-MM-YYYY') and to_date('${periodoFinal}','DD-MM-YYYY')
+                                    AND DATA_MOVIMENTO BETWEEN to_date('${dateRequestInitial}','DD-MM-YYYY') and to_date('${dateRequestFinish}','DD-MM-YYYY')
                                     ORDER BY BH_COMPETENCIA
                       `);
             if (query.length === 0) {
@@ -235,7 +235,7 @@ class Receipts {
           FROM
             VW_ML_PON_RESUMO_HOLERITE FH
           WHERE FH.ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
-          AND FH.COMPETENCIA = '${(0, date_fns_1.format)(competencia, "MM/yyyy")}'
+          AND FH.COMPETENCIA = '${competencia}'
         `);
             }
             catch (error) {
