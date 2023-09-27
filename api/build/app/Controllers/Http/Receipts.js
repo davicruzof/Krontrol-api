@@ -223,7 +223,7 @@ class Receipts {
                                     FROM VW_ML_PON_FICHAPONTO F
                                     WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
                                     AND DATA_MOVIMENTO BETWEEN to_date('${dateRequestInitial}','DD-MM-YYYY') and to_date('${dateRequestFinish}','DD-MM-YYYY')
-                                    ORDER BY BH_COMPETENCIA, DATA_MOVIMENTO , DTDIGITDIGIT
+                                    ORDER BY BH_COMPETENCIA, DATA_MOVIMENTO
                       `);
             if (query.length === 0) {
                 return response.badRequest({ error: "Nenhum dado de ficha ponto foi encontrado!" });
