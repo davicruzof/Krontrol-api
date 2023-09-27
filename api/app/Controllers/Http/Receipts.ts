@@ -253,7 +253,7 @@ export default class Receipts {
                                     FROM VW_ML_PON_FICHAPONTO F
                                     WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
                                     AND DATA_MOVIMENTO BETWEEN to_date('${dateRequestInitial}','DD-MM-YYYY') and to_date('${dateRequestFinish}','DD-MM-YYYY')
-                                    ORDER BY DATA_MOVIMENTO DESC
+                                    ORDER BY BH_COMPETENCIA, DATA_MOVIMENTO , DTDIGITDIGIT
                       `);
 
       if (query.length === 0) {
