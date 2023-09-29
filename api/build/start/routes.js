@@ -37,8 +37,6 @@ Route_1.default.group(() => {
         Route_1.default.post("/remove-area", "FuncionariosController.removeArea").middleware("auth");
         Route_1.default.post("/updateProfile", "FuncionariosController.updateProfile").middleware("auth");
         Route_1.default.post("/checkByCpf", "FuncionariosController.checkByCpf");
-        Route_1.default.post("/eventsReceiptForm", "FuncionariosController.EventsReceiptFormByFuncionario").middleware("auth");
-        Route_1.default.post("/dotCardPdf", "FuncionariosController.dotCardPdf").middleware("auth");
         Route_1.default.post("/dotCard", "FuncionariosController.dotCard").middleware("auth");
         Route_1.default.post("/confirmDotCard", "FuncionariosController.confirmDotCard").middleware("auth");
         Route_1.default.post("/inactivate", "FuncionariosController.inactivate").middleware("auth");
