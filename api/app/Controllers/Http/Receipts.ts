@@ -336,17 +336,21 @@ export default class Receipts {
 
       const data = dados.data.split("-");
 
+      if(data[1].includes("0")){
+        data[1] = data[1].replace("0", "");
+      }
+
       const month = +data[1] > 9 ? data[1] :`0${data[1]}`;
 
       const competencia = `${month}/${data[0]}`;
 
-      // const liberacaoPdf = await this.isMonthFreedom(auth.user?.id_empresa, 2, competencia);
+      const liberacaoPdf = await this.isMonthFreedom(auth.user?.id_empresa, 2, competencia);
 
-      // if (!liberacaoPdf) {
-      //   return response.badRequest({
-      //     error: "Empresa não liberou para gerar o recibo",
-      //   });
-      // }
+      if (!liberacaoPdf) {
+        return response.badRequest({
+          error: "Empresa não liberou para gerar o recibo",
+        });
+      }
 
       const funcionario = await Funcionario.findBy(
         "id_funcionario",
