@@ -279,6 +279,9 @@ class Receipts {
             if (!dados.data || !auth.user) {
                 return response.badRequest({ error: "data is required" });
             }
+            const data = dados.data.split("-");
+            const month = +data[1] > 9 ? data[1] : `0${data[1]}`;
+            const competencia = `${month}-${data[0]}`;
             const funcionario = await Funcionario_1.default.findBy("id_funcionario", auth.user?.id_funcionario);
             if (!funcionario) {
                 return response.badRequest({ error: "funcionario não encontrado!" });
@@ -306,7 +309,7 @@ class Receipts {
                                     TIPOEVEN
                                     FROM  globus.vw_flp_fichaeventosrecibo hol
                                 WHERE
-                                hol.codintfunc = ${funcionario?.id_funcionario_erp} and to_char(competficha, 'YYYY-MM') = '${dados.data}'
+                                hol.codintfunc = ${funcionario?.id_funcionario_erp} and to_char(competficha, 'MM-YYYY') = '${competencia}'
                                 and hol.TIPOFOLHA = 1
                                 order by hol.tipoeven desc,hol.desceven
                                 `);

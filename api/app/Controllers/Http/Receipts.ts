@@ -342,11 +342,11 @@ export default class Receipts {
         return response.badRequest({ error: "data is required" });
       }
 
-      // const data = dados.data.split("-");
+      const data = dados.data.split("-");
 
-      // const month = +data[1] > 9 ? data[1] :`0${data[1]}`;
+      const month = +data[1] > 9 ? data[1] :`0${data[1]}`;
 
-      // const competencia = `${month}/${data[0]}`;
+      const competencia = `${month}-${data[0]}`;
 
 
       // const liberacaoPdf = await this.isMonthFreedom(auth.user?.id_empresa, 2, competencia);
@@ -395,7 +395,7 @@ export default class Receipts {
                                     TIPOEVEN
                                     FROM  globus.vw_flp_fichaeventosrecibo hol
                                 WHERE
-                                hol.codintfunc = ${funcionario?.id_funcionario_erp} and to_char(competficha, 'YYYY-MM') = '${dados.data}'
+                                hol.codintfunc = ${funcionario?.id_funcionario_erp} and to_char(competficha, 'MM-YYYY') = '${competencia}'
                                 and hol.TIPOFOLHA = 1
                                 order by hol.tipoeven desc,hol.desceven
                                 `);
