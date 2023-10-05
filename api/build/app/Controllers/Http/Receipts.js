@@ -23,12 +23,6 @@ class Receipts {
             return queryFuncao ? queryFuncao[0] : null;
         };
         this.isMonthFreedom = async (id_empresa, id_pdf, mes) => {
-            console.log(`SELECT * FROM public.vw_ml_flp_liberacao_recibos 
-            where tipo_id = ${id_pdf} 
-            AND bloqueio_liberacao = false
-            AND mes_liberado = '${mes}'
-            AND empresa_id = ${id_empresa}
-            `);
             const liberacaoPdf = await Database_1.default.connection("pg").rawQuery(`SELECT * FROM public.vw_ml_flp_liberacao_recibos 
             where tipo_id = ${id_pdf} 
             AND bloqueio_liberacao = false
@@ -281,7 +275,7 @@ class Receipts {
             }
             const data = dados.data.split("-");
             const month = +data[1] > 9 ? data[1] : `0${data[1]}`;
-            const competencia = `${month}-${data[0]}`;
+            const competencia = `${month}/${data[0]}`;
             const funcionario = await Funcionario_1.default.findBy("id_funcionario", auth.user?.id_funcionario);
             if (!funcionario) {
                 return response.badRequest({ error: "funcionario não encontrado!" });
@@ -309,7 +303,7 @@ class Receipts {
                                     TIPOEVEN
                                     FROM  globus.vw_flp_fichaeventosrecibo hol
                                 WHERE
-                                hol.codintfunc = ${funcionario?.id_funcionario_erp} and to_char(competficha, 'MM-YYYY') = '${competencia}'
+                                hol.codintfunc = ${funcionario?.id_funcionario_erp} and to_char(competficha, 'MM/YYYY') = '${competencia}'
                                 and hol.TIPOFOLHA = 1
                                 order by hol.tipoeven desc,hol.desceven
                                 `);
