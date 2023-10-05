@@ -282,6 +282,12 @@ class Receipts {
             const data = dados.data.split("-");
             const month = +data[1] > 9 ? data[1] : `0${data[1]}`;
             const competencia = `${month}-${data[0]}`;
+            const liberacaoPdf = await this.isMonthFreedom(auth.user?.id_empresa, 2, competencia);
+            if (!liberacaoPdf) {
+                return response.badRequest({
+                    error: "Empresa não liberou para gerar o recibo",
+                });
+            }
             const funcionario = await Funcionario_1.default.findBy("id_funcionario", auth.user?.id_funcionario);
             if (!funcionario) {
                 return response.badRequest({ error: "funcionario não encontrado!" });
