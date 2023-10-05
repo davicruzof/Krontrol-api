@@ -23,6 +23,12 @@ class Receipts {
             return queryFuncao ? queryFuncao[0] : null;
         };
         this.isMonthFreedom = async (id_empresa, id_pdf, mes) => {
+            console.log(`SELECT * FROM public.vw_ml_flp_liberacao_recibos 
+            where tipo_id = ${id_pdf} 
+            AND bloqueio_liberacao = false
+            AND mes_liberado = '${mes}'
+            AND empresa_id = ${id_empresa}
+            `);
             const liberacaoPdf = await Database_1.default.connection("pg").rawQuery(`SELECT * FROM public.vw_ml_flp_liberacao_recibos 
             where tipo_id = ${id_pdf} 
             AND bloqueio_liberacao = false
@@ -272,15 +278,6 @@ class Receipts {
             const dados = request.body();
             if (!dados.data || !auth.user) {
                 return response.badRequest({ error: "data is required" });
-            }
-            const data = dados.data.split("-");
-            const month = +data[1] > 9 ? data[1] : `0${data[1]}`;
-            const competencia = `${month}/${data[0]}`;
-            const liberacaoPdf = await this.isMonthFreedom(auth.user?.id_empresa, 2, competencia);
-            if (!liberacaoPdf) {
-                return response.badRequest({
-                    error: "Empresa não liberou para gerar o recibo",
-                });
             }
             const funcionario = await Funcionario_1.default.findBy("id_funcionario", auth.user?.id_funcionario);
             if (!funcionario) {
