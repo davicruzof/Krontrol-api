@@ -169,8 +169,9 @@ class Receipts {
                 return response.badRequest({ error: "data is required" });
             }
             const data = dados.data.split("-");
+            const month = `0${data[1]}`;
+            const competencia = `${month}/${data[0]}`;
             const dateRequestInitial = luxon_1.DateTime.fromISO(new Date(`${dados.data}-27`).toISOString().replace(".000Z", "")).minus({ months: 1 }).toFormat("dd/LL/yyyy").toString();
-            const competencia = luxon_1.DateTime.fromISO(new Date(`${dados.data}-01`).toISOString().replace(".000Z", "")).toFormat("LL/yyyy").toString();
             const dateRequestFinish = luxon_1.DateTime.fromISO(new Date(`${dados.data}-26`).toISOString().replace(".000Z", "")).toFormat("dd/LL/yyyy").toString();
             const liberacaoPdf = await this.isMonthFreedom(auth.user?.id_empresa, 1, competencia);
             if (!liberacaoPdf) {
