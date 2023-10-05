@@ -177,7 +177,7 @@ export default class Receipts {
 
       const data = dados.data.split("-");
 
-      const month = `0${data[1]}`;
+      const month = +data[1] > 9 ? data[1] :`0${data[1]}`;
 
       const competencia = `${month}/${data[0]}`;
 
@@ -336,7 +336,7 @@ export default class Receipts {
 
       const data = dados.data.split("-");
 
-      const month = `0${data[1]}`;
+      const month = +data[1] > 9 ? data[1] :`0${data[1]}`;
 
       const competencia = `${month}/${data[0]}`;
 
@@ -356,16 +356,17 @@ export default class Receipts {
       if (!funcionario) {
         return response.badRequest({ error: "funcionario não encontrado!" });
       }
-
+      
       const appUpdate = await AppVersion.findBy(
         "id_funcionario",
         auth.user?.id_funcionario
-      );
-
-      if (!appUpdate) {
-        return response.badRequest({ error: "app desatualizado" });
-      }
-
+        );
+        
+        if (!appUpdate) {
+          return response.badRequest({ error: "app desatualizado" });
+        }
+        
+        
       let payStub = await Database.connection("oracle").rawQuery(`
                                     SELECT DISTINCT
                                     to_char(competficha, 'MM-YYYY') as COMPETFICHA,
