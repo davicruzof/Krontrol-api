@@ -51,14 +51,6 @@ export default class Receipts {
   };
 
   private isMonthFreedom = async (id_empresa, id_pdf, mes) => {
-
-    console.log(`SELECT * FROM public.vw_ml_flp_liberacao_recibos 
-            where tipo_id = ${id_pdf} 
-            AND bloqueio_liberacao = false
-            AND mes_liberado = '${mes}'
-            AND empresa_id = ${id_empresa}
-            `)
-
     const liberacaoPdf = await Database.connection("pg").rawQuery(
       `SELECT * FROM public.vw_ml_flp_liberacao_recibos 
             where tipo_id = ${id_pdf} 
@@ -190,7 +182,7 @@ export default class Receipts {
       const competencia = `${month}/${data[0]}`;
 
       const dateRequestInitial = DateTime.fromISO(new Date(`${dados.data}-27`).toISOString().replace(".000Z", "")).minus({ months: 1 }).toFormat("dd/LL/yyyy").toString();
-      // const competencia = DateTime.fromISO(new Date(`${dados.data}-01`).toISOString().replace(".000Z", "")).toFormat("LL/yyyy").toString();
+      
       const dateRequestFinish = DateTime.fromISO(new Date(`${dados.data}-26`).toISOString().replace(".000Z", "")).toFormat("dd/LL/yyyy").toString();
           
       const liberacaoPdf = await this.isMonthFreedom(auth.user?.id_empresa, 1, competencia);
@@ -346,16 +338,15 @@ export default class Receipts {
 
       const month = +data[1] > 9 ? data[1] :`0${data[1]}`;
 
-      const competencia = `${month}-${data[0]}`;
+      const competencia = `${month}/${data[0]}`;
 
+      const liberacaoPdf = await this.isMonthFreedom(auth.user?.id_empresa, 2, competencia);
 
-      // const liberacaoPdf = await this.isMonthFreedom(auth.user?.id_empresa, 2, competencia);
-
-      // if (!liberacaoPdf) {
-      //   return response.badRequest({
-      //     error: "Empresa não liberou para gerar o recibo",
-      //   });
-      // }
+      if (!liberacaoPdf) {
+        return response.badRequest({
+          error: "Empresa não liberou para gerar o recibo",
+        });
+      }
 
       const funcionario = await Funcionario.findBy(
         "id_funcionario",
@@ -395,7 +386,7 @@ export default class Receipts {
                                     TIPOEVEN
                                     FROM  globus.vw_flp_fichaeventosrecibo hol
                                 WHERE
-                                hol.codintfunc = ${funcionario?.id_funcionario_erp} and to_char(competficha, 'MM-YYYY') = '${competencia}'
+                                hol.codintfunc = ${funcionario?.id_funcionario_erp} and to_char(competficha, 'MM/YYYY') = '${competencia}'
                                 and hol.TIPOFOLHA = 1
                                 order by hol.tipoeven desc,hol.desceven
                                 `);
