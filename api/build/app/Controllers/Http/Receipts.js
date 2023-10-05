@@ -273,7 +273,10 @@ class Receipts {
             if (!dados.data || !auth.user) {
                 return response.badRequest({ error: "data is required" });
             }
-            const liberacaoPdf = await this.isMonthFreedom(auth.user?.id_empresa, 2, dados.data.split("-").reverse().join("/"));
+            const data = dados.data.split("-");
+            const month = `0${data[1]}`;
+            const competencia = `${month}/${data[0]}`;
+            const liberacaoPdf = await this.isMonthFreedom(auth.user?.id_empresa, 2, competencia);
             if (!liberacaoPdf) {
                 return response.badRequest({
                     error: "Empresa não liberou para gerar o recibo",
