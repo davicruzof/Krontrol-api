@@ -185,14 +185,14 @@ export default class Receipts {
 
       const data = dados.data.split("-");
 
-      const month = +data[1] > 9 ? data[1] : `0${data[1]}`;
+      const month = +data[1] > 9 ? data[1] :`0${data[1]}`;
 
       const competencia = `${month}/${data[0]}`;
 
       const dateRequestInitial = DateTime.fromISO(new Date(`${dados.data}-27`).toISOString().replace(".000Z", "")).minus({ months: 1 }).toFormat("dd/LL/yyyy").toString();
       // const competencia = DateTime.fromISO(new Date(`${dados.data}-01`).toISOString().replace(".000Z", "")).toFormat("LL/yyyy").toString();
       const dateRequestFinish = DateTime.fromISO(new Date(`${dados.data}-26`).toISOString().replace(".000Z", "")).toFormat("dd/LL/yyyy").toString();
-
+          
       const liberacaoPdf = await this.isMonthFreedom(auth.user?.id_empresa, 1, competencia);
 
       if (!liberacaoPdf) {
@@ -344,17 +344,18 @@ export default class Receipts {
 
       const data = dados.data.split("-");
 
-      const month = +data[1] > 9 ? data[1] : `0${data[1]}`;
+      const month = +data[1] > 9 ? data[1] :`0${data[1]}`;
 
       const competencia = `${month}-${data[0]}`;
 
-      const liberacaoPdf = await this.isMonthFreedom(auth.user?.id_empresa, 2, competencia);
 
-      if (!liberacaoPdf) {
-        return response.badRequest({
-          error: "Empresa não liberou para gerar o recibo",
-        });
-      }
+      // const liberacaoPdf = await this.isMonthFreedom(auth.user?.id_empresa, 2, competencia);
+
+      // if (!liberacaoPdf) {
+      //   return response.badRequest({
+      //     error: "Empresa não liberou para gerar o recibo",
+      //   });
+      // }
 
       const funcionario = await Funcionario.findBy(
         "id_funcionario",
@@ -364,17 +365,17 @@ export default class Receipts {
       if (!funcionario) {
         return response.badRequest({ error: "funcionario não encontrado!" });
       }
-
+      
       const appUpdate = await AppVersion.findBy(
         "id_funcionario",
         auth.user?.id_funcionario
-      );
-
-      if (!appUpdate) {
-        return response.badRequest({ error: "app desatualizado" });
-      }
-
-
+        );
+        
+        if (!appUpdate) {
+          return response.badRequest({ error: "app desatualizado" });
+        }
+        
+        
       let payStub = await Database.connection("oracle").rawQuery(`
                                     SELECT DISTINCT
                                     to_char(competficha, 'MM-YYYY') as COMPETFICHA,
