@@ -177,6 +177,10 @@ export default class Receipts {
 
       const data = dados.data.split("-");
 
+      if(data[1].includes("0")){
+        data[1] = data[1].replace("0", "");
+      }
+
       const month = +data[1] > 9 ? data[1] :`0${data[1]}`;
 
       const competencia = `${month}/${data[0]}`;

@@ -169,6 +169,9 @@ class Receipts {
                 return response.badRequest({ error: "data is required" });
             }
             const data = dados.data.split("-");
+            if (data[1].includes("0")) {
+                data[1] = data[1].replace("0", "");
+            }
             const month = +data[1] > 9 ? data[1] : `0${data[1]}`;
             const competencia = `${month}/${data[0]}`;
             const dateRequestInitial = luxon_1.DateTime.fromISO(new Date(`${dados.data}-27`).toISOString().replace(".000Z", "")).minus({ months: 1 }).toFormat("dd/LL/yyyy").toString();
