@@ -53,6 +53,10 @@ Route_1.default.group(() => {
         Route_1.default.post("/EventsReceiptFormByFuncionario", "Receipts.EventsReceiptFormByFuncionario").middleware("auth");
     }).prefix("/receipts");
     Route_1.default.group(() => {
+        Route_1.default.get("/", "InformativosController.getInformativos").middleware("auth");
+        Route_1.default.put("/", "InformativosController.updateInformativo").middleware("auth");
+    }).prefix("/informativos");
+    Route_1.default.group(() => {
         Route_1.default.post("/create", "VeiculosController.create");
         Route_1.default.post("/getById", "VeiculosController.getById");
         Route_1.default.get("/getAll", "VeiculosController.getAll");

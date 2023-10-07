@@ -80,13 +80,6 @@ Route.group(() => {
       "FuncionariosController.updateProfile"
     ).middleware("auth");
     Route.post("/checkByCpf", "FuncionariosController.checkByCpf");
-    // Route.post(
-    //   "/eventsReceiptForm",
-    //   "FuncionariosController.EventsReceiptFormByFuncionario"
-    // ).middleware("auth");
-    // Route.post("/dotCardPdf", "FuncionariosController.dotCardPdf").middleware(
-    //   "auth"
-    // );
     Route.post("/dotCard", "FuncionariosController.dotCard").middleware("auth");
     Route.post(
       "/confirmDotCard",
@@ -128,6 +121,15 @@ Route.group(() => {
       "auth"
     );
   }).prefix("/receipts");
+
+  Route.group(() => {
+    Route.get("/", "InformativosController.getInformativos").middleware(
+      "auth"
+    );
+    Route.put("/", "InformativosController.updateInformativo").middleware(
+      "auth"
+    );
+  }).prefix("/informativos");
 
   //Rotas Veiculos
   Route.group(() => {
