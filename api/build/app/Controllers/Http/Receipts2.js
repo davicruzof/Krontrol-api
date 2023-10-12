@@ -199,8 +199,8 @@ class Receipts2 {
                 df.usudigit,
                 df.DTDIGITDIGIT,
                 fun.CODFUNC AS registro,
-                NVL(bhd.BD_DEBITO, '--------'),
-                NVL(bhd.BH_CREDITO, '--------')
+                NVL(bhd.BD_DEBITO, '--------') AS BD_DEBITO,
+                NVL(bhd.BH_CREDITO, '--------') AS BH_CREDITO
             FROM globus.frq_digitacaomovimento df
             INNER JOIN VW_ML_FLP_FUNCIONARIO fun ON df.codintfunc = fun.id_funcionario_erp
             INNER JOIN globus.vw_bancohoras bh ON df.codintfunc = bh.codintfunc
