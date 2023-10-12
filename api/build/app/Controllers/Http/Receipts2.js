@@ -4,8 +4,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const Empresa_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/Empresa"));
+const ConfirmarPdf_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/ConfirmarPdf"));
 const Funcionario_1 = __importDefault(require("../../Models/Funcionario"));
+const pdf_creator_node_1 = __importDefault(require("pdf-creator-node"));
+const fs_1 = __importDefault(require("fs"));
+const S3_1 = global[Symbol.for('ioc.use')]("App/Controllers/Http/S3");
 const Database_1 = __importDefault(global[Symbol.for('ioc.use')]("Adonis/Lucid/Database"));
+const template_1 = global[Symbol.for('ioc.use')]("App/templates/pdf/template");
 const AppVersion_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/AppVersion"));
 const luxon_1 = require("luxon");
 class Receipts2 {
@@ -19,6 +24,34 @@ class Receipts2 {
             `);
             return liberacaoPdf?.rows.length > 0 ? true : false;
         };
+    }
+    async generatePdf(dados, template) {
+        try {
+            var options = {
+                format: "A3",
+                orientation: "portrait",
+                border: "10mm",
+                type: "pdf",
+            };
+            const filename = Math.random() + "_doc" + ".pdf";
+            var document = {
+                html: template,
+                data: {
+                    dados: dados,
+                },
+                path: "./pdfsTemp/" + filename,
+            };
+            let file = pdf_creator_node_1.default
+                .create(document, options)
+                .then((res) => {
+                return res;
+            })
+                .catch((error) => {
+                return error;
+            });
+            return await file;
+        }
+        catch (error) { }
     }
     tratarDadosDotCard(dados, dados_empresa, data, resumoFicha) {
         const ultimaPosicao = dados.length - 1;
@@ -175,7 +208,7 @@ class Receipts2 {
             LEFT JOIN globus.bgm_cadlinhas lin ON df.codintlinha = lin.codintlinha
             LEFT JOIN VW_ML_FRQ_BH_DIARIO bhd ON df.CODINTFUNC = bhd.CODINTFUNC AND bhd.DTDIGIT = df.DTDIGIT
             WHERE
-                df.CODINTFUNC IN ('${funcionario.id_funcao_erp}')
+                df.CODINTFUNC IN ('${funcionario.id_funcionario_erp}')
                 AND df.dtdigit BETWEEN '${dateRequestInitial}' AND '${dateRequestFinish}'
                 AND TO_CHAR(df.dtdigit, 'MM/YYYY') = TO_CHAR(bh.competencia, 'MM/YYYY')
                 AND df.tipodigit = 'F'
@@ -200,7 +233,26 @@ class Receipts2 {
             catch (error) {
                 resumoFicha = [];
             }
-            return response.json(this.tratarDadosDotCard(query, empresa, `${data[1]}-${data[0]}`, resumoFicha));
+            const pdfTemp = await this.generatePdf(this.tratarDadosDotCard(query, empresa, `${data[1]}-${data[0]}`, resumoFicha), template_1.fichaPonto);
+            if (!pdfTemp) {
+                return response.badRequest({ error: "Erro ao gerar pdf!" });
+            }
+            const confirmacao = await ConfirmarPdf_1.default.query()
+                .select("*")
+                .where("id_funcionario", "=", `${funcionario?.id_funcionario}`)
+                .andWhere("data_pdf", "=", `${dados.data}`);
+            if (!confirmacao) {
+                return response.badRequest({ error: "Erro ao aplicar confirmação!" });
+            }
+            const file = await (0, S3_1.uploadPdfEmpresa)(pdfTemp.filename, auth.user?.id_empresa);
+            if (!file) {
+                return response.badRequest({ error: "Erro ao gerar url do pdf!" });
+            }
+            fs_1.default.unlink(pdfTemp.filename, () => { });
+            response.json({
+                pdf: file.Location,
+                confirmado: confirmacao[0] ? true : false,
+            });
         }
         catch (error) {
             response.badRequest(error);
