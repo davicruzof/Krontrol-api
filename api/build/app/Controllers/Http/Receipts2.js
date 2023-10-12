@@ -6,11 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const Empresa_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/Empresa"));
 const ConfirmarPdf_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/ConfirmarPdf"));
 const Funcionario_1 = __importDefault(require("../../Models/Funcionario"));
-const pdf_creator_node_1 = __importDefault(require("pdf-creator-node"));
-const fs_1 = __importDefault(require("fs"));
-const S3_1 = global[Symbol.for('ioc.use')]("App/Controllers/Http/S3");
 const Database_1 = __importDefault(global[Symbol.for('ioc.use')]("Adonis/Lucid/Database"));
-const template_1 = global[Symbol.for('ioc.use')]("App/templates/pdf/template");
 const AppVersion_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/AppVersion"));
 const luxon_1 = require("luxon");
 class Receipts2 {
@@ -24,65 +20,6 @@ class Receipts2 {
             `);
             return liberacaoPdf?.rows.length > 0 ? true : false;
         };
-    }
-    async generatePdf(dados, template) {
-        try {
-            var options = {
-                format: "A3",
-                orientation: "portrait",
-                border: "10mm",
-                type: "pdf",
-            };
-            const filename = Math.random() + "_doc" + ".pdf";
-            var document = {
-                html: template,
-                data: {
-                    dados: dados,
-                },
-                path: "./pdfsTemp/" + filename,
-            };
-            let file = pdf_creator_node_1.default
-                .create(document, options)
-                .then((res) => {
-                return res;
-            })
-                .catch((error) => {
-                return error;
-            });
-            return await file;
-        }
-        catch (error) { }
-    }
-    tratarDadosDotCard(dados, dados_empresa, data, resumoFicha) {
-        const ultimaPosicao = dados.length - 1;
-        let dadosTemp = {
-            cabecalho: {
-                logo: dados_empresa.logo,
-                nomeEmpresa: dados_empresa.nomeempresarial,
-                cnpj: dados_empresa.cnpj,
-                nome: dados.NOME,
-                funcao: dados.FUNCAO,
-                competencia: data,
-                endereco: dados_empresa.logradouro,
-                periodo: data.split("").reverse().join(""),
-            },
-            rodape: {
-                saldoAnterior: dados[ultimaPosicao].SALDOANTERIOR,
-                credito: dados[ultimaPosicao].CREDITO,
-                debito: dados[ultimaPosicao].DEBITO,
-                valorPago: dados[ultimaPosicao].VALORPAGO,
-                saldoAtual: dados[ultimaPosicao].SALDOATUAL,
-            },
-            dadosDias: new Array(),
-            resumo: resumoFicha,
-        };
-        dados.forEach((element) => {
-            element.TOTALF = element.TOTALF;
-            element.EXTRA = element.EXTRA;
-            element.OUTRA = element.OUTRA;
-            dadosTemp.dadosDias.push(element);
-        });
-        return dadosTemp;
     }
     async dotCardPdfGenerator({ request, response, auth, }) {
         try {
@@ -123,10 +60,9 @@ class Receipts2 {
             }
             const query = await Database_1.default.connection("oracle").rawQuery(`
             SELECT DISTINCT
-              fun.id_funcionario_erp,
-                fun.id_empresa,
-                fun.funcao as FUNCAO,
-                fun.nome as NOME,
+                fun.id_funcionario_erp,
+                NVL(fun.funcao, '--------') AS FUNCAO,
+                NVL(fun.nome, '--------') AS NOME,
                 df.dtdigit AS DATA_MOVIMENTO,
                 oco.descocorr AS OCORRENCIA,
                 NVL(CASE
@@ -196,8 +132,7 @@ class Receipts2 {
             ,'999999900D99')
             ,1,11), '--------') AS SALDOATUAL,
                 df.tipodigit,
-                df.usudigit,
-                df.DTDIGITDIGIT,
+                
                 fun.CODFUNC AS registro,
                 NVL(bhd.BD_DEBITO, '--------') AS BD_DEBITO,
                 NVL(bhd.BH_CREDITO, '--------') AS BH_CREDITO
@@ -220,23 +155,6 @@ class Receipts2 {
                     error: "Nenhum dado de ficha ponto foi encontrado!",
                 });
             }
-            let resumoFicha = [];
-            try {
-                resumoFicha = await Database_1.default.connection("oracle").rawQuery(`
-          SELECT DISTINCT EVENTO, TRIM(HR_DIA) as HR_DIA
-          FROM
-            VW_ML_PON_RESUMO_HOLERITE FH
-          WHERE FH.ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
-          AND FH.COMPETENCIA = '${competencia}'
-        `);
-            }
-            catch (error) {
-                resumoFicha = [];
-            }
-            const pdfTemp = await this.generatePdf(this.tratarDadosDotCard(query, empresa, `${data[1]}-${data[0]}`, resumoFicha), template_1.fichaPonto);
-            if (!pdfTemp) {
-                return response.badRequest({ error: "Erro ao gerar pdf!" });
-            }
             const confirmacao = await ConfirmarPdf_1.default.query()
                 .select("*")
                 .where("id_funcionario", "=", `${funcionario?.id_funcionario}`)
@@ -244,15 +162,7 @@ class Receipts2 {
             if (!confirmacao) {
                 return response.badRequest({ error: "Erro ao aplicar confirmação!" });
             }
-            const file = await (0, S3_1.uploadPdfEmpresa)(pdfTemp.filename, auth.user?.id_empresa);
-            if (!file) {
-                return response.badRequest({ error: "Erro ao gerar url do pdf!" });
-            }
-            fs_1.default.unlink(pdfTemp.filename, () => { });
-            response.json({
-                pdf: file.Location,
-                confirmado: confirmacao[0] ? true : false,
-            });
+            return response.json({ query });
         }
         catch (error) {
             response.badRequest(error);
