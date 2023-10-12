@@ -60,8 +60,8 @@ export default class Receipts2 {
         logo: dados_empresa.logo,
         nomeEmpresa: dados_empresa.nomeempresarial,
         cnpj: dados_empresa.cnpj,
-        nome: dados.nome,
-        funcao: dados.funcao,
+        nome: dados.NOME,
+        funcao: dados.FUNCAO,
         competencia: data,
         endereco: dados_empresa.logradouro,
         periodo: data.split("").reverse().join(""),
@@ -160,16 +160,16 @@ export default class Receipts2 {
             SELECT DISTINCT
               fun.id_funcionario_erp,
                 fun.id_empresa,
-                fun.funcao,
-                fun.nome,
-                df.dtdigit AS data_movimento,
-                oco.descocorr AS ocorrencia,
+                fun.funcao as FUNCAO,
+                fun.nome as NOME,
+                df.dtdigit AS DATA_MOVIMENTO,
+                oco.descocorr AS OCORRENCIA,
                 NVL(CASE
                     WHEN df.CODOCORR IN (2, 12, 81) THEN
                         REPLACE(REPLACE(REPLACE(TO_CHAR(df.entradigit, 'HH24:MI'), '30/12/1899 00:00:00', ''), '10/11/2022 00:00:00', ''), '00:00', '')
                     ELSE
                         REPLACE(REPLACE(TO_CHAR(df.entradigit, 'HH24:MI'), '30/12/1899 00:00:00', ''), '10/11/2022 00:00:00', '')
-                END, '--------') AS entrada,
+                END, '--------') AS ENTRADA,
                 NVL(CASE
                     WHEN df.CODOCORR IN (2, 12, 81) THEN
                         REPLACE(REPLACE(TO_CHAR(df.intidigit, 'HH24:MI'), '30/12/1899 00:00:00', ''), '00:00', '')
@@ -188,21 +188,21 @@ export default class Receipts2 {
                     ELSE
                         REPLACE(TO_CHAR(df.saidadigit, 'HH24:MI'), '30/12/1899 00:00:00', '')
                 END, '--------') AS SAIDA,
-                NVL(lin.codigolinha, '--------') AS linha,
-                NVL(df.servicodigit, '--------') AS tabela,
+                NVL(lin.codigolinha, '--------') AS LINHA,
+                NVL(df.servicodigit, '--------') AS TABELA,
                 df.codocorr,
                 NVL(CASE
                     WHEN df.CODOCORR IN (1, 5, 13, 31, 81, 85) THEN
                         '0' || REPLACE(LTRIM(TO_CHAR(CASE WHEN df.CODOCORR IN (1, 5, 13, 31, 81, 85) THEN df.normaldm END, '999999990D99')), '.', ':')
-                END, '--------') AS normal,
+                END, '--------') AS NORMAL,
                 NVL(CASE
                     WHEN df.outradm > 0 THEN
                         '' || REPLACE(LTRIM(TO_CHAR(df.outradm, '')), '#', ':')
-                END, '--------') AS outra,
+                END, '--------') AS OUTRA,
                 NVL(CASE
                     WHEN df.adnotdm > 0 THEN
                         '0' || REPLACE(LTRIM(TO_CHAR(df.adnotdm, '999999990D99')), '.', ':')
-                END, '--------') AS a_not,
+                END, '--------') AS A_NOT,
                 NVL(CASE
                     WHEN df.CODOCORR IN (2) THEN
                         '0' || REPLACE(LTRIM(TO_CHAR(CASE WHEN df.CODOCORR IN (2) THEN df.normaldm END, '999999990D99')), '.', ':')
@@ -211,12 +211,12 @@ export default class Receipts2 {
                 NVL(CASE
                     WHEN df.CODOCORR NOT IN (14, 28, 104) THEN
                         TO_CHAR((df.normaldm + df.extradm + df.excessodm + df.outradm + df.adnotdm + df.extranotdm), '999999990D99')
-                END, '--------') AS TOTAL,
-                NVL(TO_CHAR(bh.competencia, 'MM/YYYY'), '--------') AS bh_competencia,
-                NVL(TO_CHAR(bh.credito, '999999900D99'), '--------') AS credito,
-                NVL(TO_CHAR(bh.debito, '999999900D99'), '--------') AS debito,
-                NVL(TO_CHAR(bh.saldoanterior, '999999900D99'), '--------') AS saldoanterior,
-                NVL(TO_CHAR(bh.valorpago, '999999900D99'), '--------') AS valorpago,
+                END, '--------') AS TOTALF,
+                NVL(TO_CHAR(bh.competencia, 'MM/YYYY'), '--------') AS BH_COMPETENCIA,
+                NVL(TO_CHAR(bh.credito, '999999900D99'), '--------') AS CREDITO,
+                NVL(TO_CHAR(bh.debito, '999999900D99'), '--------') AS DEBITO,
+                NVL(TO_CHAR(bh.saldoanterior, '999999900D99'), '--------') AS SALDOANTERIOR,
+                NVL(TO_CHAR(bh.valorpago, '999999900D99'), '--------') AS VALORPAGO,
                 NVL(SUBSTR( 
                 to_char(
                   to_char(
