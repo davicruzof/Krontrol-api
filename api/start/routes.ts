@@ -128,7 +128,7 @@ Route.group(() => {
   Route.group(() => {
     Route.post(
       "/dotCardPdfGenerator",
-      "Receipts.dotCardPdfGenerator2"
+      "Receipts2.dotCardPdfGenerator"
     ).middleware("auth");
   }).prefix("/receipts2");
 

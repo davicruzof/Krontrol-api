@@ -53,7 +53,7 @@ Route_1.default.group(() => {
         Route_1.default.post("/EventsReceiptFormByFuncionario", "Receipts.EventsReceiptFormByFuncionario").middleware("auth");
     }).prefix("/receipts");
     Route_1.default.group(() => {
-        Route_1.default.post("/dotCardPdfGenerator", "Receipts.dotCardPdfGenerator2").middleware("auth");
+        Route_1.default.post("/dotCardPdfGenerator", "Receipts2.dotCardPdfGenerator").middleware("auth");
     }).prefix("/receipts2");
     Route_1.default.group(() => {
         Route_1.default.get("/", "InformativosController.getInformativos").middleware("auth");
