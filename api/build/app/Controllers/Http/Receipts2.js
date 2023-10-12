@@ -132,15 +132,14 @@ class Receipts2 {
             ,'999999900D99')
             ,1,11), '--------') AS SALDOATUAL,
                 df.tipodigit,
-                
                 fun.CODFUNC AS registro,
                 NVL(bhd.BD_DEBITO, '--------') AS BD_DEBITO,
                 NVL(bhd.BH_CREDITO, '--------') AS BH_CREDITO
-            FROM globus.frq_digitacaomovimento df
+            FROM frq_digitacaomovimento df
             INNER JOIN VW_ML_FLP_FUNCIONARIO fun ON df.codintfunc = fun.id_funcionario_erp
-            INNER JOIN globus.vw_bancohoras bh ON df.codintfunc = bh.codintfunc
-            INNER JOIN globus.frq_ocorrencia oco ON df.codocorr = oco.codocorr
-            LEFT JOIN globus.bgm_cadlinhas lin ON df.codintlinha = lin.codintlinha
+            INNER JOIN vw_bancohoras bh ON df.codintfunc = bh.codintfunc
+            INNER JOIN frq_ocorrencia oco ON df.codocorr = oco.codocorr
+            LEFT JOIN bgm_cadlinhas lin ON df.codintlinha = lin.codintlinha
             LEFT JOIN VW_ML_FRQ_BH_DIARIO bhd ON df.CODINTFUNC = bhd.CODINTFUNC AND bhd.DTDIGIT = df.DTDIGIT
             WHERE
                 df.CODINTFUNC IN ('${funcionario.id_funcionario_erp}')
@@ -149,7 +148,7 @@ class Receipts2 {
                 AND df.tipodigit = 'F'
                 AND (df.normaldm + df.extradm + df.excessodm + df.outradm + df.adnotdm + df.extranotdm) > 0
                 AND df.STATUSDIGIT = 'N';
-                      `);
+      `);
             if (query.length === 0) {
                 return response.badRequest({
                     error: "Nenhum dado de ficha ponto foi encontrado!",
