@@ -206,7 +206,7 @@ export default class Receipts2 {
                     WHEN df.CODOCORR IN (2) THEN
                         '0' || REPLACE(LTRIM(TO_CHAR(CASE WHEN df.CODOCORR IN (2) THEN df.normaldm END, '999999990D99')), '.', ':')
                 END, '--------') AS dsr,
-                TO_CHAR(df.extranotdm, '999999990D99') AS extranotdm,
+                NVL(TO_CHAR(df.extranotdm, '999999990D99'), '--------') AS EXTRANOTDM,
                 NVL(CASE
                     WHEN df.CODOCORR NOT IN (14, 28, 104) THEN
                         TO_CHAR((df.normaldm + df.extradm + df.excessodm + df.outradm + df.adnotdm + df.extranotdm), '999999990D99')
@@ -230,7 +230,7 @@ export default class Receipts2 {
             ,'999999900D99')
             ,1,11), '--------') AS SALDOATUAL,
                 df.tipodigit,
-                fun.CODFUNC AS registro,
+                NVL(fun.CODFUNC, '--------') AS REGISTRO,
                 NVL(bhd.BD_DEBITO, '--------') AS BD_DEBITO,
                 NVL(bhd.BH_CREDITO, '--------') AS BH_CREDITO
             FROM frq_digitacaomovimento df
@@ -242,7 +242,7 @@ export default class Receipts2 {
             WHERE
                 df.CODINTFUNC IN ('${funcionario.id_funcionario_erp}')
                 AND df.dtdigit BETWEEN '${dateRequestInitial}' AND '${dateRequestFinish}'
-                AND TO_CHAR(df.dtdigit, 'MM/YYYY') = TO_CHAR(bh.competencia, 'MM/YYYY')
+                AND TO_CHAR(df.dtdigit, 'DD/MM/YYYY') = TO_CHAR(bh.competencia, 'DD/MM/YYYY')
                 AND df.tipodigit = 'F'
                 AND (df.normaldm + df.extradm + df.excessodm + df.outradm + df.adnotdm + df.extranotdm) > 0
                 AND df.STATUSDIGIT = 'N';
