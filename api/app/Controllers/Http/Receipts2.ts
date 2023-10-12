@@ -230,14 +230,14 @@ export default class Receipts2 {
             ,'999999900D99')
             ,1,11), '--------') AS SALDOATUAL,
                 df.tipodigit,
-                NVL(fun.CODFUNC, '--------') AS REGISTRO,
+                fun.CODFUNC AS registro,
                 NVL(bhd.BD_DEBITO, '--------') AS BD_DEBITO,
                 NVL(bhd.BH_CREDITO, '--------') AS BH_CREDITO
-            FROM frq_digitacaomovimento df
+            FROM globus.frq_digitacaomovimento df
             INNER JOIN VW_ML_FLP_FUNCIONARIO fun ON df.codintfunc = fun.id_funcionario_erp
-            INNER JOIN vw_bancohoras bh ON df.codintfunc = bh.codintfunc
-            INNER JOIN frq_ocorrencia oco ON df.codocorr = oco.codocorr
-            LEFT JOIN bgm_cadlinhas lin ON df.codintlinha = lin.codintlinha
+            INNER JOIN globus.vw_bancohoras bh ON df.codintfunc = bh.codintfunc
+            INNER JOIN globus.frq_ocorrencia oco ON df.codocorr = oco.codocorr
+            LEFT JOIN globus.bgm_cadlinhas lin ON df.codintlinha = lin.codintlinha
             LEFT JOIN VW_ML_FRQ_BH_DIARIO bhd ON df.CODINTFUNC = bhd.CODINTFUNC AND bhd.DTDIGIT = df.DTDIGIT
             WHERE
                 df.CODINTFUNC IN ('${funcionario.id_funcionario_erp}')
