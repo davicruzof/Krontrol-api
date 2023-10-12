@@ -111,21 +111,29 @@ Route.group(() => {
 
   //Rotas Funcionario 2
   Route.group(() => {
-    Route.post("/dotCardPdfGenerator", "Receipts.dotCardPdfGenerator").middleware(
-      "auth"
-    );
-    Route.post("/payStubPdfGenerator", "Receipts.payStubPdfGenerator").middleware(
-      "auth"
-    );
-    Route.post("/EventsReceiptFormByFuncionario", "Receipts.EventsReceiptFormByFuncionario").middleware(
-      "auth"
-    );
+    Route.post(
+      "/dotCardPdfGenerator",
+      "Receipts.dotCardPdfGenerator"
+    ).middleware("auth");
+    Route.post(
+      "/payStubPdfGenerator",
+      "Receipts.payStubPdfGenerator"
+    ).middleware("auth");
+    Route.post(
+      "/EventsReceiptFormByFuncionario",
+      "Receipts.EventsReceiptFormByFuncionario"
+    ).middleware("auth");
   }).prefix("/receipts");
 
   Route.group(() => {
-    Route.get("/", "InformativosController.getInformativos").middleware(
-      "auth"
-    );
+    Route.post(
+      "/dotCardPdfGenerator",
+      "Receipts.dotCardPdfGenerator2"
+    ).middleware("auth");
+  }).prefix("/receipts2");
+
+  Route.group(() => {
+    Route.get("/", "InformativosController.getInformativos").middleware("auth");
     Route.put("/", "InformativosController.updateInformativo").middleware(
       "auth"
     );
