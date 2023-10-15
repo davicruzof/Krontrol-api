@@ -303,7 +303,7 @@ export default class Receipts2 {
             INNER JOIN globus.vw_bancohoras bh ON df.codintfunc = bh.codintfunc
             INNER JOIN globus.frq_ocorrencia oco ON df.codocorr = oco.codocorr
             LEFT JOIN globus.bgm_cadlinhas lin ON df.codintlinha = lin.codintlinha
-            LEFT JOIN VW_ML_FRQ_BH_DIARIO bhd ON df.CODINTFUNC = bhd.CODINTFUNC AND bhd.DTDIGIT = df.DTDIGIT
+            LEFT JOIN gudma.VW_ML_FRQ_BH_DIARIO bhd ON df.CODINTFUNC = bhd.CODINTFUNC AND bhd.DTDIGIT = df.DTDIGIT
             WHERE
                 df.CODINTFUNC IN ('${funcionario.id_funcionario_erp}')
                 AND df.dtdigit BETWEEN '${dateRequestInitial}' AND '${dateRequestFinish}'
