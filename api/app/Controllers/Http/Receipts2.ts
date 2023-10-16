@@ -1,12 +1,11 @@
 import Empresa from "App/Models/Empresa";
-import ConfirmarPdf from "App/Models/ConfirmarPdf";
 import type { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
 import Funcionario from "../../Models/Funcionario";
 import pdf from "pdf-creator-node";
 import fs from "fs";
 import { uploadPdfEmpresa } from "App/Controllers/Http/S3";
 import Database from "@ioc:Adonis/Lucid/Database";
-import { fichaPonto, templateDotCard } from "App/templates/pdf/template";
+import { templateDotCard } from "App/templates/pdf/template";
 import AppVersion from "App/Models/AppVersion";
 import { DateTime } from "luxon";
 
@@ -53,37 +52,37 @@ export default class Receipts2 {
     return liberacaoPdf?.rows.length > 0 ? true : false;
   };
 
-  private tratarDadosDotCard(dados, dados_empresa, data, resumoFicha) {
-    const ultimaPosicao = dados.length - 1;
-    let dadosTemp = {
-      cabecalho: {
-        logo: dados_empresa.logo,
-        nomeEmpresa: dados_empresa.nomeempresarial,
-        cnpj: dados_empresa.cnpj,
-        nome: dados[ultimaPosicao].NOME,
-        funcao: dados[ultimaPosicao].FUNCAO,
-        competencia: data,
-        endereco: dados_empresa.logradouro,
-        periodo: data.split("").reverse().join(""),
-      },
-      rodape: {
-        saldoAnterior: dados[ultimaPosicao].SALDOANTERIOR,
-        credito: dados[ultimaPosicao].CREDITO,
-        debito: dados[ultimaPosicao].DEBITO,
-        valorPago: dados[ultimaPosicao].VALORPAGO,
-        saldoAtual: dados[ultimaPosicao].SALDOATUAL,
-      },
-      dadosDias: new Array(),
-      resumo: resumoFicha,
-    };
-    dados.forEach((element) => {
-      element.TOTALF = element.TOTALF;
-      element.EXTRA = element.EXTRA;
-      element.OUTRA = element.OUTRA;
-      dadosTemp.dadosDias.push(element);
-    });
-    return dadosTemp;
-  }
+  // private tratarDadosDotCard(dados, dados_empresa, data, resumoFicha) {
+  //   const ultimaPosicao = dados.length - 1;
+  //   let dadosTemp = {
+  //     cabecalho: {
+  //       logo: dados_empresa.logo,
+  //       nomeEmpresa: dados_empresa.nomeempresarial,
+  //       cnpj: dados_empresa.cnpj,
+  //       nome: dados[ultimaPosicao].NOME,
+  //       funcao: dados[ultimaPosicao].FUNCAO,
+  //       competencia: data,
+  //       endereco: dados_empresa.logradouro,
+  //       periodo: data.split("").reverse().join(""),
+  //     },
+  //     rodape: {
+  //       saldoAnterior: dados[ultimaPosicao].SALDOANTERIOR,
+  //       credito: dados[ultimaPosicao].CREDITO,
+  //       debito: dados[ultimaPosicao].DEBITO,
+  //       valorPago: dados[ultimaPosicao].VALORPAGO,
+  //       saldoAtual: dados[ultimaPosicao].SALDOATUAL,
+  //     },
+  //     dadosDias: new Array(),
+  //     resumo: resumoFicha,
+  //   };
+  //   dados.forEach((element) => {
+  //     element.TOTALF = element.TOTALF;
+  //     element.EXTRA = element.EXTRA;
+  //     element.OUTRA = element.OUTRA;
+  //     dadosTemp.dadosDias.push(element);
+  //   });
+  //   return dadosTemp;
+  // }
 
   private tratarDadosEvents(dados, dados_empresa) {
     let dadosTemp = {
@@ -222,154 +221,30 @@ export default class Receipts2 {
       }
 
       const query = await Database.connection("oracle").rawQuery(`
-            SELECT DISTINCT
-                fun.id_funcionario_erp,
-                NVL(fun.funcao, '--------') AS FUNCAO,
-                NVL(fun.nome, '--------') AS NOME,
-                df.dtdigit AS DATA_MOVIMENTO,
-                oco.descocorr AS OCORRENCIA,
-                NVL(CASE
-                    WHEN df.CODOCORR IN (2, 12, 81) THEN
-                        REPLACE(REPLACE(REPLACE(TO_CHAR(df.entradigit, 'HH24:MI'), '30/12/1899 00:00:00', ''), '10/11/2022 00:00:00', ''), '00:00', '')
-                    ELSE
-                        REPLACE(REPLACE(TO_CHAR(df.entradigit, 'HH24:MI'), '30/12/1899 00:00:00', ''), '10/11/2022 00:00:00', '')
-                END, '--------') AS ENTRADA,
-                NVL(CASE
-                    WHEN df.CODOCORR IN (2, 12, 81) THEN
-                        REPLACE(REPLACE(TO_CHAR(df.intidigit, 'HH24:MI'), '30/12/1899 00:00:00', ''), '00:00', '')
-                    ELSE
-                        REPLACE(TO_CHAR(df.intidigit, 'HH24:MI'), '30/12/1899 00:00:00', '')
-                END,'--------') AS I_INI,
-                NVL(CASE
-                    WHEN df.CODOCORR IN (2, 12, 81) THEN
-                        REPLACE(REPLACE(TO_CHAR(df.intfdigit, 'HH24:MI'), '30/12/1899 00:00:00', ''), '00:00', '')
-                    ELSE
-                        REPLACE(TO_CHAR(df.intfdigit, 'HH24:MI'), '30/12/1899 00:00:00', '')
-                END, '--------') AS I_FIM,
-                NVL(CASE
-                    WHEN df.CODOCORR IN (2, 12, 81) THEN
-                        REPLACE(REPLACE(TO_CHAR(df.saidadigit, 'HH24:MI'), '30/12/1899 00:00:00', ''), '00:00', '')
-                    ELSE
-                        REPLACE(TO_CHAR(df.saidadigit, 'HH24:MI'), '30/12/1899 00:00:00', '')
-                END, '--------') AS SAIDA,
-                NVL(lin.codigolinha, '--------') AS LINHA,
-                NVL(df.servicodigit, '--------') AS TABELA,
-                df.codocorr,
-                NVL(CASE
-                    WHEN df.CODOCORR IN (1, 5, 13, 31, 81, 85) THEN
-                        '0' || REPLACE(LTRIM(TO_CHAR(CASE WHEN df.CODOCORR IN (1, 5, 13, 31, 81, 85) THEN df.normaldm END, '999999990D99')), '.', ':')
-                END, '--------') AS NORMAL,
-                NVL(CASE
-                    WHEN df.outradm > 0 THEN
-                        '' || REPLACE(LTRIM(TO_CHAR(df.outradm, '')), '#', ':')
-                END, '--------') AS OUTRA,
-                NVL(CASE
-                    WHEN df.adnotdm > 0 THEN
-                        '0' || REPLACE(LTRIM(TO_CHAR(df.adnotdm, '999999990D99')), '.', ':')
-                END, '--------') AS A_NOT,
-                NVL(CASE
-                    WHEN df.CODOCORR IN (2) THEN
-                        '0' || REPLACE(LTRIM(TO_CHAR(CASE WHEN df.CODOCORR IN (2) THEN df.normaldm END, '999999990D99')), '.', ':')
-                END, '--------') AS dsr,
-                NVL(TO_CHAR(df.extranotdm, '999999990D99'), '--------') AS EXTRANOTDM,
-                NVL(CASE
-                    WHEN df.CODOCORR NOT IN (14, 28, 104) THEN
-                        TO_CHAR((df.normaldm + df.extradm + df.excessodm + df.outradm + df.adnotdm + df.extranotdm), '999999990D99')
-                END, '--------') AS TOTALF,
-                NVL(TO_CHAR(bh.competencia, 'MM/YYYY'), '--------') AS BH_COMPETENCIA,
-                NVL(TO_CHAR(bh.credito, '999999900D99'), '--------') AS CREDITO,
-                NVL(TO_CHAR(bh.debito, '999999900D99'), '--------') AS DEBITO,
-                NVL(TO_CHAR(bh.saldoanterior, '999999900D99'), '--------') AS SALDOANTERIOR,
-                NVL(TO_CHAR(bh.valorpago, '999999900D99'), '--------') AS VALORPAGO,
-                NVL(SUBSTR(
-                to_char(
-                  to_char(
-                    (( (SUBSTR(to_char( to_char(bh.saldoanterior,'999999900D99')),7,4 )*60) +
-                      CASE
-                        WHEN bh.saldoanterior < 0.00 THEN '-'||SUBSTR(to_char( to_char(bh.saldoanterior,'999999900D99')),12,2)
-                        ELSE SUBSTR(to_char( to_char(bh.saldoanterior,'999999900D99')),12,2 ) END )+
-                    ( (SUBSTR(to_char( to_char(bh.credito,'999999900D99')),7,4 )*60) +
-                      CASE WHEN bh.credito < 0.00 THEN '-'||SUBSTR(to_char( to_char(bh.credito,'999999900D99')),12,2) ELSE SUBSTR(to_char( to_char(bh.credito,'999999900D99')),12,2 ) END ) -
-            ( (SUBSTR(to_char( to_char(bh.valorpago,'999999900D99')),7,4 )*60) + CASE WHEN bh.debito < 0.00 THEN '-'||SUBSTR(to_char( to_char(bh.valorpago,'999999900D99')),12,2) ELSE SUBSTR(to_char( to_char(bh.valorpago,'999999900D99')),12,2 ) END ) -
-            ( (SUBSTR(to_char( to_char(bh.debito,'999999900D99')),7,4 )*60) + CASE WHEN bh.debito < 0.00 THEN '-'||SUBSTR(to_char( to_char(bh.debito,'999999900D99')),12,2) ELSE SUBSTR(to_char( to_char(bh.debito,'999999900D99')),12,2 ) END )) / 60 ,'999999900D99')
-            ,'999999900D99')
-            ,1,11), '--------') AS SALDOATUAL,
-                df.tipodigit,
-                fun.CODFUNC AS registro,
-                NVL(bhd.BD_DEBITO, '--------') AS BD_DEBITO,
-                NVL(bhd.BH_CREDITO, '--------') AS BH_CREDITO
-            FROM globus.FRQ_DIGITACAOMOVIMENTO df
-            INNER JOIN VW_ML_FLP_FUNCIONARIO fun ON df.codintfunc = fun.id_funcionario_erp
-            INNER JOIN globus.VW_BANCOHORAS bh ON df.codintfunc = bh.codintfunc
-            INNER JOIN globus.FRQ_OCORRENCIA oco ON df.codocorr = oco.codocorr
-            LEFT JOIN globus.BGM_CADLINHAS lin ON df.codintlinha = lin.codintlinha
-            LEFT JOIN VW_ML_FRQ_BH_DIARIO bhd ON df.CODINTFUNC = bhd.CODINTFUNC AND bhd.DTDIGIT = df.DTDIGIT
-            WHERE
+            select DISTINCT
+              df.dtdigit as data_movimento,  
+              CASE WHEN df.CODOCORR  IN(2,12,81) THEN REPLACE(replace(replace(to_char(df.entradigit,'HH24:MI'),'30/12/1899 00:00:00',''),'10/11/2022 00:00:00',''),'00:00','') ELSE replace(replace(to_char(df.entradigit,'HH24:MI'),'30/12/1899 00:00:00',''),'10/11/2022 00:00:00','') END  entrada,
+              CASE WHEN df.CODOCORR  IN(2,12,81) THEN REPLACE(replace(to_char(df.intidigit,'HH24:MI'),'30/12/1899 00:00:00',''),'00:00','')  ELSE replace(to_char(df.intidigit,'HH24:MI'),'30/12/1899 00:00:00','') END as I_INI, 
+              CASE WHEN df.CODOCORR  IN(2,12,81) THEN REPLACE(replace(to_char(df.intfdigit,'HH24:MI'),'30/12/1899 00:00:00',''),'00:00','')  ELSE replace(to_char(df.intfdigit,'HH24:MI'),'30/12/1899 00:00:00','') END AS I_FIM,
+              CASE WHEN df.CODOCORR  IN(2,12,81) THEN replace(replace(to_char(df.saidadigit,'HH24:MI'),'30/12/1899 00:00:00',''),'00:00','') ELSE replace(to_char(df.saidadigit,'HH24:MI'),'30/12/1899 00:00:00','') END AS SAIDA,
+              df.servicodigit as tabela,df.codocorr, 
+              CASE WHEN df.CODOCORR  IN(1,5,13,31,81,85)  THEN '0'|| REPLACE (  ltrim( to_char( (CASE WHEN df.CODOCORR  IN(1,5,13,31,81,85) THEN df.normaldm END),'999999990D99')),'.',':') END AS  normal, 
+              CASE WHEN df.outradm > 0 THEN ''|| REPLACE (  ltrim( to_char(df.outradm,'')),'#',':') END AS outra,
+              CASE WHEN df.adnotdm > 0 THEN '0'|| REPLACE (  ltrim( to_char(df.adnotdm,'999999990D99')),'.',':') END AS a_not,
+              CASE WHEN df.CODOCORR  IN(2)  THEN '0'|| REPLACE (  ltrim( to_char( (CASE WHEN df.CODOCORR  IN(2) THEN df.normaldm END),'999999990D99')),'.',':') END AS  dsr  , 
+              to_char(df.extranotdm ,'999999990D99')  extranotdm, 
+              CASE WHEN df.CODOCORR NOT IN (14,28,104) THEN  to_char( (df.normaldm + df.extradm + df.excessodm + df.outradm + df.adnotdm + df.extranotdm) ,'999999990D99') END AS TOTAL, 
+              df.tipodigit, df.usudigit, df.DTDIGITDIGIT
+              from globus.frq_digitacaomovimento df 
+              where 
                 df.CODINTFUNC IN ('${funcionario.id_funcionario_erp}')
                 AND df.dtdigit BETWEEN '${dateRequestInitial}' AND '${dateRequestFinish}'
-                AND TO_CHAR(df.dtdigit, 'DD/MM/YYYY') = TO_CHAR(bh.competencia, 'DD/MM/YYYY')
                 AND df.tipodigit = 'F'
                 AND (df.normaldm + df.extradm + df.excessodm + df.outradm + df.adnotdm + df.extranotdm) > 0
                 AND df.STATUSDIGIT = 'N'
       `);
 
-      if (query.length === 0) {
-        return response.badRequest({
-          error: "Nenhum dado de ficha ponto foi encontrado!",
-        });
-      }
-
-      let resumoFicha = [];
-
-      try {
-        resumoFicha = await Database.connection("oracle").rawQuery(`
-          SELECT DISTINCT EVENTO, TRIM(HR_DIA) as HR_DIA
-          FROM
-            VW_ML_PON_RESUMO_HOLERITE FH
-          WHERE FH.ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
-          AND FH.COMPETENCIA = '${competencia}'
-        `);
-      } catch (error) {
-        resumoFicha = [];
-      }
-
-      const pdfTemp = await this.generatePdf(
-        this.tratarDadosDotCard(
-          query,
-          empresa,
-          `${data[1]}-${data[0]}`,
-          resumoFicha
-        ),
-        fichaPonto
-      );
-
-      if (!pdfTemp) {
-        return response.badRequest({ error: "Erro ao gerar pdf!" });
-      }
-
-      const confirmacao = await ConfirmarPdf.query()
-        .select("*")
-        .where("id_funcionario", "=", `${funcionario?.id_funcionario}`)
-        .andWhere("data_pdf", "=", `${dados.data}`);
-
-      if (!confirmacao) {
-        return response.badRequest({ error: "Erro ao aplicar confirmação!" });
-      }
-
-      const file = await uploadPdfEmpresa(
-        pdfTemp.filename,
-        auth.user?.id_empresa
-      );
-
-      if (!file) {
-        return response.badRequest({ error: "Erro ao gerar url do pdf!" });
-      }
-
-      fs.unlink(pdfTemp.filename, () => {});
-      response.json({
-        pdf: file.Location,
-        confirmado: confirmacao[0] ? true : false,
-      });
+      return response.json(query.rows);
     } catch (error) {
       response.badRequest(error);
     }
