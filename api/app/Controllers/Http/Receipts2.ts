@@ -225,7 +225,7 @@ export default class Receipts2 {
         SELECT DISTINCT
           *
           FROM GUDMA.VW_ML_FICHAPONTO_PDF F
-          WHERE F.ID_FUNCIONARIO_ERP = '${funcionario.id_funcao_erp}'
+          WHERE F.ID_FUNCIONARIO_ERP = '${funcionario.id_funcionario_erp}'
           AND F.DATA_MOVIMENTO BETWEEN to_date('${dateRequestInitial}','DD-MM-YYYY') and to_date('${dateRequestFinish}','DD-MM-YYYY')
           ORDER BY F.BH_COMPETENCIA, F.DATA_MOVIMENTO
       `);
