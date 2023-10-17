@@ -354,7 +354,7 @@ export const fichaPonto = `
 <span>
     <hr size="1" style="border:1px dashed #000;">
     <span>
-        LISTAGEM DE MOVIMENTOS DA FREQUÊNCIA REFERENTE A {{this.DATA_MOVIMENTO}}
+        LISTAGEM DE MOVIMENTOS DA FREQUÊNCIA REFERENTE A {{dados.cabecalho.competencia}}
     </span>
     <hr size="1" style="border:1px dashed #000;">
     <div>
@@ -392,7 +392,7 @@ export const fichaPonto = `
 
         {{#each dados.dadosDias}}
             <tr>
-                <td style="width:12%;">{{this.DATA_MOVIMENTO}} </td>
+                <td style="width:12%;">{{this.DT_EXIBICAO}} </td>
                 <td style="width:7%;padding-left: 4px;">{{this.ENTRADA}} </td>
                 <td style="width:7%;padding-left: 8px;">{{this.I_INI}} </td>
                 <td style="width:7%;padding-left: 4px;">{{this.I_FIM}} </td>
