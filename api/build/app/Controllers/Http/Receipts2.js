@@ -89,8 +89,8 @@ class Receipts2 {
             if (!dados.data || !auth.user) {
                 return response.badRequest({ error: "data is required" });
             }
-            const data = `${dados.data.year}/dados.data.month}`;
-            const competencia = `${dados.data.month}/dados.data.year}`;
+            const data = `${dados.data.year}/${dados.data.month}`;
+            const competencia = `${dados.data.month}/${dados.data.year}`;
             const dateRequestInitial = luxon_1.DateTime.fromISO(new Date(`${data}-27`).toISOString().replace(".000Z", ""))
                 .minus({ months: 1 })
                 .toFormat("dd/LL/yyyy")
