@@ -182,7 +182,7 @@ export default class Receipts2 {
       const confirmacao = await ConfirmarPdf.query()
         .select("*")
         .where("id_funcionario", "=", `${funcionario?.id_funcionario}`)
-        .andWhere("data_pdf", "=", `${dados.data}`);
+        .andWhere("data_pdf", "=", `${competencia}`);
 
       if (!confirmacao) {
         return response.badRequest({ error: "Erro ao verificar confirmação!" });
