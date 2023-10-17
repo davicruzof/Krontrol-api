@@ -96,8 +96,8 @@ export default class Receipts2 {
         return response.badRequest({ error: "data is required" });
       }
 
-      const data = `${dados.year}/dados.month}`;
-      const competencia = `${dados.month}/dados.year}`;
+      const data = `${dados.data.year}/dados.data.month}`;
+      const competencia = `${dados.data.month}/dados.data.year}`;
 
       const dateRequestInitial = DateTime.fromISO(
         new Date(`${data}-27`).toISOString().replace(".000Z", "")
