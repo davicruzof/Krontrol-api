@@ -156,19 +156,19 @@ export default class Receipts2 {
           ORDER BY F.DATA_MOVIMENTO
       `);
 
-      if (query.rows.length === 0) {
-        return response.badRequest({
-          error: "Nenhum dado de ficha ponto foi encontrado!",
-        });
-      }
+      let resumoFicha = [];
 
-      let resumoFicha = await Database.connection("oracle").rawQuery(`
+      try {
+        resumoFicha = await Database.connection("oracle").rawQuery(`
           SELECT DISTINCT EVENTO, TRIM(HR_DIA) as HR_DIA
           FROM
             VW_ML_PON_RESUMO_HOLERITE FH
           WHERE FH.ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
           AND FH.COMPETENCIA = '${competencia}'
         `);
+      } catch (error) {
+        resumoFicha = [];
+      }
 
       const pdfTemp = await this.generatePdf(
         this.tratarDadosDotCard(query, empresa, resumoFicha),
