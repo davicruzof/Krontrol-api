@@ -7,7 +7,6 @@ import fs from "fs";
 import { uploadPdfEmpresa } from "App/Controllers/Http/S3";
 import Database from "@ioc:Adonis/Lucid/Database";
 import { fichaPonto } from "App/templates/pdf/template";
-import AppVersion from "App/Models/AppVersion";
 import { DateTime } from "luxon";
 
 export default class Receipts2 {
@@ -92,8 +91,8 @@ export default class Receipts2 {
     try {
       const dados = request.body();
 
-      if (!dados.data || !auth.user) {
-        return response.badRequest({ error: "data is required" });
+      if (!dados.data || !auth.user || !dados.app) {
+        return response.badRequest({ error: "Parametros faltando" });
       }
 
       const data = `${dados.data.year}/${dados.data.month}`;
@@ -133,10 +132,18 @@ export default class Receipts2 {
         return response.badRequest({ error: "funcionario não encontrado!" });
       }
 
-      const appUpdate = await AppVersion.findBy(
-        "id_funcionario",
-        auth.user?.id_funcionario
-      );
+      const versions = await Database.connection("pg")
+        .from("version_app")
+        .select("*")
+        .first();
+
+      let version = versions?.version_android;
+
+      if (dados.app.os === "ios") {
+        version = versions?.version_ios;
+      }
+
+      const appUpdate = version === dados.app.version;
 
       if (!appUpdate) {
         return response.badRequest({ error: "app desatualizado" });
@@ -152,7 +159,7 @@ export default class Receipts2 {
         SELECT DISTINCT *
           FROM GUDMA.VW_ML_FICHAPONTO_PDF F
           WHERE F.ID_FUNCIONARIO_ERP = '${funcionario.id_funcionario_erp}'
-          AND F.DATA_MOVIMENTO BETWEEN to_date('${dateRequestInitial}','DD-MM-YYYY') and to_date('${dateRequestFinish}','DD-MM-YYYY')
+          AND F.DATA_MOVIMENTO BETWEEN '${dateRequestInitial}' and '${dateRequestFinish}'
           ORDER BY F.DATA_MOVIMENTO
       `);
 

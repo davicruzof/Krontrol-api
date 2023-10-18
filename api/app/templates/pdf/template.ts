@@ -352,7 +352,6 @@ export const fichaPonto = `
 </head>
 
 <span>
-    <hr size="1" style="border:1px dashed #000;">
     <span>
         LISTAGEM DE MOVIMENTOS DA FREQUÊNCIA REFERENTE A {{dados.cabecalho.competencia}}
     </span>
@@ -408,20 +407,19 @@ export const fichaPonto = `
         {{/each}}
     </table>
 
-    <hr size="1" style="border:1px dashed #000;">
-
-    <table >
+    <table style="margin-top: 10px;" >
         <tr style="border: none; display: table-row;">
-            <td align="left" style="width: 50%;">EVENTO</td>
-            <td alignt="right">HR/DIA</td>
+            <td align="left" style="width: 80%;">EVENTO</td>
+            <td alignt="right" style="width: 20%;">HR/DIA</td>
         </tr>
         {{#each dados.resumo}}
             <tr>
-                <td align="left" >{{this.EVENTO}}</td>
-                <td align="right">{{this.HR_DIA}}</td>
+                <td align="left" style="width: 80%;">{{this.EVENTO}}</td>
+                <td alignt="right" style="width: 20%;">{{this.HR_DIA}}</td>
             </tr>
         {{/each}}
     </table>
+
     <hr size="1" style="border:1px dashed #000;">
 
     <table >
@@ -444,10 +442,6 @@ export const fichaPonto = `
             <td style="width: 25%;">VALOR PAGO: {{dados.rodape.valorPago}}</td>
         </tr>
     </table>
-    <hr size="1" style="border:1px dashed #000;">
-
-
     </body>
-
 </html>
 `;

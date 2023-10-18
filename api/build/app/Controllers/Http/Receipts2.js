@@ -11,7 +11,6 @@ const fs_1 = __importDefault(require("fs"));
 const S3_1 = global[Symbol.for('ioc.use')]("App/Controllers/Http/S3");
 const Database_1 = __importDefault(global[Symbol.for('ioc.use')]("Adonis/Lucid/Database"));
 const template_1 = global[Symbol.for('ioc.use')]("App/templates/pdf/template");
-const AppVersion_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/AppVersion"));
 const luxon_1 = require("luxon");
 class Receipts2 {
     constructor() {
@@ -86,8 +85,8 @@ class Receipts2 {
     async dotCardPdfGenerator({ request, response, auth, }) {
         try {
             const dados = request.body();
-            if (!dados.data || !auth.user) {
-                return response.badRequest({ error: "data is required" });
+            if (!dados.data || !auth.user || !dados.app) {
+                return response.badRequest({ error: "Parametros faltando" });
             }
             const data = `${dados.data.year}/${dados.data.month}`;
             const competencia = `${dados.data.month}/${dados.data.year}`;
@@ -108,7 +107,15 @@ class Receipts2 {
             if (!funcionario) {
                 return response.badRequest({ error: "funcionario não encontrado!" });
             }
-            const appUpdate = await AppVersion_1.default.findBy("id_funcionario", auth.user?.id_funcionario);
+            const versions = await Database_1.default.connection("pg")
+                .from("version_app")
+                .select("*")
+                .first();
+            let version = versions?.version_android;
+            if (dados.app.os === "ios") {
+                version = versions?.version_ios;
+            }
+            const appUpdate = version === dados.app.version;
             if (!appUpdate) {
                 return response.badRequest({ error: "app desatualizado" });
             }
@@ -120,7 +127,7 @@ class Receipts2 {
         SELECT DISTINCT *
           FROM GUDMA.VW_ML_FICHAPONTO_PDF F
           WHERE F.ID_FUNCIONARIO_ERP = '${funcionario.id_funcionario_erp}'
-          AND F.DATA_MOVIMENTO BETWEEN to_date('${dateRequestInitial}','DD-MM-YYYY') and to_date('${dateRequestFinish}','DD-MM-YYYY')
+          AND F.DATA_MOVIMENTO BETWEEN '${dateRequestInitial}' and '${dateRequestFinish}'
           ORDER BY F.DATA_MOVIMENTO
       `);
             let resumoFicha = [];
