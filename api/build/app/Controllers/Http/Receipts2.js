@@ -83,44 +83,39 @@ class Receipts2 {
         });
         return dadosTemp;
     }
+    formatDate(date) {
+        return luxon_1.DateTime.fromISO(date).toFormat("dd/LL/yyyy").toString();
+    }
+    generateRequestDates(dados) {
+        const lastDayOfMonth = `${dados.data.year}/${dados.data.month}/27`;
+        const dateRequestInitial = this.formatDate(luxon_1.DateTime.fromISO(lastDayOfMonth).minus({ months: 1 }).toJSDate());
+        const dateRequestFinish = this.formatDate(luxon_1.DateTime.fromISO(lastDayOfMonth).toJSDate());
+        return { dateRequestInitial, dateRequestFinish };
+    }
     async dotCardPdfGenerator({ request, response, auth, }) {
         try {
             const dados = request.body();
             if (!dados.data || !auth.user) {
                 return response.badRequest({ error: "data is required" });
             }
-            const data = `${dados.data.year}/${dados.data.month}`;
             const competencia = `${dados.data.month}/${dados.data.year}`;
-            const dateRequestInitial = luxon_1.DateTime.fromISO(new Date(`${data}-27`).toISOString().replace(".000Z", ""))
-                .minus({ months: 1 })
-                .toFormat("dd/LL/yyyy")
-                .toString();
-            const dateRequestFinish = luxon_1.DateTime.fromISO(new Date(`${data}-26`).toISOString().replace(".000Z", ""))
-                .toFormat("dd/LL/yyyy")
-                .toString();
-            const isMonthReleased = await this.isMonthFreedom(auth.user?.id_empresa, 1, competencia);
-            if (!isMonthReleased) {
+            const { dateRequestInitial, dateRequestFinish } = this.generateRequestDates(dados);
+            const [isMonthReleased, funcionario, appUpdate, empresa] = await Promise.all([
+                this.isMonthFreedom(auth.user?.id_empresa, 1, competencia),
+                Funcionario_1.default.findBy("id_funcionario", auth.user?.id_funcionario),
+                AppVersion_1.default.findBy("id_funcionario", auth.user?.id_funcionario),
+                Empresa_1.default.findBy("id_empresa", auth.user?.id_empresa),
+            ]);
+            if (!isMonthReleased || !funcionario || !appUpdate || !empresa) {
                 return response.badRequest({
-                    error: "Empresa não liberou para gerar o recibo",
+                    error: "Ocorreu um erro ao tentar gerar o pdf!",
                 });
-            }
-            const funcionario = await Funcionario_1.default.findBy("id_funcionario", auth.user?.id_funcionario);
-            if (!funcionario) {
-                return response.badRequest({ error: "funcionario não encontrado!" });
-            }
-            const appUpdate = await AppVersion_1.default.findBy("id_funcionario", auth.user?.id_funcionario);
-            if (!appUpdate) {
-                return response.badRequest({ error: "app desatualizado" });
-            }
-            const empresa = await Empresa_1.default.findBy("id_empresa", auth.user?.id_empresa);
-            if (!empresa) {
-                return response.badRequest({ error: "Erro ao pegar empresa!" });
             }
             const query = await Database_1.default.connection("oracle").rawQuery(`
         SELECT DISTINCT *
           FROM GUDMA.VW_ML_FICHAPONTO_PDF F
           WHERE F.ID_FUNCIONARIO_ERP = '${funcionario.id_funcionario_erp}'
-          AND F.DATA_MOVIMENTO BETWEEN to_date('${dateRequestInitial}','DD-MM-YYYY') and to_date('${dateRequestFinish}','DD-MM-YYYY')
+          AND F.DATA_MOVIMENTO BETWEEN '${dateRequestInitial}' AND '${dateRequestFinish}'
           ORDER BY F.DATA_MOVIMENTO
       `);
             let resumoFicha = [];
@@ -149,7 +144,7 @@ class Receipts2 {
             }
             const file = await (0, S3_1.uploadPdfEmpresa)(pdfTemp.filename, auth.user?.id_empresa);
             if (!file) {
-                return response.badRequest({ error: "Erro ao gerar url do pdf!" });
+                return response.badRequest({ error: "Erro ao fazer upload de pdf!" });
             }
             fs_1.default.unlink(pdfTemp.filename, () => { });
             response.json({
