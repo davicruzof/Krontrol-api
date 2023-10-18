@@ -411,13 +411,13 @@ exports.fichaPonto = `
 
     <table style="margin-top: 10px;" >
         <tr style="border: none; display: table-row;">
-            <td align="left" style="width: 80%;">EVENTO</td>
-            <td alignt="right" style="width: 20%;">HR/DIA</td>
+            <td align="left">EVENTO</td>
+            <td alignt="right">HR/DIA</td>
         </tr>
         {{#each dados.resumo}}
             <tr>
-                <td align="left" style="width: 80%;">{{this.EVENTO}}</td>
-                <td alignt="right" style="width: 20%;">{{this.HR_DIA}}</td>
+                <td align="left">{{this.EVENTO}}</td>
+                <td alignt="right">{{this.HR_DIA}}</td>
             </tr>
         {{/each}}
     </table>
