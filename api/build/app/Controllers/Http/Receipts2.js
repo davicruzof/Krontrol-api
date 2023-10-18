@@ -23,6 +23,20 @@ class Receipts2 {
             `);
             return liberacaoPdf?.rows.length > 0 ? true : false;
         };
+        this.isVersionCurrent = async (dados) => {
+            const versions = await Database_1.default.connection("pg")
+                .from("version_app")
+                .select("*")
+                .first();
+            if (!versions) {
+                return false;
+            }
+            let version = versions?.version_android;
+            if (dados.os === "ios") {
+                version = versions?.version_ios;
+            }
+            return version === dados.version;
+        };
     }
     async generatePdf(dados, template) {
         try {
@@ -82,21 +96,33 @@ class Receipts2 {
         });
         return dadosTemp;
     }
+    formatDates(date) {
+        const data = `${date.year}/${date.month}`;
+        const competencia = `${date.month}/${date.year}`;
+        const dateRequestInitial = luxon_1.DateTime.fromISO(new Date(`${data}-27`).toISOString().replace(".000Z", ""))
+            .minus({ months: 1 })
+            .toFormat("dd/LL/yyyy")
+            .toString();
+        const dateRequestFinish = luxon_1.DateTime.fromISO(new Date(`${data}-26`).toISOString().replace(".000Z", ""))
+            .toFormat("dd/LL/yyyy")
+            .toString();
+        return {
+            dateRequestInitial,
+            dateRequestFinish,
+            competencia,
+        };
+    }
     async dotCardPdfGenerator({ request, response, auth, }) {
         try {
             const dados = request.body();
             if (!dados.data || !auth.user || !dados.app) {
                 return response.badRequest({ error: "Parametros faltando" });
             }
-            const data = `${dados.data.year}/${dados.data.month}`;
-            const competencia = `${dados.data.month}/${dados.data.year}`;
-            const dateRequestInitial = luxon_1.DateTime.fromISO(new Date(`${data}-27`).toISOString().replace(".000Z", ""))
-                .minus({ months: 1 })
-                .toFormat("dd/LL/yyyy")
-                .toString();
-            const dateRequestFinish = luxon_1.DateTime.fromISO(new Date(`${data}-26`).toISOString().replace(".000Z", ""))
-                .toFormat("dd/LL/yyyy")
-                .toString();
+            const currentVersion = await this.isVersionCurrent(dados.app);
+            if (!currentVersion) {
+                return response.badRequest({ error: "app desatualizado" });
+            }
+            const { dateRequestInitial, dateRequestFinish, competencia } = this.formatDates(dados.data);
             const isMonthReleased = await this.isMonthFreedom(auth.user?.id_empresa, 1, competencia);
             if (!isMonthReleased) {
                 return response.badRequest({
@@ -106,18 +132,6 @@ class Receipts2 {
             const funcionario = await Funcionario_1.default.findBy("id_funcionario", auth.user?.id_funcionario);
             if (!funcionario) {
                 return response.badRequest({ error: "funcionario não encontrado!" });
-            }
-            const versions = await Database_1.default.connection("pg")
-                .from("version_app")
-                .select("*")
-                .first();
-            let version = versions?.version_android;
-            if (dados.app.os === "ios") {
-                version = versions?.version_ios;
-            }
-            const appUpdate = version === dados.app.version;
-            if (!appUpdate) {
-                return response.badRequest({ error: "app desatualizado" });
             }
             const empresa = await Empresa_1.default.findBy("id_empresa", auth.user?.id_empresa);
             if (!empresa) {

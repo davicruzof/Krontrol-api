@@ -83,6 +83,49 @@ export default class Receipts2 {
     return dadosTemp;
   }
 
+  private formatDates(date) {
+    const data = `${date.year}/${date.month}`;
+    const competencia = `${date.month}/${date.year}`;
+
+    const dateRequestInitial = DateTime.fromISO(
+      new Date(`${data}-27`).toISOString().replace(".000Z", "")
+    )
+      .minus({ months: 1 })
+      .toFormat("dd/LL/yyyy")
+      .toString();
+
+    const dateRequestFinish = DateTime.fromISO(
+      new Date(`${data}-26`).toISOString().replace(".000Z", "")
+    )
+      .toFormat("dd/LL/yyyy")
+      .toString();
+
+    return {
+      dateRequestInitial,
+      dateRequestFinish,
+      competencia,
+    };
+  }
+
+  private isVersionCurrent = async (dados) => {
+    const versions = await Database.connection("pg")
+      .from("version_app")
+      .select("*")
+      .first();
+
+    if (!versions) {
+      return false;
+    }
+
+    let version = versions?.version_android;
+
+    if (dados.os === "ios") {
+      version = versions?.version_ios;
+    }
+
+    return version === dados.version;
+  };
+
   public async dotCardPdfGenerator({
     request,
     response,
@@ -95,21 +138,14 @@ export default class Receipts2 {
         return response.badRequest({ error: "Parametros faltando" });
       }
 
-      const data = `${dados.data.year}/${dados.data.month}`;
-      const competencia = `${dados.data.month}/${dados.data.year}`;
+      const currentVersion = await this.isVersionCurrent(dados.app);
 
-      const dateRequestInitial = DateTime.fromISO(
-        new Date(`${data}-27`).toISOString().replace(".000Z", "")
-      )
-        .minus({ months: 1 })
-        .toFormat("dd/LL/yyyy")
-        .toString();
+      if (!currentVersion) {
+        return response.badRequest({ error: "app desatualizado" });
+      }
 
-      const dateRequestFinish = DateTime.fromISO(
-        new Date(`${data}-26`).toISOString().replace(".000Z", "")
-      )
-        .toFormat("dd/LL/yyyy")
-        .toString();
+      const { dateRequestInitial, dateRequestFinish, competencia } =
+        this.formatDates(dados.data);
 
       const isMonthReleased = await this.isMonthFreedom(
         auth.user?.id_empresa,
@@ -130,23 +166,6 @@ export default class Receipts2 {
 
       if (!funcionario) {
         return response.badRequest({ error: "funcionario não encontrado!" });
-      }
-
-      const versions = await Database.connection("pg")
-        .from("version_app")
-        .select("*")
-        .first();
-
-      let version = versions?.version_android;
-
-      if (dados.app.os === "ios") {
-        version = versions?.version_ios;
-      }
-
-      const appUpdate = version === dados.app.version;
-
-      if (!appUpdate) {
-        return response.badRequest({ error: "app desatualizado" });
       }
 
       const empresa = await Empresa.findBy("id_empresa", auth.user?.id_empresa);
