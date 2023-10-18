@@ -11,6 +11,7 @@ const fs_1 = __importDefault(require("fs"));
 const S3_1 = global[Symbol.for('ioc.use')]("App/Controllers/Http/S3");
 const Database_1 = __importDefault(global[Symbol.for('ioc.use')]("Adonis/Lucid/Database"));
 const template_1 = global[Symbol.for('ioc.use')]("App/templates/pdf/template");
+const AppVersion_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/AppVersion"));
 const luxon_1 = require("luxon");
 class Receipts2 {
     constructor() {
@@ -85,11 +86,11 @@ class Receipts2 {
     async dotCardPdfGenerator({ request, response, auth, }) {
         try {
             const dados = request.body();
-            if (!dados.data || !auth.user || !dados.app) {
-                return response.badRequest({ error: "Parametros faltando" });
+            if (!dados.data || !auth.user) {
+                return response.badRequest({ error: "data is required" });
             }
-            const data = `${dados.data.year}/${dados.data.month}`;
-            const competencia = `${dados.data.month}/${dados.data.year}`;
+            const data = `${dados.data.year}/dados.data.month}`;
+            const competencia = `${dados.data.month}/dados.data.year}`;
             const dateRequestInitial = luxon_1.DateTime.fromISO(new Date(`${data}-27`).toISOString().replace(".000Z", ""))
                 .minus({ months: 1 })
                 .toFormat("dd/LL/yyyy")
@@ -107,6 +108,10 @@ class Receipts2 {
             if (!funcionario) {
                 return response.badRequest({ error: "funcionario não encontrado!" });
             }
+            const appUpdate = await AppVersion_1.default.findBy("id_funcionario", auth.user?.id_funcionario);
+            if (!appUpdate) {
+                return response.badRequest({ error: "app desatualizado" });
+            }
             const empresa = await Empresa_1.default.findBy("id_empresa", auth.user?.id_empresa);
             if (!empresa) {
                 return response.badRequest({ error: "Erro ao pegar empresa!" });
@@ -115,22 +120,21 @@ class Receipts2 {
         SELECT DISTINCT *
           FROM GUDMA.VW_ML_FICHAPONTO_PDF F
           WHERE F.ID_FUNCIONARIO_ERP = '${funcionario.id_funcionario_erp}'
-          AND F.DATA_MOVIMENTO BETWEEN '${dateRequestInitial}' and '${dateRequestFinish}'
+          AND F.DATA_MOVIMENTO BETWEEN to_date('${dateRequestInitial}','DD-MM-YYYY') and to_date('${dateRequestFinish}','DD-MM-YYYY')
           ORDER BY F.DATA_MOVIMENTO
       `);
-            let resumoFicha = [];
-            try {
-                resumoFicha = await Database_1.default.connection("oracle").rawQuery(`
+            if (!query.rows) {
+                return response.badRequest({
+                    error: "Nenhum dado de ficha ponto foi encontrado!",
+                });
+            }
+            let resumoFicha = await Database_1.default.connection("oracle").rawQuery(`
           SELECT DISTINCT EVENTO, TRIM(HR_DIA) as HR_DIA
           FROM
             VW_ML_PON_RESUMO_HOLERITE FH
           WHERE FH.ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
           AND FH.COMPETENCIA = '${competencia}'
         `);
-            }
-            catch (error) {
-                resumoFicha = [];
-            }
             const pdfTemp = await this.generatePdf(this.tratarDadosDotCard(query, empresa, resumoFicha), template_1.fichaPonto);
             if (!pdfTemp) {
                 return response.badRequest({ error: "Erro ao gerar pdf!" });
@@ -138,7 +142,7 @@ class Receipts2 {
             const confirmacao = await ConfirmarPdf_1.default.query()
                 .select("*")
                 .where("id_funcionario", "=", `${funcionario?.id_funcionario}`)
-                .andWhere("data_pdf", "=", `${competencia}`);
+                .andWhere("data_pdf", "=", `${dados.data}`);
             if (!confirmacao) {
                 return response.badRequest({ error: "Erro ao verificar confirmação!" });
             }

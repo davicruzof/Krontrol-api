@@ -7,6 +7,7 @@ import fs from "fs";
 import { uploadPdfEmpresa } from "App/Controllers/Http/S3";
 import Database from "@ioc:Adonis/Lucid/Database";
 import { fichaPonto } from "App/templates/pdf/template";
+import AppVersion from "App/Models/AppVersion";
 import { DateTime } from "luxon";
 
 export default class Receipts2 {
@@ -83,49 +84,6 @@ export default class Receipts2 {
     return dadosTemp;
   }
 
-  // private formatDates(date) {
-  //   const data = `${date.year}/${date.month}`;
-  //   const competencia = `${date.month}/${date.year}`;
-
-  //   const dateRequestInitial = DateTime.fromISO(
-  //     new Date(`${data}-27`).toISOString().replace(".000Z", "")
-  //   )
-  //     .minus({ months: 1 })
-  //     .toFormat("dd/LL/yyyy")
-  //     .toString();
-
-  //   const dateRequestFinish = DateTime.fromISO(
-  //     new Date(`${data}-26`).toISOString().replace(".000Z", "")
-  //   )
-  //     .toFormat("dd/LL/yyyy")
-  //     .toString();
-
-  //   return {
-  //     dateRequestInitial,
-  //     dateRequestFinish,
-  //     competencia,
-  //   };
-  // }
-
-  // private isVersionCurrent = async (dados) => {
-  //   const versions = await Database.connection("pg")
-  //     .from("version_app")
-  //     .select("*")
-  //     .first();
-
-  //   if (!versions) {
-  //     return false;
-  //   }
-
-  //   let version = versions?.version_android;
-
-  //   if (dados.os === "ios") {
-  //     version = versions?.version_ios;
-  //   }
-
-  //   return version === dados.version;
-  // };
-
   public async dotCardPdfGenerator({
     request,
     response,
@@ -134,18 +92,12 @@ export default class Receipts2 {
     try {
       const dados = request.body();
 
-      if (!dados.data || !auth.user || !dados.app) {
-        return response.badRequest({ error: "Parametros faltando" });
+      if (!dados.data || !auth.user) {
+        return response.badRequest({ error: "data is required" });
       }
 
-      // const currentVersion = await this.isVersionCurrent(dados.app);
-
-      // if (!currentVersion) {
-      //   return response.badRequest({ error: "app desatualizado" });
-      // }
-
-      const data = `${dados.data.year}/${dados.data.month}`;
-      const competencia = `${dados.data.month}/${dados.data.year}`;
+      const data = `${dados.data.year}/dados.data.month}`;
+      const competencia = `${dados.data.month}/dados.data.year}`;
 
       const dateRequestInitial = DateTime.fromISO(
         new Date(`${data}-27`).toISOString().replace(".000Z", "")
@@ -181,6 +133,15 @@ export default class Receipts2 {
         return response.badRequest({ error: "funcionario não encontrado!" });
       }
 
+      const appUpdate = await AppVersion.findBy(
+        "id_funcionario",
+        auth.user?.id_funcionario
+      );
+
+      if (!appUpdate) {
+        return response.badRequest({ error: "app desatualizado" });
+      }
+
       const empresa = await Empresa.findBy("id_empresa", auth.user?.id_empresa);
 
       if (!empresa) {
@@ -191,23 +152,23 @@ export default class Receipts2 {
         SELECT DISTINCT *
           FROM GUDMA.VW_ML_FICHAPONTO_PDF F
           WHERE F.ID_FUNCIONARIO_ERP = '${funcionario.id_funcionario_erp}'
-          AND F.DATA_MOVIMENTO BETWEEN '${dateRequestInitial}' and '${dateRequestFinish}'
+          AND F.DATA_MOVIMENTO BETWEEN to_date('${dateRequestInitial}','DD-MM-YYYY') and to_date('${dateRequestFinish}','DD-MM-YYYY')
           ORDER BY F.DATA_MOVIMENTO
       `);
 
-      let resumoFicha = [];
+      if (!query.rows) {
+        return response.badRequest({
+          error: "Nenhum dado de ficha ponto foi encontrado!",
+        });
+      }
 
-      try {
-        resumoFicha = await Database.connection("oracle").rawQuery(`
+      let resumoFicha = await Database.connection("oracle").rawQuery(`
           SELECT DISTINCT EVENTO, TRIM(HR_DIA) as HR_DIA
           FROM
             VW_ML_PON_RESUMO_HOLERITE FH
           WHERE FH.ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
           AND FH.COMPETENCIA = '${competencia}'
         `);
-      } catch (error) {
-        resumoFicha = [];
-      }
 
       const pdfTemp = await this.generatePdf(
         this.tratarDadosDotCard(query, empresa, resumoFicha),
@@ -221,7 +182,7 @@ export default class Receipts2 {
       const confirmacao = await ConfirmarPdf.query()
         .select("*")
         .where("id_funcionario", "=", `${funcionario?.id_funcionario}`)
-        .andWhere("data_pdf", "=", `${competencia}`);
+        .andWhere("data_pdf", "=", `${dados.data}`);
 
       if (!confirmacao) {
         return response.badRequest({ error: "Erro ao verificar confirmação!" });
