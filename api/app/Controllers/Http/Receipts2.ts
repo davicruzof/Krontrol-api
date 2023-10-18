@@ -40,11 +40,7 @@ export default class Receipts2 {
     } catch (error) {}
   }
 
-  private isMonthFreedom = async (
-    id_empresa,
-    id_pdf,
-    mes
-  ): Promise<boolean> => {
+  private isMonthFreedom = async (id_empresa, id_pdf, mes) => {
     const liberacaoPdf = await Database.connection("pg").rawQuery(
       `SELECT * FROM public.vw_ml_flp_liberacao_recibos 
             where tipo_id = ${id_pdf} 
@@ -88,24 +84,6 @@ export default class Receipts2 {
     return dadosTemp;
   }
 
-  private formatDate(date) {
-    return DateTime.fromISO(date).toFormat("dd/LL/yyyy").toString();
-  }
-
-  private generateRequestDates(dados) {
-    const lastDayOfMonth = `${dados.data.year}/${dados.data.month}/27`;
-
-    const dateRequestInitial = this.formatDate(
-      DateTime.fromISO(lastDayOfMonth).minus({ months: 1 }).toJSDate()
-    );
-
-    const dateRequestFinish = this.formatDate(
-      DateTime.fromISO(lastDayOfMonth).toJSDate()
-    );
-
-    return { dateRequestInitial, dateRequestFinish };
-  }
-
   public async dotCardPdfGenerator({
     request,
     response,
@@ -118,30 +96,63 @@ export default class Receipts2 {
         return response.badRequest({ error: "data is required" });
       }
 
+      const data = `${dados.data.year}/${dados.data.month}`;
       const competencia = `${dados.data.month}/${dados.data.year}`;
 
-      const { dateRequestInitial, dateRequestFinish } =
-        this.generateRequestDates(dados);
+      const dateRequestInitial = DateTime.fromISO(
+        new Date(`${data}-27`).toISOString().replace(".000Z", "")
+      )
+        .minus({ months: 1 })
+        .toFormat("dd/LL/yyyy")
+        .toString();
 
-      const [isMonthReleased, funcionario, appUpdate, empresa] =
-        await Promise.all([
-          this.isMonthFreedom(auth.user?.id_empresa, 1, competencia),
-          Funcionario.findBy("id_funcionario", auth.user?.id_funcionario),
-          AppVersion.findBy("id_funcionario", auth.user?.id_funcionario),
-          Empresa.findBy("id_empresa", auth.user?.id_empresa),
-        ]);
+      const dateRequestFinish = DateTime.fromISO(
+        new Date(`${data}-26`).toISOString().replace(".000Z", "")
+      )
+        .toFormat("dd/LL/yyyy")
+        .toString();
 
-      if (!isMonthReleased || !funcionario || !appUpdate || !empresa) {
+      const isMonthReleased = await this.isMonthFreedom(
+        auth.user?.id_empresa,
+        1,
+        competencia
+      );
+
+      if (!isMonthReleased) {
         return response.badRequest({
-          error: "Ocorreu um erro ao tentar gerar o pdf!",
+          error: "Empresa não liberou para gerar o recibo",
         });
+      }
+
+      const funcionario = await Funcionario.findBy(
+        "id_funcionario",
+        auth.user?.id_funcionario
+      );
+
+      if (!funcionario) {
+        return response.badRequest({ error: "funcionario não encontrado!" });
+      }
+
+      const appUpdate = await AppVersion.findBy(
+        "id_funcionario",
+        auth.user?.id_funcionario
+      );
+
+      if (!appUpdate) {
+        return response.badRequest({ error: "app desatualizado" });
+      }
+
+      const empresa = await Empresa.findBy("id_empresa", auth.user?.id_empresa);
+
+      if (!empresa) {
+        return response.badRequest({ error: "Erro ao pegar empresa!" });
       }
 
       const query = await Database.connection("oracle").rawQuery(`
         SELECT DISTINCT *
           FROM GUDMA.VW_ML_FICHAPONTO_PDF F
           WHERE F.ID_FUNCIONARIO_ERP = '${funcionario.id_funcionario_erp}'
-          AND F.DATA_MOVIMENTO BETWEEN '${dateRequestInitial}' AND '${dateRequestFinish}'
+          AND F.DATA_MOVIMENTO BETWEEN to_date('${dateRequestInitial}','DD-MM-YYYY') and to_date('${dateRequestFinish}','DD-MM-YYYY')
           ORDER BY F.DATA_MOVIMENTO
       `);
 
@@ -183,11 +194,10 @@ export default class Receipts2 {
       );
 
       if (!file) {
-        return response.badRequest({ error: "Erro ao fazer upload de pdf!" });
+        return response.badRequest({ error: "Erro ao gerar url do pdf!" });
       }
 
       fs.unlink(pdfTemp.filename, () => {});
-
       response.json({
         pdf: file.Location,
         confirmado: confirmacao[0] ? true : false,
