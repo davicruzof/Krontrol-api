@@ -107,24 +107,24 @@ export default class Receipts2 {
     };
   }
 
-  private isVersionCurrent = async (dados) => {
-    const versions = await Database.connection("pg")
-      .from("version_app")
-      .select("*")
-      .first();
+  // private isVersionCurrent = async (dados) => {
+  //   const versions = await Database.connection("pg")
+  //     .from("version_app")
+  //     .select("*")
+  //     .first();
 
-    if (!versions) {
-      return false;
-    }
+  //   if (!versions) {
+  //     return false;
+  //   }
 
-    let version = versions?.version_android;
+  //   let version = versions?.version_android;
 
-    if (dados.os === "ios") {
-      version = versions?.version_ios;
-    }
+  //   if (dados.os === "ios") {
+  //     version = versions?.version_ios;
+  //   }
 
-    return version === dados.version;
-  };
+  //   return version === dados.version;
+  // };
 
   public async dotCardPdfGenerator({
     request,
@@ -138,11 +138,11 @@ export default class Receipts2 {
         return response.badRequest({ error: "Parametros faltando" });
       }
 
-      const currentVersion = await this.isVersionCurrent(dados.app);
+      // const currentVersion = await this.isVersionCurrent(dados.app);
 
-      if (!currentVersion) {
-        return response.badRequest({ error: "app desatualizado" });
-      }
+      // if (!currentVersion) {
+      //   return response.badRequest({ error: "app desatualizado" });
+      // }
 
       const { dateRequestInitial, dateRequestFinish, competencia } =
         this.formatDates(dados.data);

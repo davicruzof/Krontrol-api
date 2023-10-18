@@ -23,20 +23,6 @@ class Receipts2 {
             `);
             return liberacaoPdf?.rows.length > 0 ? true : false;
         };
-        this.isVersionCurrent = async (dados) => {
-            const versions = await Database_1.default.connection("pg")
-                .from("version_app")
-                .select("*")
-                .first();
-            if (!versions) {
-                return false;
-            }
-            let version = versions?.version_android;
-            if (dados.os === "ios") {
-                version = versions?.version_ios;
-            }
-            return version === dados.version;
-        };
     }
     async generatePdf(dados, template) {
         try {
@@ -117,10 +103,6 @@ class Receipts2 {
             const dados = request.body();
             if (!dados.data || !auth.user || !dados.app) {
                 return response.badRequest({ error: "Parametros faltando" });
-            }
-            const currentVersion = await this.isVersionCurrent(dados.app);
-            if (!currentVersion) {
-                return response.badRequest({ error: "app desatualizado" });
             }
             const { dateRequestInitial, dateRequestFinish, competencia } = this.formatDates(dados.data);
             const isMonthReleased = await this.isMonthFreedom(auth.user?.id_empresa, 1, competencia);

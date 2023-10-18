@@ -309,7 +309,7 @@ export const templateDotCard = `
 
 export const fichaPonto = `
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 
 <head>
     <meta charset="UTF-8">
@@ -357,20 +357,20 @@ export const fichaPonto = `
     </span>
     <hr size="1" style="border:1px dashed #000;">
     <div>
-        <span>EMPRESA: </span><span>{{dados.cabecalho.nomeEmpresa}}</span>
+        <span>EMPRESA: {{dados.cabecalho.nomeEmpresa}}</span>
     </div>
     <div>
-        <span>ENDEREÇO: </span><span>{{dados.cabecalho.endereco}}</span>
+        <span>ENDEREÇO: {{dados.cabecalho.endereco}}</span>
     </div>
     <div>
-        <span>CNPJ: </span><span>{{dados.cabecalho.cnpj}}</span>
+        <span>CNPJ: {{dados.cabecalho.cnpj}}</span>
     </div>
     <hr size="1" style="border:1px dashed #000;">
     <div>
-        <span>FUNCIONÁRIO: </span><span>{{dados.cabecalho.ID_FUNCIONARIO_ERP}} - {{dados.cabecalho.nome}}</span>
+        <span>FUNCIONÁRIO: {{dados.cabecalho.nome}}</span>
     </div>
     <div>
-        <span>FUNÇÃO: </span><span>{{dados.cabecalho.funcao}}</span>
+        <span>FUNÇÃO: {{dados.cabecalho.funcao}}</span>
     </div>
     <hr size="1" style="border:1px dashed #000;">
     <table style="margin-bottom: 20px;">
