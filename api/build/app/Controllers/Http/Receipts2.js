@@ -82,29 +82,21 @@ class Receipts2 {
         });
         return dadosTemp;
     }
-    formatDates(date) {
-        const data = `${date.year}/${date.month}`;
-        const competencia = `${date.month}/${date.year}`;
-        const dateRequestInitial = luxon_1.DateTime.fromISO(new Date(`${data}-27`).toISOString().replace(".000Z", ""))
-            .minus({ months: 1 })
-            .toFormat("dd/LL/yyyy")
-            .toString();
-        const dateRequestFinish = luxon_1.DateTime.fromISO(new Date(`${data}-26`).toISOString().replace(".000Z", ""))
-            .toFormat("dd/LL/yyyy")
-            .toString();
-        return {
-            dateRequestInitial,
-            dateRequestFinish,
-            competencia,
-        };
-    }
     async dotCardPdfGenerator({ request, response, auth, }) {
         try {
             const dados = request.body();
             if (!dados.data || !auth.user || !dados.app) {
                 return response.badRequest({ error: "Parametros faltando" });
             }
-            const { dateRequestInitial, dateRequestFinish, competencia } = this.formatDates(dados.data);
+            const data = `${dados.data.year}/${dados.data.month}`;
+            const competencia = `${dados.data.month}/${dados.data.year}`;
+            const dateRequestInitial = luxon_1.DateTime.fromISO(new Date(`${data}-27`).toISOString().replace(".000Z", ""))
+                .minus({ months: 1 })
+                .toFormat("dd/LL/yyyy")
+                .toString();
+            const dateRequestFinish = luxon_1.DateTime.fromISO(new Date(`${data}-26`).toISOString().replace(".000Z", ""))
+                .toFormat("dd/LL/yyyy")
+                .toString();
             const isMonthReleased = await this.isMonthFreedom(auth.user?.id_empresa, 1, competencia);
             if (!isMonthReleased) {
                 return response.badRequest({

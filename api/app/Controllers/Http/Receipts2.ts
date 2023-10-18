@@ -83,29 +83,29 @@ export default class Receipts2 {
     return dadosTemp;
   }
 
-  private formatDates(date) {
-    const data = `${date.year}/${date.month}`;
-    const competencia = `${date.month}/${date.year}`;
+  // private formatDates(date) {
+  //   const data = `${date.year}/${date.month}`;
+  //   const competencia = `${date.month}/${date.year}`;
 
-    const dateRequestInitial = DateTime.fromISO(
-      new Date(`${data}-27`).toISOString().replace(".000Z", "")
-    )
-      .minus({ months: 1 })
-      .toFormat("dd/LL/yyyy")
-      .toString();
+  //   const dateRequestInitial = DateTime.fromISO(
+  //     new Date(`${data}-27`).toISOString().replace(".000Z", "")
+  //   )
+  //     .minus({ months: 1 })
+  //     .toFormat("dd/LL/yyyy")
+  //     .toString();
 
-    const dateRequestFinish = DateTime.fromISO(
-      new Date(`${data}-26`).toISOString().replace(".000Z", "")
-    )
-      .toFormat("dd/LL/yyyy")
-      .toString();
+  //   const dateRequestFinish = DateTime.fromISO(
+  //     new Date(`${data}-26`).toISOString().replace(".000Z", "")
+  //   )
+  //     .toFormat("dd/LL/yyyy")
+  //     .toString();
 
-    return {
-      dateRequestInitial,
-      dateRequestFinish,
-      competencia,
-    };
-  }
+  //   return {
+  //     dateRequestInitial,
+  //     dateRequestFinish,
+  //     competencia,
+  //   };
+  // }
 
   // private isVersionCurrent = async (dados) => {
   //   const versions = await Database.connection("pg")
@@ -144,8 +144,21 @@ export default class Receipts2 {
       //   return response.badRequest({ error: "app desatualizado" });
       // }
 
-      const { dateRequestInitial, dateRequestFinish, competencia } =
-        this.formatDates(dados.data);
+      const data = `${dados.data.year}/${dados.data.month}`;
+      const competencia = `${dados.data.month}/${dados.data.year}`;
+
+      const dateRequestInitial = DateTime.fromISO(
+        new Date(`${data}-27`).toISOString().replace(".000Z", "")
+      )
+        .minus({ months: 1 })
+        .toFormat("dd/LL/yyyy")
+        .toString();
+
+      const dateRequestFinish = DateTime.fromISO(
+        new Date(`${data}-26`).toISOString().replace(".000Z", "")
+      )
+        .toFormat("dd/LL/yyyy")
+        .toString();
 
       const isMonthReleased = await this.isMonthFreedom(
         auth.user?.id_empresa,
