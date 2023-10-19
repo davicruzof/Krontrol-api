@@ -413,7 +413,7 @@ export const fichaPonto = `
             <td alignt="right">HR/DIA</td>
         </tr>
         {{#each dados.resumo}}
-            <tr>
+            <tr style="border: none; display: table-row;">
                 <td align="left">{{this.EVENTO}}</td>
                 <td alignt="right">{{this.HR_DIA}}</td>
             </tr>
