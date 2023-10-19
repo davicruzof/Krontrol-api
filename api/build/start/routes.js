@@ -57,6 +57,7 @@ Route_1.default.group(() => {
     }).prefix("/receipts2");
     Route_1.default.group(() => {
         Route_1.default.get("/", "InformativosController.getInformativos").middleware("auth");
+        Route_1.default.get("/notify", "InformativosController.getInformativosNotify").middleware("auth");
         Route_1.default.put("/", "InformativosController.updateInformativo").middleware("auth");
     }).prefix("/informativos");
     Route_1.default.group(() => {

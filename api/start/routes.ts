@@ -134,6 +134,10 @@ Route.group(() => {
 
   Route.group(() => {
     Route.get("/", "InformativosController.getInformativos").middleware("auth");
+    Route.get(
+      "/notify",
+      "InformativosController.getInformativosNotify"
+    ).middleware("auth");
     Route.put("/", "InformativosController.updateInformativo").middleware(
       "auth"
     );
