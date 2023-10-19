@@ -4,11 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const Empresa_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/Empresa"));
-const ConfirmarPdf_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/ConfirmarPdf"));
 const Funcionario_1 = __importDefault(require("../../Models/Funcionario"));
-const pdf_creator_node_1 = __importDefault(require("pdf-creator-node"));
-const fs_1 = __importDefault(require("fs"));
-const S3_1 = global[Symbol.for('ioc.use')]("App/Controllers/Http/S3");
 const Database_1 = __importDefault(global[Symbol.for('ioc.use')]("Adonis/Lucid/Database"));
 const template_1 = global[Symbol.for('ioc.use')]("App/templates/pdf/template");
 const AppVersion_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/AppVersion"));
@@ -27,12 +23,6 @@ class Receipts2 {
     }
     async generatePdf(dados, template) {
         try {
-            var options = {
-                format: "A3",
-                orientation: "portrait",
-                border: "10mm",
-                type: "pdf",
-            };
             const filename = Math.random() + "_doc" + ".pdf";
             var document = {
                 html: template,
@@ -41,15 +31,7 @@ class Receipts2 {
                 },
                 path: "./pdfsTemp/" + filename,
             };
-            let file = pdf_creator_node_1.default
-                .create(document, options)
-                .then((res) => {
-                return res;
-            })
-                .catch((error) => {
-                return error;
-            });
-            return await file;
+            return document;
         }
         catch (error) { }
     }
@@ -137,25 +119,7 @@ class Receipts2 {
                 resumoFicha = [];
             }
             const pdfTemp = await this.generatePdf(this.tratarDadosDotCard(query, empresa, resumoFicha), template_1.fichaPonto);
-            if (!pdfTemp) {
-                return response.badRequest({ error: "Erro ao gerar pdf!" });
-            }
-            const confirmacao = await ConfirmarPdf_1.default.query()
-                .select("*")
-                .where("id_funcionario", "=", `${funcionario?.id_funcionario}`)
-                .andWhere("data_pdf", "=", `${dados.data}`);
-            if (!confirmacao) {
-                return response.badRequest({ error: "Erro ao verificar confirmação!" });
-            }
-            const file = await (0, S3_1.uploadPdfEmpresa)(pdfTemp.filename, auth.user?.id_empresa);
-            if (!file) {
-                return response.badRequest({ error: "Erro ao gerar url do pdf!" });
-            }
-            fs_1.default.unlink(pdfTemp.filename, () => { });
-            response.json({
-                pdf: file.Location,
-                confirmado: confirmacao[0] ? true : false,
-            });
+            return response.json({ pdfTemp });
         }
         catch (error) {
             response.badRequest(error);

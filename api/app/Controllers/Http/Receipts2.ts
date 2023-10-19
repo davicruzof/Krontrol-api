@@ -1,10 +1,10 @@
 import Empresa from "App/Models/Empresa";
-import ConfirmarPdf from "App/Models/ConfirmarPdf";
+// import ConfirmarPdf from "App/Models/ConfirmarPdf";
 import type { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
 import Funcionario from "../../Models/Funcionario";
-import pdf from "pdf-creator-node";
-import fs from "fs";
-import { uploadPdfEmpresa } from "App/Controllers/Http/S3";
+// import pdf from "pdf-creator-node";
+// import fs from "fs";
+// import { uploadPdfEmpresa } from "App/Controllers/Http/S3";
 import Database from "@ioc:Adonis/Lucid/Database";
 import { fichaPonto } from "App/templates/pdf/template";
 import AppVersion from "App/Models/AppVersion";
@@ -13,13 +13,15 @@ import { DateTime } from "luxon";
 export default class Receipts2 {
   private async generatePdf(dados, template) {
     try {
-      var options = {
-        format: "A3",
-        orientation: "portrait",
-        border: "10mm",
-        type: "pdf",
-      };
+      // var options = {
+      //   format: "A3",
+      //   orientation: "portrait",
+      //   border: "10mm",
+      //   type: "pdf",
+      // };
+
       const filename = Math.random() + "_doc" + ".pdf";
+
       var document = {
         html: template,
         data: {
@@ -28,15 +30,17 @@ export default class Receipts2 {
         path: "./pdfsTemp/" + filename,
       };
 
-      let file = pdf
-        .create(document, options)
-        .then((res) => {
-          return res;
-        })
-        .catch((error) => {
-          return error;
-        });
-      return await file;
+      return document;
+
+      // let file = pdf
+      //   .create(document, options)
+      //   .then((res) => {
+      //     return res;
+      //   })
+      //   .catch((error) => {
+      //     return error;
+      //   });
+      // return await file;
     } catch (error) {}
   }
 
@@ -175,33 +179,35 @@ export default class Receipts2 {
         fichaPonto
       );
 
-      if (!pdfTemp) {
-        return response.badRequest({ error: "Erro ao gerar pdf!" });
-      }
+      return response.json({ pdfTemp });
 
-      const confirmacao = await ConfirmarPdf.query()
-        .select("*")
-        .where("id_funcionario", "=", `${funcionario?.id_funcionario}`)
-        .andWhere("data_pdf", "=", `${dados.data}`);
+      // if (!pdfTemp) {
+      //   return response.badRequest({ error: "Erro ao gerar pdf!" });
+      // }
 
-      if (!confirmacao) {
-        return response.badRequest({ error: "Erro ao verificar confirmação!" });
-      }
+      // const confirmacao = await ConfirmarPdf.query()
+      //   .select("*")
+      //   .where("id_funcionario", "=", `${funcionario?.id_funcionario}`)
+      //   .andWhere("data_pdf", "=", `${dados.data}`);
 
-      const file = await uploadPdfEmpresa(
-        pdfTemp.filename,
-        auth.user?.id_empresa
-      );
+      // if (!confirmacao) {
+      //   return response.badRequest({ error: "Erro ao verificar confirmação!" });
+      // }
 
-      if (!file) {
-        return response.badRequest({ error: "Erro ao gerar url do pdf!" });
-      }
+      // const file = await uploadPdfEmpresa(
+      //   pdfTemp.filename,
+      //   auth.user?.id_empresa
+      // );
 
-      fs.unlink(pdfTemp.filename, () => {});
-      response.json({
-        pdf: file.Location,
-        confirmado: confirmacao[0] ? true : false,
-      });
+      // if (!file) {
+      //   return response.badRequest({ error: "Erro ao gerar url do pdf!" });
+      // }
+
+      // fs.unlink(pdfTemp.filename, () => {});
+      // response.json({
+      //   pdf: file.Location,
+      //   confirmado: confirmacao[0] ? true : false,
+      // });
     } catch (error) {
       response.badRequest(error);
     }
