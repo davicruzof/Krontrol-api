@@ -13,6 +13,12 @@ const Database_1 = __importDefault(global[Symbol.for('ioc.use')]("Adonis/Lucid/D
 const template_1 = global[Symbol.for('ioc.use')]("App/templates/pdf/template");
 const AppVersion_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/AppVersion"));
 const luxon_1 = require("luxon");
+const axios_1 = __importDefault(require("axios"));
+const BASE_URL = "https://endpointsambaiba.ml18.com.br/glo/pontoeletronico";
+const api = axios_1.default.create({
+    baseURL: BASE_URL,
+    timeout: 10000,
+});
 class Receipts2 {
     constructor() {
         this.isMonthFreedom = async (id_empresa, id_pdf, mes) => {
@@ -25,33 +31,34 @@ class Receipts2 {
             return liberacaoPdf?.rows.length > 0 ? true : false;
         };
         this.getFichaPonto = async (id_funcionario_erp, dateRequestInitial, dateRequestFinish, token) => {
-            var myHeaders = new Headers();
-            myHeaders.append("Content-Type", "application/json");
-            myHeaders.append("Authorization", `Bearer ${token}`);
-            var raw = JSON.stringify({
-                ID_FUNCIONARIO_ERP: id_funcionario_erp,
-                dt_movimento_inicio: dateRequestInitial,
-                dt_movimento_fim: dateRequestFinish,
-            });
-            var requestOptions = {
-                method: "POST",
-                headers: myHeaders,
-                body: raw,
-            };
-            const result = await fetch("https://endpointsambaiba.ml18.com.br/glo/pontoeletronico/ficha", requestOptions);
-            if (result.status === 200) {
-                const json = await result.json();
-                const format = json.map((obj) => {
-                    Object.keys(obj).forEach((key) => {
-                        if (obj[key] === null) {
-                            obj[key] = "--------";
-                        }
-                    });
-                    return obj;
+            try {
+                const { data, status } = await api.post("/ficha", {
+                    ID_FUNCIONARIO_ERP: id_funcionario_erp,
+                    dt_movimento_inicio: dateRequestInitial,
+                    dt_movimento_fim: dateRequestFinish,
+                }, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
                 });
-                return format;
+                if (status === 200) {
+                    const json = data;
+                    const format = json.map((obj) => {
+                        Object.keys(obj).forEach((key) => {
+                            if (obj[key] === null) {
+                                obj[key] = "--------";
+                            }
+                        });
+                        return obj;
+                    });
+                    return format;
+                }
+                else {
+                    return [];
+                }
             }
-            else {
+            catch (error) {
                 return [];
             }
         };

@@ -9,6 +9,14 @@ import Database from "@ioc:Adonis/Lucid/Database";
 import { fichaPonto } from "App/templates/pdf/template";
 import AppVersion from "App/Models/AppVersion";
 import { DateTime } from "luxon";
+import axios from "axios";
+
+const BASE_URL = "https://endpointsambaiba.ml18.com.br/glo/pontoeletronico";
+
+const api = axios.create({
+  baseURL: BASE_URL,
+  timeout: 10000,
+});
 
 export default class Receipts2 {
   private async generatePdf(dados, template) {
@@ -92,41 +100,60 @@ export default class Receipts2 {
     dateRequestFinish,
     token
   ) => {
-    var myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    myHeaders.append("Authorization", `Bearer ${token}`);
+    try {
+      const { data, status } = await api.post(
+        "/ficha",
+        {
+          ID_FUNCIONARIO_ERP: id_funcionario_erp,
+          dt_movimento_inicio: dateRequestInitial,
+          dt_movimento_fim: dateRequestFinish,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
-    var raw = JSON.stringify({
-      ID_FUNCIONARIO_ERP: id_funcionario_erp,
-      dt_movimento_inicio: dateRequestInitial,
-      dt_movimento_fim: dateRequestFinish,
-    });
-
-    var requestOptions = {
-      method: "POST",
-      headers: myHeaders,
-      body: raw,
-    };
-
-    const result = await fetch(
-      "https://endpointsambaiba.ml18.com.br/glo/pontoeletronico/ficha",
-      requestOptions
-    );
-
-    if (result.status === 200) {
-      const json: any = await result.json();
-      const format = json.map((obj) => {
-        Object.keys(obj).forEach((key) => {
-          if (obj[key] === null) {
-            obj[key] = "--------";
-          }
+      if (status === 200) {
+        const json = data;
+        const format = json.map((obj) => {
+          Object.keys(obj).forEach((key) => {
+            if (obj[key] === null) {
+              obj[key] = "--------";
+            }
+          });
+          return obj;
         });
-        return obj;
-      });
-      return format;
-    } else {
+        return format;
+      } else {
+        return [];
+      }
+    } catch (error) {
       return [];
     }
+
+    // var myHeaders = new Headers();
+    // myHeaders.append("Content-Type", "application/json");
+    // myHeaders.append("Authorization", `Bearer ${token}`);
+
+    // var raw = JSON.stringify({
+    //   ID_FUNCIONARIO_ERP: id_funcionario_erp,
+    //   dt_movimento_inicio: dateRequestInitial,
+    //   dt_movimento_fim: dateRequestFinish,
+    // });
+
+    // var requestOptions = {
+    //   method: "POST",
+    //   headers: myHeaders,
+    //   body: raw,
+    // };
+
+    // const result = await fetch(
+    //   "https://endpointsambaiba.ml18.com.br/glo/pontoeletronico/ficha",
+    //   requestOptions
+    // );
   };
 
   public async dotCardPdfGenerator({
