@@ -6,43 +6,43 @@ import Funcionario from "../../Models/Funcionario";
 // import fs from "fs";
 // import { uploadPdfEmpresa } from "App/Controllers/Http/S3";
 import Database from "@ioc:Adonis/Lucid/Database";
-import { fichaPonto } from "App/templates/pdf/template";
+// import { fichaPonto } from "App/templates/pdf/template";
 import AppVersion from "App/Models/AppVersion";
 import { DateTime } from "luxon";
 
 export default class Receipts2 {
-  private async generatePdf(dados, template) {
-    try {
-      // var options = {
-      //   format: "A3",
-      //   orientation: "portrait",
-      //   border: "10mm",
-      //   type: "pdf",
-      // };
+  // private async generatePdf(dados, template) {
+  //   try {
+  //     // var options = {
+  //     //   format: "A3",
+  //     //   orientation: "portrait",
+  //     //   border: "10mm",
+  //     //   type: "pdf",
+  //     // };
 
-      const filename = Math.random() + "_doc" + ".pdf";
+  //     const filename = Math.random() + "_doc" + ".pdf";
 
-      var document = {
-        html: template,
-        data: {
-          dados: dados,
-        },
-        path: "./pdfsTemp/" + filename,
-      };
+  //     var document = {
+  //       html: template,
+  //       data: {
+  //         dados: dados,
+  //       },
+  //       path: "./pdfsTemp/" + filename,
+  //     };
 
-      return document;
+  //     return document;
 
-      // let file = pdf
-      //   .create(document, options)
-      //   .then((res) => {
-      //     return res;
-      //   })
-      //   .catch((error) => {
-      //     return error;
-      //   });
-      // return await file;
-    } catch (error) {}
-  }
+  //     // let file = pdf
+  //     //   .create(document, options)
+  //     //   .then((res) => {
+  //     //     return res;
+  //     //   })
+  //     //   .catch((error) => {
+  //     //     return error;
+  //     //   });
+  //     // return await file;
+  //   } catch (error) {}
+  // }
 
   private isMonthFreedom = async (id_empresa, id_pdf, mes) => {
     const liberacaoPdf = await Database.connection("pg").rawQuery(
@@ -57,36 +57,36 @@ export default class Receipts2 {
     return liberacaoPdf?.rows.length > 0 ? true : false;
   };
 
-  private tratarDadosDotCard(dados, dados_empresa, resumoFicha) {
-    const ultimaPosicao = dados.length - 1;
-    let dadosTemp = {
-      cabecalho: {
-        logo: dados_empresa.logo,
-        nomeEmpresa: dados_empresa.nomeempresarial,
-        cnpj: dados_empresa.cnpj,
-        nome: dados[ultimaPosicao].NOME,
-        funcao: dados[ultimaPosicao].FUNCAO,
-        competencia: dados[ultimaPosicao].BH_COMPETENCIA,
-        endereco: dados_empresa.logradouro,
-      },
-      rodape: {
-        saldoAnterior: dados[ultimaPosicao].SALDOANTERIOR,
-        credito: dados[ultimaPosicao].CREDITO,
-        debito: dados[ultimaPosicao].DEBITO,
-        valorPago: dados[ultimaPosicao].VALORPAGO,
-        saldoAtual: dados[ultimaPosicao].SALDOATUAL,
-      },
-      dadosDias: new Array(),
-      resumo: resumoFicha,
-    };
-    dados.forEach((element) => {
-      element.TOTALF = element.TOTALF;
-      element.EXTRA = element.EXTRA;
-      element.OUTRA = element.OUTRA;
-      dadosTemp.dadosDias.push(element);
-    });
-    return dadosTemp;
-  }
+  // private tratarDadosDotCard(dados, dados_empresa, resumoFicha) {
+  //   const ultimaPosicao = dados.length - 1;
+  //   let dadosTemp = {
+  //     cabecalho: {
+  //       logo: dados_empresa.logo,
+  //       nomeEmpresa: dados_empresa.nomeempresarial,
+  //       cnpj: dados_empresa.cnpj,
+  //       nome: dados[ultimaPosicao].NOME,
+  //       funcao: dados[ultimaPosicao].FUNCAO,
+  //       competencia: dados[ultimaPosicao].BH_COMPETENCIA,
+  //       endereco: dados_empresa.logradouro,
+  //     },
+  //     rodape: {
+  //       saldoAnterior: dados[ultimaPosicao].SALDOANTERIOR,
+  //       credito: dados[ultimaPosicao].CREDITO,
+  //       debito: dados[ultimaPosicao].DEBITO,
+  //       valorPago: dados[ultimaPosicao].VALORPAGO,
+  //       saldoAtual: dados[ultimaPosicao].SALDOATUAL,
+  //     },
+  //     dadosDias: new Array(),
+  //     resumo: resumoFicha,
+  //   };
+  //   dados.forEach((element) => {
+  //     element.TOTALF = element.TOTALF;
+  //     element.EXTRA = element.EXTRA;
+  //     element.OUTRA = element.OUTRA;
+  //     dadosTemp.dadosDias.push(element);
+  //   });
+  //   return dadosTemp;
+  // }
 
   public async dotCardPdfGenerator({
     request,
@@ -107,13 +107,13 @@ export default class Receipts2 {
         new Date(`${data}-27`).toISOString().replace(".000Z", "")
       )
         .minus({ months: 1 })
-        .toFormat("dd/LL/yyyy")
+        .toFormat("yyyy/LL/dd")
         .toString();
 
       const dateRequestFinish = DateTime.fromISO(
         new Date(`${data}-26`).toISOString().replace(".000Z", "")
       )
-        .toFormat("dd/LL/yyyy")
+        .toFormat("yyyy/LL/dd")
         .toString();
 
       const isMonthReleased = await this.isMonthFreedom(
@@ -153,10 +153,10 @@ export default class Receipts2 {
       }
 
       const query = await Database.connection("oracle").rawQuery(`
-        SELECT DISTINCT *
+        SELECT *
           FROM GUDMA.VW_ML_FICHAPONTO_PDF F
           WHERE F.ID_FUNCIONARIO_ERP = '${funcionario.id_funcionario_erp}'
-          AND F.DATA_MOVIMENTO BETWEEN to_date('${dateRequestInitial}','DD-MM-YYYY') and to_date('${dateRequestFinish}','DD-MM-YYYY')
+          AND F.DATA_MOVIMENTO BETWEEN '${dateRequestInitial}' and '${dateRequestFinish}'
           ORDER BY F.DATA_MOVIMENTO
       `);
 
@@ -174,12 +174,12 @@ export default class Receipts2 {
         resumoFicha = [];
       }
 
-      const pdfTemp = await this.generatePdf(
-        this.tratarDadosDotCard(query, empresa, resumoFicha),
-        fichaPonto
-      );
+      // const pdfTemp = await this.generatePdf(
+      //   this.tratarDadosDotCard(query, empresa, resumoFicha),
+      //   fichaPonto
+      // );
 
-      return response.json({ pdfTemp });
+      return response.json({ query, resumoFicha });
 
       // if (!pdfTemp) {
       //   return response.badRequest({ error: "Erro ao gerar pdf!" });

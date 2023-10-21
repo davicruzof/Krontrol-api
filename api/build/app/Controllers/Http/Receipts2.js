@@ -6,7 +6,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const Empresa_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/Empresa"));
 const Funcionario_1 = __importDefault(require("../../Models/Funcionario"));
 const Database_1 = __importDefault(global[Symbol.for('ioc.use')]("Adonis/Lucid/Database"));
-const template_1 = global[Symbol.for('ioc.use')]("App/templates/pdf/template");
 const AppVersion_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/AppVersion"));
 const luxon_1 = require("luxon");
 class Receipts2 {
@@ -21,50 +20,6 @@ class Receipts2 {
             return liberacaoPdf?.rows.length > 0 ? true : false;
         };
     }
-    async generatePdf(dados, template) {
-        try {
-            const filename = Math.random() + "_doc" + ".pdf";
-            var document = {
-                html: template,
-                data: {
-                    dados: dados,
-                },
-                path: "./pdfsTemp/" + filename,
-            };
-            return document;
-        }
-        catch (error) { }
-    }
-    tratarDadosDotCard(dados, dados_empresa, resumoFicha) {
-        const ultimaPosicao = dados.length - 1;
-        let dadosTemp = {
-            cabecalho: {
-                logo: dados_empresa.logo,
-                nomeEmpresa: dados_empresa.nomeempresarial,
-                cnpj: dados_empresa.cnpj,
-                nome: dados[ultimaPosicao].NOME,
-                funcao: dados[ultimaPosicao].FUNCAO,
-                competencia: dados[ultimaPosicao].BH_COMPETENCIA,
-                endereco: dados_empresa.logradouro,
-            },
-            rodape: {
-                saldoAnterior: dados[ultimaPosicao].SALDOANTERIOR,
-                credito: dados[ultimaPosicao].CREDITO,
-                debito: dados[ultimaPosicao].DEBITO,
-                valorPago: dados[ultimaPosicao].VALORPAGO,
-                saldoAtual: dados[ultimaPosicao].SALDOATUAL,
-            },
-            dadosDias: new Array(),
-            resumo: resumoFicha,
-        };
-        dados.forEach((element) => {
-            element.TOTALF = element.TOTALF;
-            element.EXTRA = element.EXTRA;
-            element.OUTRA = element.OUTRA;
-            dadosTemp.dadosDias.push(element);
-        });
-        return dadosTemp;
-    }
     async dotCardPdfGenerator({ request, response, auth, }) {
         try {
             const dados = request.body();
@@ -75,10 +30,10 @@ class Receipts2 {
             const competencia = `${dados.data.month}/${dados.data.year}`;
             const dateRequestInitial = luxon_1.DateTime.fromISO(new Date(`${data}-27`).toISOString().replace(".000Z", ""))
                 .minus({ months: 1 })
-                .toFormat("dd/LL/yyyy")
+                .toFormat("yyyy/LL/dd")
                 .toString();
             const dateRequestFinish = luxon_1.DateTime.fromISO(new Date(`${data}-26`).toISOString().replace(".000Z", ""))
-                .toFormat("dd/LL/yyyy")
+                .toFormat("yyyy/LL/dd")
                 .toString();
             const isMonthReleased = await this.isMonthFreedom(auth.user?.id_empresa, 1, competencia);
             if (!isMonthReleased) {
@@ -99,10 +54,10 @@ class Receipts2 {
                 return response.badRequest({ error: "Erro ao pegar empresa!" });
             }
             const query = await Database_1.default.connection("oracle").rawQuery(`
-        SELECT DISTINCT *
+        SELECT *
           FROM GUDMA.VW_ML_FICHAPONTO_PDF F
           WHERE F.ID_FUNCIONARIO_ERP = '${funcionario.id_funcionario_erp}'
-          AND F.DATA_MOVIMENTO BETWEEN to_date('${dateRequestInitial}','DD-MM-YYYY') and to_date('${dateRequestFinish}','DD-MM-YYYY')
+          AND F.DATA_MOVIMENTO BETWEEN '${dateRequestInitial}' and '${dateRequestFinish}'
           ORDER BY F.DATA_MOVIMENTO
       `);
             let resumoFicha = [];
@@ -118,8 +73,7 @@ class Receipts2 {
             catch (error) {
                 resumoFicha = [];
             }
-            const pdfTemp = await this.generatePdf(this.tratarDadosDotCard(query, empresa, resumoFicha), template_1.fichaPonto);
-            return response.json({ pdfTemp });
+            return response.json({ query, resumoFicha });
         }
         catch (error) {
             response.badRequest(error);
