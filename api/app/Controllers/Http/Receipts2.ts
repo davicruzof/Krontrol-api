@@ -10,37 +10,6 @@ import { fichaPonto } from "App/templates/pdf/template";
 import AppVersion from "App/Models/AppVersion";
 import { DateTime } from "luxon";
 
-interface ApiExternalReturn {
-  ID_FUNCIONARIO_ERP: number;
-  FUNCAO: string;
-  NOME: string;
-  DATA_MOVIMENTO: string;
-  DT_EXIBICAO: string;
-  OCORRENCIA: string;
-  ENTRADA: string;
-  I_INI: string;
-  I_FIM: string;
-  SAIDA: string;
-  LINHA: string;
-  TABELA: string;
-  NORMAL: string;
-  EXTRA: string;
-  OUTRA: string;
-  A_NOT: string;
-  DSR: string;
-  EXTRANOTDM: string;
-  TOTALF: string;
-  BH_COMPETENCIA: string;
-  CREDITO: string;
-  DEBITO: string;
-  SALDOANTERIOR: string;
-  VALORPAGO: string;
-  SALDOATUAL: string;
-  REGISTRO: string;
-  BD_DEBITO: string;
-  BH_CREDITO: string;
-}
-
 export default class Receipts2 {
   private async generatePdf(dados, template) {
     try {
@@ -139,16 +108,13 @@ export default class Receipts2 {
       body: raw,
     };
 
-    const result = (await fetch(
+    const result = await fetch(
       "https://endpointsambaiba.ml18.com.br/glo/pontoeletronico/ficha",
       requestOptions
-    )) as {
-      status: number;
-      json: () => Promise<ApiExternalReturn[]>;
-    };
+    );
 
     if (result.status === 200) {
-      const json = await result.json();
+      const json: any = await result.json();
       const format = json.map((obj) => {
         Object.keys(obj).forEach((key) => {
           if (obj[key] === null) {

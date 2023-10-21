@@ -38,7 +38,7 @@ class Receipts2 {
                 headers: myHeaders,
                 body: raw,
             };
-            const result = (await fetch("https://endpointsambaiba.ml18.com.br/glo/pontoeletronico/ficha", requestOptions));
+            const result = await fetch("https://endpointsambaiba.ml18.com.br/glo/pontoeletronico/ficha", requestOptions);
             if (result.status === 200) {
                 const json = await result.json();
                 const format = json.map((obj) => {

@@ -378,7 +378,7 @@ exports.fichaPonto = `
     <table style="margin-bottom: 20px;">
         <tr>
             <td style="width:12%;" >Data </td>
-            <td style="width:7%;padding-left: 4px;" >Entrada </td>
+            <td style="width:7%;" >Entrada </td>
             <td style="width:7%;padding-left: 8px;">I. Ini.</td>
             <td style="width:7%;">I. Fim </td>
             <td style="width:6%;">Saída </td>
