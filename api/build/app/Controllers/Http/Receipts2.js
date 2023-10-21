@@ -91,7 +91,7 @@ class Receipts2 {
         }
         catch (error) { }
     }
-    tratarDadosDotCard(dados, dados_empresa, resumoFicha) {
+    tratarDadosDotCard(dados, dados_empresa, resumoFicha, competencia) {
         const ultimaPosicao = dados.length - 1;
         let dadosTemp = {
             cabecalho: {
@@ -100,7 +100,7 @@ class Receipts2 {
                 cnpj: dados_empresa.cnpj,
                 nome: dados[ultimaPosicao].NOME,
                 funcao: dados[ultimaPosicao].FUNCAO,
-                competencia: dados[ultimaPosicao].BH_COMPETENCIA,
+                competencia: competencia,
                 endereco: dados_empresa.logradouro,
             },
             rodape: {
@@ -129,11 +129,11 @@ class Receipts2 {
             }
             const data = `${dados.data.year}/${dados.data.month}`;
             const competencia = `${dados.data.month}/${dados.data.year}`;
-            const dateRequestInitial = luxon_1.DateTime.fromISO(new Date(`${data}-27`).toISOString().replace(".000Z", ""))
+            const dateRequestInitial = luxon_1.DateTime.fromISO(new Date(`${data}/27`).toISOString().replace(".000Z", ""))
                 .minus({ months: 1 })
                 .toFormat("dd-LL-yyyy")
                 .toString();
-            const dateRequestFinish = luxon_1.DateTime.fromISO(new Date(`${data}-26`).toISOString().replace(".000Z", ""))
+            const dateRequestFinish = luxon_1.DateTime.fromISO(new Date(`${data}/26`).toISOString().replace(".000Z", ""))
                 .toFormat("dd-LL-yyyy")
                 .toString();
             const isMonthReleased = await this.isMonthFreedom(auth.user?.id_empresa, 1, competencia);
@@ -171,7 +171,7 @@ class Receipts2 {
             catch (error) {
                 resumoFicha = [];
             }
-            const pdfTemp = await this.generatePdf(this.tratarDadosDotCard(query, empresa, resumoFicha), template_1.fichaPonto);
+            const pdfTemp = await this.generatePdf(this.tratarDadosDotCard(query, empresa, resumoFicha, competencia), template_1.fichaPonto);
             if (!pdfTemp) {
                 return response.badRequest({ error: "Erro ao gerar pdf!" });
             }

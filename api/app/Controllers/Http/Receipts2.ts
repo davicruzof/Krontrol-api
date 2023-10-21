@@ -63,7 +63,7 @@ export default class Receipts2 {
     return liberacaoPdf?.rows.length > 0 ? true : false;
   };
 
-  private tratarDadosDotCard(dados, dados_empresa, resumoFicha) {
+  private tratarDadosDotCard(dados, dados_empresa, resumoFicha, competencia) {
     const ultimaPosicao = dados.length - 1;
     let dadosTemp = {
       cabecalho: {
@@ -72,7 +72,7 @@ export default class Receipts2 {
         cnpj: dados_empresa.cnpj,
         nome: dados[ultimaPosicao].NOME,
         funcao: dados[ultimaPosicao].FUNCAO,
-        competencia: dados[ultimaPosicao].BH_COMPETENCIA,
+        competencia: competencia,
         endereco: dados_empresa.logradouro,
       },
       rodape: {
@@ -172,14 +172,14 @@ export default class Receipts2 {
       const competencia = `${dados.data.month}/${dados.data.year}`;
 
       const dateRequestInitial = DateTime.fromISO(
-        new Date(`${data}-27`).toISOString().replace(".000Z", "")
+        new Date(`${data}/27`).toISOString().replace(".000Z", "")
       )
         .minus({ months: 1 })
         .toFormat("dd-LL-yyyy")
         .toString();
 
       const dateRequestFinish = DateTime.fromISO(
-        new Date(`${data}-26`).toISOString().replace(".000Z", "")
+        new Date(`${data}/26`).toISOString().replace(".000Z", "")
       )
         .toFormat("dd-LL-yyyy")
         .toString();
@@ -246,7 +246,7 @@ export default class Receipts2 {
       }
 
       const pdfTemp = await this.generatePdf(
-        this.tratarDadosDotCard(query, empresa, resumoFicha),
+        this.tratarDadosDotCard(query, empresa, resumoFicha, competencia),
         fichaPonto
       );
 
