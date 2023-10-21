@@ -1,48 +1,77 @@
 import Empresa from "App/Models/Empresa";
-// import ConfirmarPdf from "App/Models/ConfirmarPdf";
+import ConfirmarPdf from "App/Models/ConfirmarPdf";
 import type { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
 import Funcionario from "../../Models/Funcionario";
-// import pdf from "pdf-creator-node";
-// import fs from "fs";
-// import { uploadPdfEmpresa } from "App/Controllers/Http/S3";
+import pdf from "pdf-creator-node";
+import fs from "fs";
+import { uploadPdfEmpresa } from "App/Controllers/Http/S3";
 import Database from "@ioc:Adonis/Lucid/Database";
-// import { fichaPonto } from "App/templates/pdf/template";
+import { fichaPonto } from "App/templates/pdf/template";
 import AppVersion from "App/Models/AppVersion";
 import { DateTime } from "luxon";
 
+interface ApiExternalReturn {
+  ID_FUNCIONARIO_ERP: number;
+  FUNCAO: string;
+  NOME: string;
+  DATA_MOVIMENTO: string;
+  DT_EXIBICAO: string;
+  OCORRENCIA: string;
+  ENTRADA: string;
+  I_INI: string;
+  I_FIM: string;
+  SAIDA: string;
+  LINHA: string;
+  TABELA: string;
+  NORMAL: string;
+  EXTRA: string;
+  OUTRA: string;
+  A_NOT: string;
+  DSR: string;
+  EXTRANOTDM: string;
+  TOTALF: string;
+  BH_COMPETENCIA: string;
+  CREDITO: string;
+  DEBITO: string;
+  SALDOANTERIOR: string;
+  VALORPAGO: string;
+  SALDOATUAL: string;
+  REGISTRO: string;
+  BD_DEBITO: string;
+  BH_CREDITO: string;
+}
+
 export default class Receipts2 {
-  // private async generatePdf(dados, template) {
-  //   try {
-  //     // var options = {
-  //     //   format: "A3",
-  //     //   orientation: "portrait",
-  //     //   border: "10mm",
-  //     //   type: "pdf",
-  //     // };
+  private async generatePdf(dados, template) {
+    try {
+      var options = {
+        format: "A3",
+        orientation: "portrait",
+        border: "10mm",
+        type: "pdf",
+      };
 
-  //     const filename = Math.random() + "_doc" + ".pdf";
+      const filename = Math.random() + "_doc" + ".pdf";
 
-  //     var document = {
-  //       html: template,
-  //       data: {
-  //         dados: dados,
-  //       },
-  //       path: "./pdfsTemp/" + filename,
-  //     };
+      var document = {
+        html: template,
+        data: {
+          dados: dados,
+        },
+        path: "./pdfsTemp/" + filename,
+      };
 
-  //     return document;
-
-  //     // let file = pdf
-  //     //   .create(document, options)
-  //     //   .then((res) => {
-  //     //     return res;
-  //     //   })
-  //     //   .catch((error) => {
-  //     //     return error;
-  //     //   });
-  //     // return await file;
-  //   } catch (error) {}
-  // }
+      let file = pdf
+        .create(document, options)
+        .then((res) => {
+          return res;
+        })
+        .catch((error) => {
+          return error;
+        });
+      return await file;
+    } catch (error) {}
+  }
 
   private isMonthFreedom = async (id_empresa, id_pdf, mes) => {
     const liberacaoPdf = await Database.connection("pg").rawQuery(
@@ -57,36 +86,82 @@ export default class Receipts2 {
     return liberacaoPdf?.rows.length > 0 ? true : false;
   };
 
-  // private tratarDadosDotCard(dados, dados_empresa, resumoFicha) {
-  //   const ultimaPosicao = dados.length - 1;
-  //   let dadosTemp = {
-  //     cabecalho: {
-  //       logo: dados_empresa.logo,
-  //       nomeEmpresa: dados_empresa.nomeempresarial,
-  //       cnpj: dados_empresa.cnpj,
-  //       nome: dados[ultimaPosicao].NOME,
-  //       funcao: dados[ultimaPosicao].FUNCAO,
-  //       competencia: dados[ultimaPosicao].BH_COMPETENCIA,
-  //       endereco: dados_empresa.logradouro,
-  //     },
-  //     rodape: {
-  //       saldoAnterior: dados[ultimaPosicao].SALDOANTERIOR,
-  //       credito: dados[ultimaPosicao].CREDITO,
-  //       debito: dados[ultimaPosicao].DEBITO,
-  //       valorPago: dados[ultimaPosicao].VALORPAGO,
-  //       saldoAtual: dados[ultimaPosicao].SALDOATUAL,
-  //     },
-  //     dadosDias: new Array(),
-  //     resumo: resumoFicha,
-  //   };
-  //   dados.forEach((element) => {
-  //     element.TOTALF = element.TOTALF;
-  //     element.EXTRA = element.EXTRA;
-  //     element.OUTRA = element.OUTRA;
-  //     dadosTemp.dadosDias.push(element);
-  //   });
-  //   return dadosTemp;
-  // }
+  private tratarDadosDotCard(dados, dados_empresa, resumoFicha) {
+    const ultimaPosicao = dados.length - 1;
+    let dadosTemp = {
+      cabecalho: {
+        logo: dados_empresa.logo,
+        nomeEmpresa: dados_empresa.nomeempresarial,
+        cnpj: dados_empresa.cnpj,
+        nome: dados[ultimaPosicao].NOME,
+        funcao: dados[ultimaPosicao].FUNCAO,
+        competencia: dados[ultimaPosicao].BH_COMPETENCIA,
+        endereco: dados_empresa.logradouro,
+      },
+      rodape: {
+        saldoAnterior: dados[ultimaPosicao].SALDOANTERIOR,
+        credito: dados[ultimaPosicao].CREDITO,
+        debito: dados[ultimaPosicao].DEBITO,
+        valorPago: dados[ultimaPosicao].VALORPAGO,
+        saldoAtual: dados[ultimaPosicao].SALDOATUAL,
+      },
+      dadosDias: new Array(),
+      resumo: resumoFicha,
+    };
+    dados.forEach((element) => {
+      element.TOTALF = element.TOTALF;
+      element.EXTRA = element.EXTRA;
+      element.OUTRA = element.OUTRA;
+      dadosTemp.dadosDias.push(element);
+    });
+    return dadosTemp;
+  }
+
+  public getFichaPonto = async (
+    id_funcionario_erp,
+    dateRequestInitial,
+    dateRequestFinish,
+    token
+  ) => {
+    var myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    myHeaders.append("Authorization", `Bearer ${token}`);
+
+    var raw = JSON.stringify({
+      ID_FUNCIONARIO_ERP: id_funcionario_erp,
+      dt_movimento_inicio: dateRequestInitial,
+      dt_movimento_fim: dateRequestFinish,
+    });
+
+    var requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      body: raw,
+    };
+
+    const result = (await fetch(
+      "https://endpointsambaiba.ml18.com.br/glo/pontoeletronico/ficha",
+      requestOptions
+    )) as {
+      status: number;
+      json: () => Promise<ApiExternalReturn[]>;
+    };
+
+    if (result.status === 200) {
+      const json = await result.json();
+      const format = json.map((obj) => {
+        Object.keys(obj).forEach((key) => {
+          if (obj[key] === null) {
+            obj[key] = "--------";
+          }
+        });
+        return obj;
+      });
+      return format;
+    } else {
+      return [];
+    }
+  };
 
   public async dotCardPdfGenerator({
     request,
@@ -96,7 +171,7 @@ export default class Receipts2 {
     try {
       const dados = request.body();
 
-      if (!dados.data || !auth.user) {
+      if (!dados.data || !auth.user || !dados.token) {
         return response.badRequest({ error: "data is required" });
       }
 
@@ -152,13 +227,12 @@ export default class Receipts2 {
         return response.badRequest({ error: "Erro ao pegar empresa!" });
       }
 
-      const query = await Database.connection("oracle").rawQuery(`
-        SELECT *
-          FROM GUDMA.VW_ML_FICHAPONTO_PDF F
-          WHERE F.ID_FUNCIONARIO_ERP = '${funcionario.id_funcionario_erp}'
-          AND F.DATA_MOVIMENTO BETWEEN '${dateRequestInitial}' and '${dateRequestFinish}'
-          ORDER BY F.DATA_MOVIMENTO
-      `);
+      const query = await this.getFichaPonto(
+        funcionario.id_funcionario_erp,
+        dateRequestInitial,
+        dateRequestFinish,
+        dados.token
+      );
 
       let resumoFicha = [];
 
@@ -174,40 +248,38 @@ export default class Receipts2 {
         resumoFicha = [];
       }
 
-      // const pdfTemp = await this.generatePdf(
-      //   this.tratarDadosDotCard(query, empresa, resumoFicha),
-      //   fichaPonto
-      // );
+      const pdfTemp = await this.generatePdf(
+        this.tratarDadosDotCard(query, empresa, resumoFicha),
+        fichaPonto
+      );
 
-      return response.json({ query, resumoFicha });
+      if (!pdfTemp) {
+        return response.badRequest({ error: "Erro ao gerar pdf!" });
+      }
 
-      // if (!pdfTemp) {
-      //   return response.badRequest({ error: "Erro ao gerar pdf!" });
-      // }
+      const confirmacao = await ConfirmarPdf.query()
+        .select("*")
+        .where("id_funcionario", "=", `${funcionario?.id_funcionario}`)
+        .andWhere("data_pdf", "=", `${dados.data}`);
 
-      // const confirmacao = await ConfirmarPdf.query()
-      //   .select("*")
-      //   .where("id_funcionario", "=", `${funcionario?.id_funcionario}`)
-      //   .andWhere("data_pdf", "=", `${dados.data}`);
+      if (!confirmacao) {
+        return response.badRequest({ error: "Erro ao verificar confirmação!" });
+      }
 
-      // if (!confirmacao) {
-      //   return response.badRequest({ error: "Erro ao verificar confirmação!" });
-      // }
+      const file = await uploadPdfEmpresa(
+        pdfTemp.filename,
+        auth.user?.id_empresa
+      );
 
-      // const file = await uploadPdfEmpresa(
-      //   pdfTemp.filename,
-      //   auth.user?.id_empresa
-      // );
+      if (!file) {
+        return response.badRequest({ error: "Erro ao gerar url do pdf!" });
+      }
 
-      // if (!file) {
-      //   return response.badRequest({ error: "Erro ao gerar url do pdf!" });
-      // }
-
-      // fs.unlink(pdfTemp.filename, () => {});
-      // response.json({
-      //   pdf: file.Location,
-      //   confirmado: confirmacao[0] ? true : false,
-      // });
+      fs.unlink(pdfTemp.filename, () => {});
+      response.json({
+        pdf: file.Location,
+        confirmado: confirmacao[0] ? true : false,
+      });
     } catch (error) {
       response.badRequest(error);
     }
