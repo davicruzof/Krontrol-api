@@ -107,13 +107,13 @@ export default class Receipts2 {
         new Date(`${data}-27`).toISOString().replace(".000Z", "")
       )
         .minus({ months: 1 })
-        .toFormat("yyyy/LL/dd")
+        .toFormat("dd/LL/yyyy")
         .toString();
 
       const dateRequestFinish = DateTime.fromISO(
         new Date(`${data}-26`).toISOString().replace(".000Z", "")
       )
-        .toFormat("yyyy/LL/dd")
+        .toFormat("dd/LL/yyyy")
         .toString();
 
       const isMonthReleased = await this.isMonthFreedom(
