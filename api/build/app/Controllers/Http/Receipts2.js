@@ -30,10 +30,10 @@ class Receipts2 {
             const competencia = `${dados.data.month}/${dados.data.year}`;
             const dateRequestInitial = luxon_1.DateTime.fromISO(new Date(`${data}-27`).toISOString().replace(".000Z", ""))
                 .minus({ months: 1 })
-                .toFormat("dd/LL/yyyy")
+                .toFormat("dd-LL-yyyy")
                 .toString();
             const dateRequestFinish = luxon_1.DateTime.fromISO(new Date(`${data}-26`).toISOString().replace(".000Z", ""))
-                .toFormat("dd/LL/yyyy")
+                .toFormat("dd-LL-yyyy")
                 .toString();
             const isMonthReleased = await this.isMonthFreedom(auth.user?.id_empresa, 1, competencia);
             if (!isMonthReleased) {
