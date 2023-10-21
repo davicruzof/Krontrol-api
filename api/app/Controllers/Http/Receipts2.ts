@@ -200,19 +200,23 @@ export default class Receipts2 {
         dados.token
       );
 
+      if (query.length === 0) {
+        return response.badRequest({ error: "Erro pegar ficha ponto!" });
+      }
+
       let resumoFicha = [];
 
-      // try {
-      //   resumoFicha = await Database.connection("oracle").rawQuery(`
-      //     SELECT DISTINCT EVENTO, TRIM(HR_DIA) as HR_DIA
-      //     FROM
-      //       VW_ML_PON_RESUMO_HOLERITE FH
-      //     WHERE FH.ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
-      //     AND FH.COMPETENCIA = '${competencia}'
-      //   `);
-      // } catch (error) {
-      //   resumoFicha = [];
-      // }
+      try {
+        resumoFicha = await Database.connection("oracle").rawQuery(`
+          SELECT DISTINCT EVENTO, TRIM(HR_DIA) as HR_DIA
+          FROM
+            VW_ML_PON_RESUMO_HOLERITE FH
+          WHERE FH.ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
+          AND FH.COMPETENCIA = '${competencia}'
+        `);
+      } catch (error) {
+        resumoFicha = [];
+      }
 
       const pdfTemp = await this.generatePdf(
         this.tratarDadosDotCard(query, empresa, resumoFicha),

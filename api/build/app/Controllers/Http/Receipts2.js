@@ -148,7 +148,22 @@ class Receipts2 {
                 return response.badRequest({ error: "Erro ao pegar empresa!" });
             }
             const query = await this.getFichaPonto(funcionario.id_funcionario_erp, dateRequestInitial, dateRequestFinish, dados.token);
+            if (query.length === 0) {
+                return response.badRequest({ error: "Erro pegar ficha ponto!" });
+            }
             let resumoFicha = [];
+            try {
+                resumoFicha = await Database_1.default.connection("oracle").rawQuery(`
+          SELECT DISTINCT EVENTO, TRIM(HR_DIA) as HR_DIA
+          FROM
+            VW_ML_PON_RESUMO_HOLERITE FH
+          WHERE FH.ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
+          AND FH.COMPETENCIA = '${competencia}'
+        `);
+            }
+            catch (error) {
+                resumoFicha = [];
+            }
             const pdfTemp = await this.generatePdf(this.tratarDadosDotCard(query, empresa, resumoFicha), template_1.fichaPonto);
             if (!pdfTemp) {
                 return response.badRequest({ error: "Erro ao gerar pdf!" });
