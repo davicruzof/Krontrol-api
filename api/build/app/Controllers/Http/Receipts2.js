@@ -30,7 +30,7 @@ class Receipts2 {
             `);
             return liberacaoPdf?.rows.length > 0 ? true : false;
         };
-        this.getFichaPonto = async (id_funcionario_erp, dateRequestInitial, dateRequestFinish, token) => {
+        this.getFichaPonto = async (id_funcionario_erp, dateRequestInitial, dateRequestFinish) => {
             try {
                 const { data, status } = await api.post("/ficha", {
                     ID_FUNCIONARIO_ERP: id_funcionario_erp,
@@ -38,7 +38,6 @@ class Receipts2 {
                     dt_movimento_fim: dateRequestFinish,
                 }, {
                     headers: {
-                        Authorization: `Bearer ${token}`,
                         "Content-Type": "application/json",
                     },
                 });
@@ -124,7 +123,7 @@ class Receipts2 {
     async dotCardPdfGenerator({ request, response, auth, }) {
         try {
             const dados = request.body();
-            if (!dados.data || !auth.user || !dados.token) {
+            if (!dados.data || !auth.user) {
                 return response.badRequest({ error: "data is required" });
             }
             const data = `${dados.data.year}/${dados.data.month}`;
@@ -154,7 +153,7 @@ class Receipts2 {
             if (!empresa) {
                 return response.badRequest({ error: "Erro ao pegar empresa!" });
             }
-            const query = await this.getFichaPonto(funcionario.id_funcionario_erp, dateRequestInitial, dateRequestFinish, dados.token);
+            const query = await this.getFichaPonto(funcionario.id_funcionario_erp, dateRequestInitial, dateRequestFinish);
             if (query.length === 0) {
                 return response.badRequest({ error: "Erro pegar ficha ponto!" });
             }

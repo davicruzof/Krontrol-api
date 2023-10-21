@@ -97,8 +97,7 @@ export default class Receipts2 {
   public getFichaPonto = async (
     id_funcionario_erp,
     dateRequestInitial,
-    dateRequestFinish,
-    token
+    dateRequestFinish
   ) => {
     try {
       const { data, status } = await api.post(
@@ -110,7 +109,6 @@ export default class Receipts2 {
         },
         {
           headers: {
-            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
         }
@@ -133,27 +131,6 @@ export default class Receipts2 {
     } catch (error) {
       return [];
     }
-
-    // var myHeaders = new Headers();
-    // myHeaders.append("Content-Type", "application/json");
-    // myHeaders.append("Authorization", `Bearer ${token}`);
-
-    // var raw = JSON.stringify({
-    //   ID_FUNCIONARIO_ERP: id_funcionario_erp,
-    //   dt_movimento_inicio: dateRequestInitial,
-    //   dt_movimento_fim: dateRequestFinish,
-    // });
-
-    // var requestOptions = {
-    //   method: "POST",
-    //   headers: myHeaders,
-    //   body: raw,
-    // };
-
-    // const result = await fetch(
-    //   "https://endpointsambaiba.ml18.com.br/glo/pontoeletronico/ficha",
-    //   requestOptions
-    // );
   };
 
   public async dotCardPdfGenerator({
@@ -164,7 +141,7 @@ export default class Receipts2 {
     try {
       const dados = request.body();
 
-      if (!dados.data || !auth.user || !dados.token) {
+      if (!dados.data || !auth.user) {
         return response.badRequest({ error: "data is required" });
       }
 
@@ -223,8 +200,7 @@ export default class Receipts2 {
       const query = await this.getFichaPonto(
         funcionario.id_funcionario_erp,
         dateRequestInitial,
-        dateRequestFinish,
-        dados.token
+        dateRequestFinish
       );
 
       if (query.length === 0) {
