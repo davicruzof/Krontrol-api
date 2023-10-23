@@ -124,7 +124,9 @@ class Receipts2 {
         try {
             const dados = request.body();
             if (!dados.data || !auth.user) {
-                return response.badRequest({ error: "data is required" });
+                return response.badRequest({
+                    error: "Não foi possivel consultar sua ficha ponto!",
+                });
             }
             const data = `${dados.data.year}/${dados.data.month}`;
             const competencia = `${dados.data.month}/${dados.data.year}`;
@@ -147,7 +149,7 @@ class Receipts2 {
             }
             const appUpdate = await AppVersion_1.default.findBy("id_funcionario", auth.user?.id_funcionario);
             if (!appUpdate) {
-                return response.badRequest({ error: "app desatualizado" });
+                return response.badRequest({ error: "O seu app desatualizado!" });
             }
             const empresa = await Empresa_1.default.findBy("id_empresa", auth.user?.id_empresa);
             if (!empresa) {
@@ -155,7 +157,9 @@ class Receipts2 {
             }
             const query = await this.getFichaPonto(funcionario.id_funcionario_erp, dateRequestInitial, dateRequestFinish);
             if (query.length === 0) {
-                return response.badRequest({ error: "Erro pegar ficha ponto!" });
+                return response.badRequest({
+                    error: "Não foi possivel gerar a sua ficha ponto! Tente novamente mais tarde",
+                });
             }
             let resumoFicha = [];
             try {

@@ -142,7 +142,9 @@ export default class Receipts2 {
       const dados = request.body();
 
       if (!dados.data || !auth.user) {
-        return response.badRequest({ error: "data is required" });
+        return response.badRequest({
+          error: "Não foi possivel consultar sua ficha ponto!",
+        });
       }
 
       const data = `${dados.data.year}/${dados.data.month}`;
@@ -188,7 +190,7 @@ export default class Receipts2 {
       );
 
       if (!appUpdate) {
-        return response.badRequest({ error: "app desatualizado" });
+        return response.badRequest({ error: "O seu app desatualizado!" });
       }
 
       const empresa = await Empresa.findBy("id_empresa", auth.user?.id_empresa);
@@ -204,7 +206,10 @@ export default class Receipts2 {
       );
 
       if (query.length === 0) {
-        return response.badRequest({ error: "Erro pegar ficha ponto!" });
+        return response.badRequest({
+          error:
+            "Não foi possivel gerar a sua ficha ponto! Tente novamente mais tarde",
+        });
       }
 
       let resumoFicha = [];
