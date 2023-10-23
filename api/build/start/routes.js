@@ -18,6 +18,9 @@ Route_1.default.group(() => {
         Route_1.default.post("/create", "UsersController.create");
     }).prefix("/user");
     Route_1.default.group(() => {
+        Route_1.default.get("/", "VersionApp.versionApp");
+    }).prefix("/versionApp");
+    Route_1.default.group(() => {
         Route_1.default.get("/", "EmpresasController.getAll");
         Route_1.default.post("/create", "EmpresasController.create");
         Route_1.default.post("/getById", "EmpresasController.getById");
@@ -53,8 +56,8 @@ Route_1.default.group(() => {
         Route_1.default.post("/EventsReceiptFormByFuncionario", "Receipts.EventsReceiptFormByFuncionario").middleware("auth");
     }).prefix("/receipts");
     Route_1.default.group(() => {
-        Route_1.default.post("/dotCardPdfGenerator", "Receipts2.dotCardPdfGenerator").middleware("auth");
-    }).prefix("/receipts2");
+        Route_1.default.post("/dotCardPdfGenerator", "DotCardPdf.dotCardPdfGenerator").middleware("auth");
+    }).prefix("/DotCardPdf");
     Route_1.default.group(() => {
         Route_1.default.get("/", "InformativosController.getInformativos").middleware("auth");
         Route_1.default.get("/notify", "InformativosController.getInformativosNotify").middleware("auth");

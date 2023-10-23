@@ -42,6 +42,11 @@ Route.group(() => {
     Route.post("/create", "UsersController.create");
   }).prefix("/user");
 
+  //VersionApp
+  Route.group(() => {
+    Route.get("/", "VersionApp.versionApp");
+  }).prefix("/versionApp");
+
   //Rotas Empresa
   Route.group(() => {
     Route.get("/", "EmpresasController.getAll");
@@ -128,9 +133,9 @@ Route.group(() => {
   Route.group(() => {
     Route.post(
       "/dotCardPdfGenerator",
-      "Receipts2.dotCardPdfGenerator"
+      "DotCardPdf.dotCardPdfGenerator"
     ).middleware("auth");
-  }).prefix("/receipts2");
+  }).prefix("/DotCardPdf");
 
   Route.group(() => {
     Route.get("/", "InformativosController.getInformativos").middleware("auth");

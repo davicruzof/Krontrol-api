@@ -19,7 +19,7 @@ const api = axios_1.default.create({
     baseURL: BASE_URL,
     timeout: 10000,
 });
-class Receipts2 {
+class DotCardPdf {
     constructor() {
         this.isMonthFreedom = async (id_empresa, id_pdf, mes) => {
             const liberacaoPdf = await Database_1.default.connection("pg").rawQuery(`SELECT * FROM public.vw_ml_flp_liberacao_recibos 
@@ -200,5 +200,5 @@ class Receipts2 {
         }
     }
 }
-exports.default = Receipts2;
-//# sourceMappingURL=Receipts2.js.map
+exports.default = DotCardPdf;
+//# sourceMappingURL=DotCardPdf.js.map

@@ -18,7 +18,7 @@ const api = axios.create({
   timeout: 10000,
 });
 
-export default class Receipts2 {
+export default class DotCardPdf {
   private async generatePdf(dados, template) {
     try {
       var options = {
