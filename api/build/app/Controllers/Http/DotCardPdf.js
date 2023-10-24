@@ -156,6 +156,11 @@ class DotCardPdf {
                 return response.badRequest({ error: "Erro ao pegar empresa!" });
             }
             const query = await this.getFichaPonto(funcionario.id_funcionario_erp, dateRequestInitial, dateRequestFinish);
+            if (query.length === 0) {
+                return response.badRequest({
+                    error: "Não foi possivel gerar a sua ficha ponto! Tente novamente mais tarde",
+                });
+            }
             let resumoFicha = [];
             try {
                 resumoFicha = await Database_1.default.connection("oracle").rawQuery(`
