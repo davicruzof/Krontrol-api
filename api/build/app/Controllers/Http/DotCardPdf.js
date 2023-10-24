@@ -10,14 +10,14 @@ const pdf_creator_node_1 = __importDefault(require("pdf-creator-node"));
 const fs_1 = __importDefault(require("fs"));
 const S3_1 = global[Symbol.for('ioc.use')]("App/Controllers/Http/S3");
 const Database_1 = __importDefault(global[Symbol.for('ioc.use')]("Adonis/Lucid/Database"));
-const template_1 = global[Symbol.for('ioc.use')]("App/templates/pdf/template");
 const AppVersion_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/AppVersion"));
 const luxon_1 = require("luxon");
 const axios_1 = __importDefault(require("axios"));
+const template_ficha_ponto_1 = global[Symbol.for('ioc.use')]("App/templates/pdf/template_ficha_ponto");
 const BASE_URL = "https://endpointsambaiba.ml18.com.br/glo/pontoeletronico";
 const api = axios_1.default.create({
     baseURL: BASE_URL,
-    timeout: 10000,
+    timeout: 30000,
 });
 class DotCardPdf {
     constructor() {
@@ -156,11 +156,6 @@ class DotCardPdf {
                 return response.badRequest({ error: "Erro ao pegar empresa!" });
             }
             const query = await this.getFichaPonto(funcionario.id_funcionario_erp, dateRequestInitial, dateRequestFinish);
-            if (query.length === 0) {
-                return response.badRequest({
-                    error: "Não foi possivel gerar a sua ficha ponto! Tente novamente mais tarde",
-                });
-            }
             let resumoFicha = [];
             try {
                 resumoFicha = await Database_1.default.connection("oracle").rawQuery(`
@@ -174,7 +169,7 @@ class DotCardPdf {
             catch (error) {
                 resumoFicha = [];
             }
-            const pdfTemp = await this.generatePdf(this.tratarDadosDotCard(query, empresa, resumoFicha, competencia), template_1.fichaPonto);
+            const pdfTemp = await this.generatePdf(this.tratarDadosDotCard(query, empresa, resumoFicha, competencia), template_ficha_ponto_1.Template_Ficha_Ponto);
             if (!pdfTemp) {
                 return response.badRequest({ error: "Erro ao gerar pdf!" });
             }
