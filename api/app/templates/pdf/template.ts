@@ -391,7 +391,7 @@ export const fichaPonto = `
 
         {{#each dados.dadosDias}}
             <tr>
-                <td style="width:12%;">{{this.DT_EXIBICAO}} </td>
+                <td style="width:12%;">{{this.DATA_MOVIMENTO}} </td>
                 <td style="width:7%;padding-left: 4px;">{{this.ENTRADA}} </td>
                 <td style="width:7%;padding-left: 8px;">{{this.I_INI}} </td>
                 <td style="width:7%;padding-left: 4px;">{{this.I_FIM}} </td>
