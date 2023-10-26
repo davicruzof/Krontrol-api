@@ -205,12 +205,12 @@ export default class DotCardPdf {
         dateRequestFinish
       );
 
-      if (query.length === 0) {
-        return response.badRequest({
-          error:
-            "Não foi possivel gerar a sua ficha ponto! Tente novamente mais tarde",
-        });
-      }
+      // if (query.length === 0) {
+      //   return response.badRequest({
+      //     error:
+      //       "Não foi possivel gerar a sua ficha ponto! Tente novamente mais tarde",
+      //   });
+      // }
 
       let resumoFicha = [];
 
