@@ -8,15 +8,8 @@ import { uploadPdfEmpresa } from "App/Controllers/Http/S3";
 import Database from "@ioc:Adonis/Lucid/Database";
 import AppVersion from "App/Models/AppVersion";
 import { DateTime } from "luxon";
-import axios from "axios";
 import { Template_Ficha_Ponto } from "App/templates/pdf/template_ficha_ponto";
-
-const BASE_URL = "https://endpointsambaiba.ml18.com.br/glo/pontoeletronico";
-
-const api = axios.create({
-  baseURL: BASE_URL,
-  timeout: 30000,
-});
+import RequestFichaPonto from "./RequestFicha";
 
 export default class DotCardPdf {
   private async generatePdf(dados, template) {
@@ -94,45 +87,6 @@ export default class DotCardPdf {
     return dadosTemp;
   }
 
-  public getFichaPonto = async (
-    id_funcionario_erp,
-    dateRequestInitial,
-    dateRequestFinish
-  ) => {
-    try {
-      const { data, status } = await api.post(
-        "/ficha",
-        {
-          ID_FUNCIONARIO_ERP: id_funcionario_erp,
-          dt_movimento_inicio: dateRequestInitial,
-          dt_movimento_fim: dateRequestFinish,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (status === 200) {
-        const json = data;
-        const format = json.map((obj) => {
-          Object.keys(obj).forEach((key) => {
-            if (obj[key] === null) {
-              obj[key] = "--------";
-            }
-          });
-          return obj;
-        });
-        return format;
-      } else {
-        return [];
-      }
-    } catch (error) {
-      return [];
-    }
-  };
-
   public async dotCardPdfGenerator({
     request,
     response,
@@ -199,18 +153,27 @@ export default class DotCardPdf {
         return response.badRequest({ error: "Erro ao pegar empresa!" });
       }
 
-      const query = await this.getFichaPonto(
+      const query = await RequestFichaPonto(
         funcionario.id_funcionario_erp,
         dateRequestInitial,
         dateRequestFinish
       );
 
-      // if (query.length === 0) {
-      //   return response.badRequest({
-      //     error:
-      //       "Não foi possivel gerar a sua ficha ponto! Tente novamente mais tarde",
-      //   });
-      // }
+      if (query.length === 0) {
+        return response.badRequest({
+          error:
+            "Não foi possivel gerar a sua ficha ponto! Tente novamente mais tarde",
+        });
+      }
+
+      const formattedData = query.map((obj) => {
+        Object.keys(obj).forEach((key) => {
+          if (obj[key] === null) {
+            obj[key] = "--------";
+          }
+        });
+        return obj;
+      });
 
       let resumoFicha = [];
 
@@ -227,7 +190,12 @@ export default class DotCardPdf {
       }
 
       const pdfTemp = await this.generatePdf(
-        this.tratarDadosDotCard(query, empresa, resumoFicha, competencia),
+        this.tratarDadosDotCard(
+          formattedData,
+          empresa,
+          resumoFicha,
+          competencia
+        ),
         Template_Ficha_Ponto
       );
 
