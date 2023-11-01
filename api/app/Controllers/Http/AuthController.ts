@@ -87,7 +87,11 @@ export default class AuthController {
         return response.unauthorized({ error: "Dados inválidos" });
       }
 
-      response.json(await auth.use("api").generate(user));
+      response.json(
+        await auth.use("api").generate(user, {
+          expiresIn: "10 days",
+        })
+      );
     } catch (error) {
       response.badRequest(error.messages);
     }
