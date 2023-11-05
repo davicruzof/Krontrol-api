@@ -12,7 +12,6 @@ import AppVersion from "App/Models/AppVersion";
 import { DateTime } from "luxon";
 
 export default class Receipts {
-
   private async generatePdf(dados, template) {
     try {
       var options = {
@@ -39,7 +38,7 @@ export default class Receipts {
           return error;
         });
       return await file;
-    } catch (error) { }
+    } catch (error) {}
   }
 
   private getEmployeeFunction = async (id_funcao, id_empresa) => {
@@ -167,7 +166,11 @@ export default class Receipts {
     return dadosTemp;
   }
 
-  public async dotCardPdfGenerator({ request, response, auth }: HttpContextContract) {
+  public async dotCardPdfGenerator({
+    request,
+    response,
+    auth,
+  }: HttpContextContract) {
     try {
       const dados = request.body();
 
@@ -175,21 +178,28 @@ export default class Receipts {
         return response.badRequest({ error: "data is required" });
       }
 
-      const data = dados.data.split("-");
+      const [year, month] = dados.data.split("-");
 
-      if(data[1].includes("0")){
-        data[1] = data[1].replace("0", "");
-      }
+      const competencia = `${month}/${year}`;
 
-      const month = +data[1] > 9 ? data[1] :`0${data[1]}`;
+      const dateRequestInitial = DateTime.fromISO(
+        new Date(`${dados.data}-27`).toISOString().replace(".000Z", "")
+      )
+        .minus({ months: 1 })
+        .toFormat("dd/LL/yyyy")
+        .toString();
 
-      const competencia = `${month}/${data[0]}`;
+      const dateRequestFinish = DateTime.fromISO(
+        new Date(`${dados.data}-26`).toISOString().replace(".000Z", "")
+      )
+        .toFormat("dd/LL/yyyy")
+        .toString();
 
-      const dateRequestInitial = DateTime.fromISO(new Date(`${dados.data}-27`).toISOString().replace(".000Z", "")).minus({ months: 1 }).toFormat("dd/LL/yyyy").toString();
-      
-      const dateRequestFinish = DateTime.fromISO(new Date(`${dados.data}-26`).toISOString().replace(".000Z", "")).toFormat("dd/LL/yyyy").toString();
-          
-      const liberacaoPdf = await this.isMonthFreedom(auth.user?.id_empresa, 1, competencia);
+      const liberacaoPdf = await this.isMonthFreedom(
+        auth.user?.id_empresa,
+        1,
+        competencia
+      );
 
       if (!liberacaoPdf) {
         return response.badRequest({
@@ -263,7 +273,9 @@ export default class Receipts {
                       `);
 
       if (query.length === 0) {
-        return response.badRequest({ error: "Nenhum dado de ficha ponto foi encontrado!" });
+        return response.badRequest({
+          error: "Nenhum dado de ficha ponto foi encontrado!",
+        });
       }
 
       let resumoFicha = [];
@@ -285,7 +297,7 @@ export default class Receipts {
           query,
           empresa,
           funcionario,
-          `${data[1]}-${data[0]}`,
+          `${month}-${year}`,
           resumoFicha,
           funcao.funcao
         ),
@@ -314,12 +326,11 @@ export default class Receipts {
         return response.badRequest({ error: "Erro ao gerar url do pdf!" });
       }
 
-      fs.unlink(pdfTemp.filename, () => { });
+      fs.unlink(pdfTemp.filename, () => {});
       response.json({
         pdf: file.Location,
         confirmado: confirmacao[0] ? true : false,
       });
-
     } catch (error) {
       response.badRequest(error);
     }
@@ -333,22 +344,19 @@ export default class Receipts {
     try {
       const dados = request.body();
 
-
       if (!dados.data || !auth.user) {
         return response.badRequest({ error: "data is required" });
       }
 
-      const data = dados.data.split("-");
+      const [year, month] = dados.data.split("-");
 
-      if(data[1].includes("0")){
-        data[1] = data[1].replace("0", "");
-      }
+      const competencia = `${month}/${year}`;
 
-      const month = +data[1] > 9 ? data[1] :`0${data[1]}`;
-
-      const competencia = `${month}/${data[0]}`;
-
-      const liberacaoPdf = await this.isMonthFreedom(auth.user?.id_empresa, 2, competencia);
+      const liberacaoPdf = await this.isMonthFreedom(
+        auth.user?.id_empresa,
+        2,
+        competencia
+      );
 
       if (!liberacaoPdf) {
         return response.badRequest({
@@ -364,17 +372,16 @@ export default class Receipts {
       if (!funcionario) {
         return response.badRequest({ error: "funcionario não encontrado!" });
       }
-      
+
       const appUpdate = await AppVersion.findBy(
         "id_funcionario",
         auth.user?.id_funcionario
-        );
-        
-        if (!appUpdate) {
-          return response.badRequest({ error: "app desatualizado" });
-        }
-        
-        
+      );
+
+      if (!appUpdate) {
+        return response.badRequest({ error: "app desatualizado" });
+      }
+
       let payStub = await Database.connection("oracle").rawQuery(`
                                     SELECT DISTINCT
                                     to_char(competficha, 'MM-YYYY') as COMPETFICHA,
@@ -421,9 +428,8 @@ export default class Receipts {
         return response.badRequest({ error: "Erro ao gerar url do pdf!" });
       }
 
-      fs.unlink(pdfTemp.filename, () => { });
+      fs.unlink(pdfTemp.filename, () => {});
       response.json({ pdf: file.Location });
-
     } catch (error) {
       response.json(error);
     }

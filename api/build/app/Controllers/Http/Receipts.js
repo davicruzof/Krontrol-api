@@ -162,20 +162,21 @@ class Receipts {
         });
         return dadosTemp;
     }
-    async dotCardPdfGenerator({ request, response, auth }) {
+    async dotCardPdfGenerator({ request, response, auth, }) {
         try {
             const dados = request.body();
             if (!dados.data || !auth.user) {
                 return response.badRequest({ error: "data is required" });
             }
-            const data = dados.data.split("-");
-            if (data[1].includes("0")) {
-                data[1] = data[1].replace("0", "");
-            }
-            const month = +data[1] > 9 ? data[1] : `0${data[1]}`;
-            const competencia = `${month}/${data[0]}`;
-            const dateRequestInitial = luxon_1.DateTime.fromISO(new Date(`${dados.data}-27`).toISOString().replace(".000Z", "")).minus({ months: 1 }).toFormat("dd/LL/yyyy").toString();
-            const dateRequestFinish = luxon_1.DateTime.fromISO(new Date(`${dados.data}-26`).toISOString().replace(".000Z", "")).toFormat("dd/LL/yyyy").toString();
+            const [year, month] = dados.data.split("-");
+            const competencia = `${month}/${year}`;
+            const dateRequestInitial = luxon_1.DateTime.fromISO(new Date(`${dados.data}-27`).toISOString().replace(".000Z", ""))
+                .minus({ months: 1 })
+                .toFormat("dd/LL/yyyy")
+                .toString();
+            const dateRequestFinish = luxon_1.DateTime.fromISO(new Date(`${dados.data}-26`).toISOString().replace(".000Z", ""))
+                .toFormat("dd/LL/yyyy")
+                .toString();
             const liberacaoPdf = await this.isMonthFreedom(auth.user?.id_empresa, 1, competencia);
             if (!liberacaoPdf) {
                 return response.badRequest({
@@ -230,7 +231,9 @@ class Receipts {
                                     ORDER BY BH_COMPETENCIA, DATA_MOVIMENTO
                       `);
             if (query.length === 0) {
-                return response.badRequest({ error: "Nenhum dado de ficha ponto foi encontrado!" });
+                return response.badRequest({
+                    error: "Nenhum dado de ficha ponto foi encontrado!",
+                });
             }
             let resumoFicha = [];
             try {
@@ -245,7 +248,7 @@ class Receipts {
             catch (error) {
                 resumoFicha = [];
             }
-            const pdfTemp = await this.generatePdf(this.tratarDadosDotCard(query, empresa, funcionario, `${data[1]}-${data[0]}`, resumoFicha, funcao.funcao), template_1.fichaPonto);
+            const pdfTemp = await this.generatePdf(this.tratarDadosDotCard(query, empresa, funcionario, `${month}-${year}`, resumoFicha, funcao.funcao), template_1.fichaPonto);
             if (!pdfTemp) {
                 return response.badRequest({ error: "Erro ao gerar pdf!" });
             }
@@ -276,12 +279,8 @@ class Receipts {
             if (!dados.data || !auth.user) {
                 return response.badRequest({ error: "data is required" });
             }
-            const data = dados.data.split("-");
-            if (data[1].includes("0")) {
-                data[1] = data[1].replace("0", "");
-            }
-            const month = +data[1] > 9 ? data[1] : `0${data[1]}`;
-            const competencia = `${month}/${data[0]}`;
+            const [year, month] = dados.data.split("-");
+            const competencia = `${month}/${year}`;
             const liberacaoPdf = await this.isMonthFreedom(auth.user?.id_empresa, 2, competencia);
             if (!liberacaoPdf) {
                 return response.badRequest({
