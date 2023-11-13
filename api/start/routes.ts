@@ -138,6 +138,10 @@ Route.group(() => {
   }).prefix("/DotCardPdf");
 
   Route.group(() => {
+    Route.post("/version", "VersionApp.create").middleware("auth");
+  }).prefix("/AppVersion");
+
+  Route.group(() => {
     Route.get("/", "InformativosController.getInformativos").middleware("auth");
     Route.get(
       "/notify",

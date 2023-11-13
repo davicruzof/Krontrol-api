@@ -59,6 +59,9 @@ Route_1.default.group(() => {
         Route_1.default.post("/dotCardPdfGenerator", "DotCardPdf.dotCardPdfGenerator").middleware("auth");
     }).prefix("/DotCardPdf");
     Route_1.default.group(() => {
+        Route_1.default.post("/version", "VersionApp.create").middleware("auth");
+    }).prefix("/AppVersion");
+    Route_1.default.group(() => {
         Route_1.default.get("/", "InformativosController.getInformativos").middleware("auth");
         Route_1.default.get("/notify", "InformativosController.getInformativosNotify").middleware("auth");
         Route_1.default.put("/", "InformativosController.updateInformativo").middleware("auth");

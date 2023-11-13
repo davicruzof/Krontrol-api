@@ -9,7 +9,6 @@ const User_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/User"))
 const Funcionario_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/Funcionario"));
 const Database_1 = __importDefault(global[Symbol.for('ioc.use')]("Adonis/Lucid/Database"));
 const GlobalController_1 = __importDefault(require("./GlobalController"));
-const AppVersion_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/AppVersion"));
 const userSchema = Validator_1.schema.create({
     cpf: Validator_1.schema.string(),
     id_empresa: Validator_1.schema.number(),
@@ -51,7 +50,7 @@ class AuthController {
     async login({ request, response, auth }) {
         try {
             await request.validate({ schema: userSchema });
-            const { cpf, id_empresa, senha, version } = request.body();
+            const { cpf, id_empresa, senha } = request.body();
             const employee = await this.getEmployee(cpf, id_empresa);
             if (!employee) {
                 return response.unauthorized({ error: "Funcionário inválido" });
@@ -62,18 +61,6 @@ class AuthController {
             const user = await this.getUser(employee);
             if (!user) {
                 return response.unauthorized({ error: "Usuário inválido" });
-            }
-            if (version) {
-                const versionStorage = await AppVersion_1.default.findBy("id_funcionario", user.id_funcionario);
-                if (versionStorage) {
-                    versionStorage.merge({ app_version: version }).save();
-                }
-                else {
-                    await AppVersion_1.default.create({
-                        id_funcionario: user.id_funcionario,
-                        app_version: version,
-                    });
-                }
             }
             const isValidPassword = await this.verifyPassword(user, senha);
             if (!isValidPassword) {

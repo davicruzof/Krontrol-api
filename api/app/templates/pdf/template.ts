@@ -169,7 +169,11 @@ export const templateDotCard = `
             <tr>
                 <td style="
                         border: 1px solid black;
-                        width: 40%;"><span>{{this.DESCEVEN}}</span>
+                        width: 10%;"><span>{{this.CODEVENTO}}</span>
+                </td>
+                <td style="
+                        border: 1px solid black;
+                        width: 30%;"><span>{{this.DESCEVEN}}</span>
                 </td>
                 <td
                     align="right"

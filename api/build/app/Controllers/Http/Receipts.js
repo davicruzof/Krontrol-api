@@ -23,8 +23,8 @@ class Receipts {
             return queryFuncao ? queryFuncao[0] : null;
         };
         this.isMonthFreedom = async (id_empresa, id_pdf, mes) => {
-            const liberacaoPdf = await Database_1.default.connection("pg").rawQuery(`SELECT * FROM public.vw_ml_flp_liberacao_recibos 
-            where tipo_id = ${id_pdf} 
+            const liberacaoPdf = await Database_1.default.connection("pg").rawQuery(`SELECT * FROM public.vw_ml_flp_liberacao_recibos
+            where tipo_id = ${id_pdf}
             AND bloqueio_liberacao = false
             AND mes_liberado = '${mes}'
             AND empresa_id = ${id_empresa}
@@ -298,6 +298,7 @@ class Receipts {
             let payStub = await Database_1.default.connection("oracle").rawQuery(`
                                     SELECT DISTINCT
                                     to_char(competficha, 'MM-YYYY') as COMPETFICHA,
+                                    CODEVENTO,
                                     CODINTFUNC,
                                     to_char(VALORFICHA, 'FM999G999G999D90', 'nls_numeric_characters='',.''') AS VALORFICHA,
                                     REFERENCIA,
@@ -316,7 +317,7 @@ class Receipts {
                                 WHERE
                                 hol.codintfunc = ${funcionario?.id_funcionario_erp} and to_char(competficha, 'MM/YYYY') = '${competencia}'
                                 and hol.TIPOFOLHA = 1
-                                order by hol.tipoeven desc,hol.desceven
+                                order by hol.tipoeven desc,hol.codevento asc
                                 `);
             const empresa = await Empresa_1.default.findBy("id_empresa", auth.user?.id_empresa);
             if (!empresa) {

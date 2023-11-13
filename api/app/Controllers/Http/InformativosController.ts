@@ -12,12 +12,12 @@ export default class Receipts {
     const data = DateTime.now().toFormat("yyyy-MM-dd");
 
     const informativos = await Database.connection("pg").rawQuery(
-      `SELECT * FROM public.vw_ml_sac_informativo_funcionario 
+      `SELECT * FROM public.vw_ml_sac_informativo_funcionario
             where funcionario_id = ${user?.id_funcionario}
-            and vigencia_ini <= '${data}' 
-            and vigencia_fim > '${data}' 
+            and vigencia_ini <= '${data}'
+            and vigencia_fim > '${data}'
             and cancelado = false
-            order by dt_cadastro desc 
+            order by dt_cadastro desc
             `
     );
 
@@ -33,24 +33,15 @@ export default class Receipts {
     const data = DateTime.now().toFormat("yyyy-MM-dd");
 
     const informativos = await Database.connection("pg").rawQuery(
-      `SELECT * FROM public.vw_ml_sac_informativo_funcionario 
+      `SELECT * FROM public.vw_ml_sac_informativo_funcionario
             where funcionario_id = ${user?.id_funcionario}
-            and vigencia_ini <= '${data}' 
-            and vigencia_fim > '${data}' 
+            and vigencia_ini <= '${data}'
+            and vigencia_fim > '${data}'
             and cancelado = false
             and status_id = 1
-            order by dt_cadastro desc 
+            order by dt_cadastro desc
             `
     );
-
-    console.log(`SELECT * FROM public.vw_ml_sac_informativo_funcionario 
-            where funcionario_id = ${user?.id_funcionario}
-            and vigencia_ini <= '${data}' 
-            and vigencia_fim > '${data}' 
-            and cancelado = false
-            and status_id = 1
-            order by dt_cadastro desc 
-            `);
 
     response.json({ notifyNumber: informativos.rows.length });
   };

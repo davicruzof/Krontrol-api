@@ -10,6 +10,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const Orm_1 = global[Symbol.for('ioc.use')]("Adonis/Lucid/Orm");
+const luxon_1 = require("luxon");
 class AppVersion extends Orm_1.BaseModel {
     static get table() {
         return "ml_app_version";
@@ -27,5 +28,21 @@ __decorate([
     (0, Orm_1.column)(),
     __metadata("design:type", String)
 ], AppVersion.prototype, "app_version", void 0);
+__decorate([
+    (0, Orm_1.column)(),
+    __metadata("design:type", String)
+], AppVersion.prototype, "so", void 0);
+__decorate([
+    Orm_1.column.dateTime({ autoCreate: true }),
+    __metadata("design:type", luxon_1.DateTime)
+], AppVersion.prototype, "created_at", void 0);
+__decorate([
+    Orm_1.column.dateTime({ autoUpdate: true }),
+    __metadata("design:type", luxon_1.DateTime)
+], AppVersion.prototype, "updated_at", void 0);
+__decorate([
+    (0, Orm_1.column)(),
+    __metadata("design:type", Number)
+], AppVersion.prototype, "id_empresa", void 0);
 exports.default = AppVersion;
 //# sourceMappingURL=AppVersion.js.map
