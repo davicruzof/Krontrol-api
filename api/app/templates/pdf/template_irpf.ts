@@ -91,40 +91,40 @@ export const templateIRPF = `
         </tr>
     </table>
 
-    <b>1. Fonte Pagadora Pessoa Jurídica ou Pessoa Física</b>
+    <b style="font-size: 14px;">1. Fonte Pagadora Pessoa Jurídica ou Pessoa Física</b>
 
     <table>
         <tr style="width: 100%;">
         <td style="width: 40%; border: 1px solid #000; padding: 8px;">
-            <div style="font-size: 12px;">
+            <div style="font-size: 10px;">
             CNPJ
             </div>
-            <div>
+            <div style="font-size: 12px;">
             {{dados.CNPJ_EMPRESA}}
             </div>
         </td>
         <td style="border: 1px solid #000; padding: 8px;">
-            <div style="font-size: 12px;">
+            <div style="font-size: 10px;">
             Nome Empresarial
             </div>
-            <div>
+            <div style="font-size: 12px;">
             {{dados.NOME_EMPRESA}}
             </div>
         </td>
         </tr>
     </table>
 
-    <b>2. Pessoa Física Beneficiária dos Rendimentos</b>
+    <b style="font-size: 14px;">2. Pessoa Física Beneficiária dos Rendimentos</b>
 
     <table>
         <tr style="width: 100%;">
         <td style="width: 30%; border: 1px solid #000; padding: 8px;">
-            <div>
+            <div style="font-size: 12px;">
             CPF: {{dados.CPF}}
             </div>
         </td>
         <td style="border: 1px solid #000; padding: 8px;">
-            <div>
+            <div style="font-size: 12px;">
             Nome Completo: {{dados.NOME}}
             </div>
         </td>
@@ -133,7 +133,7 @@ export const templateIRPF = `
     <table>
         <tr style="width: 100%;">
         <td style="width: 100%; border: 1px solid #000; padding: 8px;">
-            <div>
+            <div style="font-size: 12px;">
             Natureza do rendimento
             </div>
         </td>
@@ -141,66 +141,66 @@ export const templateIRPF = `
         </tr>
     </table>
 
-    <b>3. Rendimentos Tributáveis, Deduções e Imposto de renda Retido na Fonte</b>
+    <b style="font-size: 14px;">3. Rendimentos Tributáveis, Deduções e Imposto de renda Retido na Fonte</b>
 
     <table>
         <tr style="width: 100%;">
         <td style="width: 80%; border: 1px solid #000; padding: 8px;">
-            <div style="font-size: 14px;">
+            <div style="font-size: 12px;">
             1.Total dos rendimentos(Inclusive férias)
             </div>
         </td>
         <td style="border: 1px solid #000; padding: 8px;">
-            <div style="text-align: end;">
+            <div style="text-align: end; font-size:12px;">
             {{dados.VLR_RENDIMENTO}}
             </div>
         </td>
         </tr>
         <tr style="width: 100%;">
         <td style="width: 80%; border: 1px solid #000; padding: 8px;">
-            <div style="font-size: 14px;">
+            <div style="font-size: 12px;">
             2. Contribuição previdenciária oficial
             </div>
         </td>
         <td style="border: 1px solid #000; padding: 8px;">
-            <div style="text-align: end;">
+            <div style="text-align: end; font-size:12px;">
             {{dados.VLR_CPO}}
             </div>
         </td>
         </tr>
         <tr style="width: 100%;">
         <td style="width: 80%; border: 1px solid #000; padding: 8px;">
-            <div style="font-size: 14px;">
+            <div style="font-size: 12px;">
             3. Contribuição a entidades de prev. complementar e a fundos de aposentadoria prog. individual - Fapi (quadro
             7)
             </div>
         </td>
         <td style="border: 1px solid #000; padding: 8px;">
-            <div style="text-align: end;">
+            <div style="text-align: end; font-size:12px;">
             0
             </div>
         </td>
         </tr>
         <tr style="width: 100%;">
         <td style="width: 80%; border: 1px solid #000; padding: 8px;">
-            <div style="font-size: 14px;">
+            <div style="font-size: 12px;">
             4. Pensão Alimentícia(Informar beneficiário no quadro 7)
             </div>
         </td>
         <td style="border: 1px solid #000; padding: 8px;">
-            <div style="text-align: end;">
+            <div style="text-align: end; font-size:12px;">
             {{dados.VLR_PENSAO_ALIM}}
             </div>
         </td>
         </tr>
         <tr style="width: 100%;">
         <td style="width: 80%; border: 1px solid #000; padding: 8px;">
-            <div style="font-size: 14px;">
+            <div style="font-size: 12px;">
             5. Imposto sobre a renda retido na fonte
             </div>
         </td>
         <td style="border: 1px solid #000; padding: 8px;">
-            <div style="text-align: end;">
+            <div style="text-align: end; font-size:12px;">
             {{dados.VLR_IMP_RETIDO}}
             </div>
         </td>
@@ -210,9 +210,9 @@ export const templateIRPF = `
     <table>
         <tr>
         <td style="width: 80%;padding: 8px;">
-            <b>4. Rendimentos Isentos e Não Tributáveis</b>
+            <b style="font-size: 14px;">4. Rendimentos Isentos e Não Tributáveis</b>
         </td>
-        <td style="padding: 8px; text-align: center;">
+        <td style="padding: 8px; text-align: center; font-size: 12px;">
             Valores em reais
         </td>
         </tr>
@@ -221,89 +221,89 @@ export const templateIRPF = `
     <table>
         <tr style="width: 100%;">
         <td style="width: 80%; border: 1px solid #000; padding: 8px;">
-            <div style="font-size: 14px;">
+            <div style="font-size: 12px;">
             1. Parcela Isenta dos proventos de aposentadoria, reserva, reforma e pensão (65 anos ou mais)
             </div>
         </td>
         <td style="border: 1px solid #000; padding: 8px;">
-            <div style="text-align: end;">
+            <div style="text-align: end; font-size: 12px;">
             0
             </div>
         </td>
         </tr>
         <tr style="width: 100%;">
         <td style="width: 80%; border: 1px solid #000; padding: 8px;">
-            <div style="font-size: 14px;">
+            <div style="font-size: 12px;">
             2. Diárias e ajuda de custo
             </div>
         </td>
         <td style="border: 1px solid #000; padding: 8px;">
-            <div style="text-align: end;">
+            <div style="text-align: end; font-size: 12px;">
             0
             </div>
         </td>
         </tr>
         <tr style="width: 100%;">
         <td style="width: 80%; border: 1px solid #000; padding: 8px;">
-            <div style="font-size: 14px;">
+            <div style="font-size: 12px;">
             3. Pensão e proventos de aposentadoria ou reforma por moléstia grave proventos de aposentadoria ou reforma por
             acidente
             em serviço
             </div>
         </td>
         <td style="border: 1px solid #000; padding: 8px;">
-            <div style="text-align: end;">
+            <div style="text-align: end; font-size: 12px;">
             0
             </div>
         </td>
         </tr>
         <tr style="width: 100%;">
         <td style="width: 80%; border: 1px solid #000; padding: 8px;">
-            <div style="font-size: 14px;">
+            <div style="font-size: 12px;">
             4. Lucros e dividendos, apurados a partir de 1996, pago por pessoa jurídica(lucro real, presumido ou
             arbitrado)
             </div>
         </td>
         <td style="border: 1px solid #000; padding: 8px;">
-            <div style="text-align: end;">
+            <div style="text-align: end; font-size: 12px;">
             0
             </div>
         </td>
         </tr>
         <tr style="width: 100%;">
         <td style="width: 80%; border: 1px solid #000; padding: 8px;">
-            <div style="font-size: 14px;">
+            <div style="font-size: 12px;">
             5. Valores pagos ao titular ou sócio da microempresa ou empresa de pequeno porte, exceto pro labore, aluguéis
             ou
             serviços prestados
             </div>
         </td>
         <td style="border: 1px solid #000; padding: 8px;">
-            <div style="text-align: end;">
+            <div style="text-align: end; font-size: 12px;">
             0
             </div>
         </td>
         </tr>
         <tr style="width: 100%;">
         <td style="width: 80%; border: 1px solid #000; padding: 8px;">
-            <div style="font-size: 14px;">
+            <div style="font-size: 12px;">
             6. Indenização por rescisão de contrato de trabalho, inclusive a título de PDV, e por acidente de trabalho
             </div>
         </td>
         <td style="border: 1px solid #000; padding: 8px;">
-            <div style="text-align: end;">
+            <div style="text-align: end; font-size: 12px;">
             {{dados.VLR_INDENIZACAO}}
             </div>
         </td>
         </tr>
         <tr style="width: 100%;">
         <td style="width: 80%; border: 1px solid #000; padding: 8px;">
-            <div style="font-size: 14px;">
+            <div style="font-size: 12px;">
             7. Outros:(CLÁUSULA 3ª DA CCT;)
             </div>
         </td>
         <td style="border: 1px solid #000; padding: 8px;">
-            <div style="text-align: end;">
+            <div style="text-align: end; font-size: 12px;">
             0
             </div>
         </td>
@@ -313,9 +313,9 @@ export const templateIRPF = `
     <table>
         <tr>
         <td style="width: 80%;padding: 8px;">
-            <b>5. Rendimentos sujeitos a Tributação Exclusiva(rendimento líquido)</b>
+            <b style="font-size: 14px;">5. Rendimentos sujeitos a Tributação Exclusiva(rendimento líquido)</b>
         </td>
-        <td style="padding: 8px; text-align: center;">
+        <td style="padding: 8px; text-align: center; font-size: 12px;">
             Valores em reais
         </td>
         </tr>
@@ -324,36 +324,36 @@ export const templateIRPF = `
     <table>
         <tr style="width: 100%;">
         <td style="width: 80%; border: 1px solid #000; padding: 8px;">
-            <div style="font-size: 14px;">
+            <div style="font-size: 12px;">
             1. Décimo terceiro salário
             </div>
         </td>
         <td style="border: 1px solid #000; padding: 8px;">
-            <div style="text-align: end;">
+            <div style="text-align: end; font-size: 12px;">
             {{dados.VLR_DEC13}}
             </div>
         </td>
         </tr>
         <tr style="width: 100%;">
         <td style="width: 80%; border: 1px solid #000; padding: 8px;">
-            <div style="font-size: 14px;">
+            <div style="font-size: 12px;">
             2. Imposto sobre a renda retida na fonte sobre 13º salário
             </div>
         </td>
         <td style="border: 1px solid #000; padding: 8px;">
-            <div style="text-align: end;">
+            <div style="text-align: end; font-size: 12px;">
             0
             </div>
         </td>
         </tr>
         <tr style="width: 100%;">
         <td style="width: 80%; border: 1px solid #000; padding: 8px;">
-            <div style="font-size: 14px;">
+            <div style="font-size: 12px;">
             3. Outros
             </div>
         </td>
         <td style="border: 1px solid #000; padding: 8px;">
-            <div style="text-align: end;">
+            <div style="text-align: end; font-size: 12px;">
             {{dados.VLR_OUTROS}}
             </div>
         </td>
@@ -361,18 +361,18 @@ export const templateIRPF = `
     </table>
 
     <div>
-        <b>6. Rendimentos recebidos acumuladamente - art.12-a da lei no.7.713, de 1988 (sujeito a tributacão exclusiva)</b>
+        <b style="font-size: 14px;">6. Rendimentos recebidos acumuladamente - art.12-a da lei no.7.713, de 1988 (sujeito a tributacão exclusiva)</b>
     </div>
 
     <div>
-        <b>7. Informações complementares</b>
+        <b style="font-size: 14px;">7. Informações complementares</b>
     </div>
 
-    <div style="min-height: 200px; border: 1px solid #000; margin: 2px">
+    <div style="min-height: 100px; border: 1px solid #000; margin: 2px">
 
     </div>
 
-    <b>8. RESPONSAVEL PELAS INFORMACOES</b>
+    <b style="font-size: 14px;">8. RESPONSAVEL PELAS INFORMACOES</b>
 
     <table>
         <tr style="width: 100%;">
