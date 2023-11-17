@@ -486,9 +486,7 @@ export default class Receipts {
       dadosIRPF[0].VLR_INDENIZACAO = this.formattedCurrency(
         dadosIRPF[0].VLR_INDENIZACAO
       );
-      dadosIRPF[0].DESC_OUTROS = this.formattedCurrency(
-        dadosIRPF[0].DESC_OUTROS
-      );
+      dadosIRPF[0].VLR_OUTROS = this.formattedCurrency(dadosIRPF[0].VLR_OUTROS);
       dadosIRPF[0].VLR_ASSMEDICA = this.formattedCurrency(
         dadosIRPF[0].VLR_ASSMEDICA
       );
