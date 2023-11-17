@@ -14,7 +14,6 @@ const template_1 = global[Symbol.for('ioc.use')]("App/templates/pdf/template");
 const Funcao_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/Funcao"));
 const AppVersion_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/AppVersion"));
 const luxon_1 = require("luxon");
-const template_irpf_1 = global[Symbol.for('ioc.use')]("App/templates/pdf/template_irpf");
 class Receipts {
     constructor() {
         this.getEmployeeFunction = async (id_funcao, id_empresa) => {
@@ -369,12 +368,7 @@ class Receipts {
             dadosIRPF[0].DESC_OUTROS = this.formattedCurrency(dadosIRPF[0].DESC_OUTROS);
             dadosIRPF[0].VLR_ASSMEDICA = this.formattedCurrency(dadosIRPF[0].VLR_ASSMEDICA);
             dadosIRPF[0].VLR_ODONTO = this.formattedCurrency(dadosIRPF[0].VLR_ODONTO);
-            let pdfTemp = await this.generatePdf(dadosIRPF[0], template_irpf_1.templateIRPF);
-            let file = await (0, S3_1.uploadPdfEmpresa)(pdfTemp.filename, auth.user?.id_empresa);
-            if (file) {
-                fs_1.default.unlink(pdfTemp.filename, () => { });
-                response.json({ pdf: file.Location });
-            }
+            return response.json(dadosIRPF[0]);
         }
         catch (error) {
             response.badRequest("Erro interno");

@@ -10,7 +10,7 @@ import { fichaPonto, templateDotCard } from "App/templates/pdf/template";
 import Funcao from "App/Models/Funcao";
 import AppVersion from "App/Models/AppVersion";
 import { DateTime } from "luxon";
-import { templateIRPF } from "App/templates/pdf/template_irpf";
+// import { templateIRPF } from "App/templates/pdf/template_irpf";
 
 export default class Receipts {
   private async generatePdf(dados, template) {
@@ -490,16 +490,18 @@ export default class Receipts {
       );
       dadosIRPF[0].VLR_ODONTO = this.formattedCurrency(dadosIRPF[0].VLR_ODONTO);
 
-      let pdfTemp = await this.generatePdf(dadosIRPF[0], templateIRPF);
-      let file = await uploadPdfEmpresa(
-        pdfTemp.filename,
-        auth.user?.id_empresa
-      );
+      return response.json(dadosIRPF[0]);
 
-      if (file) {
-        fs.unlink(pdfTemp.filename, () => {});
-        response.json({ pdf: file.Location });
-      }
+      // let pdfTemp = await this.generatePdf(dadosIRPF[0], templateIRPF);
+      // let file = await uploadPdfEmpresa(
+      //   pdfTemp.filename,
+      //   auth.user?.id_empresa
+      // );
+
+      // if (file) {
+      //   fs.unlink(pdfTemp.filename, () => {});
+      //   response.json({ pdf: file.Location });
+      // }
     } catch (error) {
       response.badRequest("Erro interno");
     }
