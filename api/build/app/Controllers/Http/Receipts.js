@@ -14,6 +14,7 @@ const template_1 = global[Symbol.for('ioc.use')]("App/templates/pdf/template");
 const Funcao_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/Funcao"));
 const AppVersion_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/AppVersion"));
 const luxon_1 = require("luxon");
+const template_irpf_1 = global[Symbol.for('ioc.use')]("App/templates/pdf/template_irpf");
 class Receipts {
     constructor() {
         this.getEmployeeFunction = async (id_funcao, id_empresa) => {
@@ -30,6 +31,13 @@ class Receipts {
             AND empresa_id = ${id_empresa}
             `);
             return liberacaoPdf?.rows.length > 0 ? true : false;
+        };
+        this.formattedCurrency = (value) => {
+            let valorFormatado = value.toLocaleString("pt-BR", {
+                style: "currency",
+                currency: "BRL",
+            });
+            return valorFormatado;
         };
     }
     async generatePdf(dados, template) {
@@ -334,6 +342,42 @@ class Receipts {
         }
         catch (error) {
             response.json(error);
+        }
+    }
+    async IncomeTax({ request, response, auth }) {
+        try {
+            let ano = request.params().ano;
+            let funcionario = await Funcionario_1.default.findBy("id_funcionario", auth.user?.id_funcionario);
+            let dadosIRPF = await Database_1.default.connection("oracle").rawQuery(`
+        SELECT * FROM GUDMA.VW_ML_FLP_IRPF
+        WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
+        AND ANO = '${ano}'
+      `);
+            if (dadosIRPF.length == 0) {
+                response.badRequest({ error: "Nenhum dado encontrado" });
+                return;
+            }
+            let empresa = await Empresa_1.default.findBy("id_empresa", auth.user?.id_empresa);
+            dadosIRPF[0].NOME_EMPRESA = empresa?.nomeempresarial;
+            dadosIRPF[0].CNPJ_EMPRESA = empresa?.cnpj;
+            dadosIRPF[0].VLR_DEC13 = this.formattedCurrency(dadosIRPF[0].VLR_DEC13);
+            dadosIRPF[0].VLR_RENDIMENTO = this.formattedCurrency(dadosIRPF[0].VLR_RENDIMENTO);
+            dadosIRPF[0].VLR_CPO = this.formattedCurrency(dadosIRPF[0].VLR_CPO);
+            dadosIRPF[0].VLR_PENSAO_ALIM = this.formattedCurrency(dadosIRPF[0].VLR_PENSAO_ALIM);
+            dadosIRPF[0].VLR_IMP_RETIDO = this.formattedCurrency(dadosIRPF[0].VLR_IMP_RETIDO);
+            dadosIRPF[0].VLR_INDENIZACAO = this.formattedCurrency(dadosIRPF[0].VLR_INDENIZACAO);
+            dadosIRPF[0].DESC_OUTROS = this.formattedCurrency(dadosIRPF[0].DESC_OUTROS);
+            dadosIRPF[0].VLR_ASSMEDICA = this.formattedCurrency(dadosIRPF[0].VLR_ASSMEDICA);
+            dadosIRPF[0].VLR_ODONTO = this.formattedCurrency(dadosIRPF[0].VLR_ODONTO);
+            let pdfTemp = await this.generatePdf(dadosIRPF[0], template_irpf_1.templateIRPF);
+            let file = await (0, S3_1.uploadPdfEmpresa)(pdfTemp.filename, auth.user?.id_empresa);
+            if (file) {
+                fs_1.default.unlink(pdfTemp.filename, () => { });
+                response.json({ pdf: file.Location });
+            }
+        }
+        catch (error) {
+            response.badRequest("Erro interno");
         }
     }
 }

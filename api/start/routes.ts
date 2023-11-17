@@ -128,6 +128,7 @@ Route.group(() => {
       "/EventsReceiptFormByFuncionario",
       "Receipts.EventsReceiptFormByFuncionario"
     ).middleware("auth");
+    Route.post("/incomeTax", "Receipts.IncomeTax").middleware("auth");
   }).prefix("/receipts");
 
   Route.group(() => {

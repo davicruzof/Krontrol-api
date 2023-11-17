@@ -40,7 +40,7 @@ export const templateIRPF = `
 
     <table>
         <tr style="width: 100%;">
-        <td style="width: 50%; border: 1px solid #000; padding: 8px;">
+        <td style="width: 50%; border: 1px solid #000; padding: 4px; font-size: 12px;">
             <center>
             <div>
                 <b>Ministério da Fazenda</b>
@@ -56,7 +56,7 @@ export const templateIRPF = `
             </div>
             </center>
         </td>
-        <td style="border: 1px solid #000; padding: 8px;">
+        <td style="border: 1px solid #000; padding: 4px; font-size: 12px;">
             <center>
             <div>
                 Comprovante de Rendimentos Pagos e de
@@ -81,10 +81,9 @@ export const templateIRPF = `
             <center>
             Verifique as condições e o prazo para aprensentação da Declaração do Imposto sobre a Renda da Pessoa Física
             para
-            este ano-
             </center>
             <center>
-            -calendário no sítio daSecretaria da da Receita Federal do Brasil na Internet, no endereço
+            este ano-calendário no sítio daSecretaria da da Receita Federal do Brasil na Internet, no endereço
             <www.receita.fazenda.gov.br>
             </center>
         </td>
@@ -97,18 +96,12 @@ export const templateIRPF = `
         <tr style="width: 100%;">
         <td style="width: 40%; border: 1px solid #000; padding: 8px;">
             <div style="font-size: 10px;">
-            CNPJ
-            </div>
-            <div style="font-size: 10px;">
-            {{dados.CNPJ_EMPRESA}}
+            CNPJ: {{dados.CNPJ_EMPRESA}}
             </div>
         </td>
         <td style="border: 1px solid #000; padding: 8px;">
             <div style="font-size: 10px;">
-            Nome Empresarial
-            </div>
-            <div style="font-size: 10px;">
-            {{dados.NOME_EMPRESA}}
+            Empresa: {{dados.NOME_EMPRESA}}
             </div>
         </td>
         </tr>
@@ -368,7 +361,7 @@ export const templateIRPF = `
         <b style="font-size: 10px;">7. Informações complementares</b>
     </div>
 
-    <div style="min-height: 70px; border: 1px solid #000; margin: 2px">
+    <div style="min-height: 100px; border: 1px solid #000; margin: 2px">
 
     </div>
 
