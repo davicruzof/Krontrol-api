@@ -31,13 +31,6 @@ class Receipts {
             `);
             return liberacaoPdf?.rows.length > 0 ? true : false;
         };
-        this.formattedCurrency = (value) => {
-            let valorFormatado = value.toLocaleString("pt-BR", {
-                style: "currency",
-                currency: "BRL",
-            });
-            return valorFormatado;
-        };
     }
     async generatePdf(dados, template) {
         try {
@@ -359,15 +352,6 @@ class Receipts {
             let empresa = await Empresa_1.default.findBy("id_empresa", auth.user?.id_empresa);
             dadosIRPF[0].NOME_EMPRESA = empresa?.nomeempresarial;
             dadosIRPF[0].CNPJ_EMPRESA = empresa?.cnpj;
-            dadosIRPF[0].VLR_DEC13 = this.formattedCurrency(dadosIRPF[0].VLR_DEC13);
-            dadosIRPF[0].VLR_RENDIMENTO = this.formattedCurrency(dadosIRPF[0].VLR_RENDIMENTO);
-            dadosIRPF[0].VLR_CPO = this.formattedCurrency(dadosIRPF[0].VLR_CPO);
-            dadosIRPF[0].VLR_PENSAO_ALIM = this.formattedCurrency(dadosIRPF[0].VLR_PENSAO_ALIM);
-            dadosIRPF[0].VLR_IMP_RETIDO = this.formattedCurrency(dadosIRPF[0].VLR_IMP_RETIDO);
-            dadosIRPF[0].VLR_INDENIZACAO = this.formattedCurrency(dadosIRPF[0].VLR_INDENIZACAO);
-            dadosIRPF[0].DESC_OUTROS = this.formattedCurrency(dadosIRPF[0].DESC_OUTROS);
-            dadosIRPF[0].VLR_ASSMEDICA = this.formattedCurrency(dadosIRPF[0].VLR_ASSMEDICA);
-            dadosIRPF[0].VLR_ODONTO = this.formattedCurrency(dadosIRPF[0].VLR_ODONTO);
             return response.json(dadosIRPF[0]);
         }
         catch (error) {
