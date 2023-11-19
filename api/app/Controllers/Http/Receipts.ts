@@ -179,19 +179,21 @@ export default class Receipts {
         return response.badRequest({ error: "data is required" });
       }
 
-      const [year, month] = dados.data.split("-");
+      const { year, month } = dados.data;
 
       const competencia = `${month}/${year}`;
 
+      const data = `${year}-${month}`;
+
       const dateRequestInitial = DateTime.fromISO(
-        new Date(`${dados.data}-27`).toISOString().replace(".000Z", "")
+        new Date(`${data}-27`).toISOString().replace(".000Z", "")
       )
         .minus({ months: 1 })
         .toFormat("dd/LL/yyyy")
         .toString();
 
       const dateRequestFinish = DateTime.fromISO(
-        new Date(`${dados.data}-26`).toISOString().replace(".000Z", "")
+        new Date(`${data}-26`).toISOString().replace(".000Z", "")
       )
         .toFormat("dd/LL/yyyy")
         .toString();
@@ -298,7 +300,7 @@ export default class Receipts {
           query,
           empresa,
           funcionario,
-          `${month}-${year}`,
+          competencia,
           resumoFicha,
           funcao.funcao
         ),
@@ -312,7 +314,7 @@ export default class Receipts {
       const confirmacao = await ConfirmarPdf.query()
         .select("*")
         .where("id_funcionario", "=", `${funcionario?.id_funcionario}`)
-        .andWhere("data_pdf", "=", `${dados.data}`);
+        .andWhere("data_pdf", "=", `${data}`);
 
       if (!confirmacao) {
         return response.badRequest({ error: "Erro ao aplicar confirmação!" });
@@ -349,7 +351,7 @@ export default class Receipts {
         return response.badRequest({ error: "data is required" });
       }
 
-      const [year, month] = dados.data.split("-");
+      const { year, month } = dados.data;
 
       const competencia = `${month}/${year}`;
 

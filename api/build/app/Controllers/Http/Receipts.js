@@ -179,13 +179,14 @@ class Receipts {
             if (!dados.data || !auth.user) {
                 return response.badRequest({ error: "data is required" });
             }
-            const [year, month] = dados.data.split("-");
+            const { year, month } = dados.data;
             const competencia = `${month}/${year}`;
-            const dateRequestInitial = luxon_1.DateTime.fromISO(new Date(`${dados.data}-27`).toISOString().replace(".000Z", ""))
+            const data = `${year}-${month}`;
+            const dateRequestInitial = luxon_1.DateTime.fromISO(new Date(`${data}-27`).toISOString().replace(".000Z", ""))
                 .minus({ months: 1 })
                 .toFormat("dd/LL/yyyy")
                 .toString();
-            const dateRequestFinish = luxon_1.DateTime.fromISO(new Date(`${dados.data}-26`).toISOString().replace(".000Z", ""))
+            const dateRequestFinish = luxon_1.DateTime.fromISO(new Date(`${data}-26`).toISOString().replace(".000Z", ""))
                 .toFormat("dd/LL/yyyy")
                 .toString();
             const liberacaoPdf = await this.isMonthFreedom(auth.user?.id_empresa, 1, competencia);
@@ -259,14 +260,14 @@ class Receipts {
             catch (error) {
                 resumoFicha = [];
             }
-            const pdfTemp = await this.generatePdf(this.tratarDadosDotCard(query, empresa, funcionario, `${month}-${year}`, resumoFicha, funcao.funcao), template_1.fichaPonto);
+            const pdfTemp = await this.generatePdf(this.tratarDadosDotCard(query, empresa, funcionario, competencia, resumoFicha, funcao.funcao), template_1.fichaPonto);
             if (!pdfTemp) {
                 return response.badRequest({ error: "Erro ao gerar pdf!" });
             }
             const confirmacao = await ConfirmarPdf_1.default.query()
                 .select("*")
                 .where("id_funcionario", "=", `${funcionario?.id_funcionario}`)
-                .andWhere("data_pdf", "=", `${dados.data}`);
+                .andWhere("data_pdf", "=", `${data}`);
             if (!confirmacao) {
                 return response.badRequest({ error: "Erro ao aplicar confirmação!" });
             }
@@ -290,7 +291,7 @@ class Receipts {
             if (!dados.data || !auth.user) {
                 return response.badRequest({ error: "data is required" });
             }
-            const [year, month] = dados.data.split("-");
+            const { year, month } = dados.data;
             const competencia = `${month}/${year}`;
             const liberacaoPdf = await this.isMonthFreedom(auth.user?.id_empresa, 2, competencia);
             if (!liberacaoPdf) {

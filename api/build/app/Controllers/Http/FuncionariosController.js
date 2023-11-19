@@ -7,8 +7,6 @@ const Empresa_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/Empr
 const ConfirmarPdf_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/ConfirmarPdf"));
 const Validator_1 = global[Symbol.for('ioc.use')]("Adonis/Core/Validator");
 const Funcionario_1 = __importDefault(require("../../Models/Funcionario"));
-const pdf_creator_node_1 = __importDefault(require("pdf-creator-node"));
-const fs_1 = __importDefault(require("fs"));
 const S3_1 = global[Symbol.for('ioc.use')]("App/Controllers/Http/S3");
 const FuncionarioArea_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/FuncionarioArea"));
 const Funcionario_2 = global[Symbol.for('ioc.use')]("App/Schemas/Funcionario");
@@ -16,7 +14,6 @@ const Database_1 = __importDefault(global[Symbol.for('ioc.use')]("Adonis/Lucid/D
 const User_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/User"));
 const ConfirmaFichaPonto_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/ConfirmaFichaPonto"));
 const crypto_1 = __importDefault(require("crypto"));
-const template_irpf_1 = global[Symbol.for('ioc.use')]("App/templates/pdf/template_irpf");
 const GlobalController_1 = __importDefault(require("./GlobalController"));
 const date_fns_1 = require("date-fns");
 class FuncionariosController {
@@ -353,34 +350,6 @@ class FuncionariosController {
             response.json(error);
         }
     }
-    async generatePdf(dados, template) {
-        try {
-            var options = {
-                format: "A3",
-                orientation: "portrait",
-                border: "10mm",
-                type: "pdf",
-            };
-            const filename = Math.random() + "_doc" + ".pdf";
-            var document = {
-                html: template,
-                data: {
-                    dados: dados,
-                },
-                path: "./pdfsTemp/" + filename,
-            };
-            let file = pdf_creator_node_1.default
-                .create(document, options)
-                .then((res) => {
-                return res;
-            })
-                .catch((error) => {
-                return error;
-            });
-            return await file;
-        }
-        catch (error) { }
-    }
     async confirmPdf({ request, response, auth }) {
         try {
             const foto = request.file("foto");
@@ -499,29 +468,6 @@ class FuncionariosController {
         let retorno = [];
         dados.map((element) => retorno.push(element.ANO));
         return retorno;
-    }
-    async getIrpf({ request, response, auth }) {
-        try {
-            let ano = request.params().ano;
-            let funcionario = await Funcionario_1.default.findBy("id_funcionario", auth.user?.id_funcionario);
-            let dadosIRPF = await Database_1.default.connection("oracle").rawQuery(`
-        SELECT * FROM GUDMA.VW_ML_FLP_IRPF
-        WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
-        AND ANO = '${ano}'
-      `);
-            let empresa = await Empresa_1.default.findBy("id_empresa", auth.user?.id_empresa);
-            dadosIRPF[0].NOME_EMPRESA = empresa?.nomeempresarial;
-            dadosIRPF[0].CNPJ_EMPRESA = empresa?.cnpj;
-            let pdfTemp = await this.generatePdf(dadosIRPF[0], template_irpf_1.templateIRPF);
-            let file = await (0, S3_1.uploadPdfEmpresa)(pdfTemp.filename, auth.user?.id_empresa);
-            if (file) {
-                fs_1.default.unlink(pdfTemp.filename, () => { });
-                response.json({ pdf: file.Location });
-            }
-        }
-        catch (error) {
-            response.badRequest("Erro interno");
-        }
     }
     async vacation({ request, response, auth }) {
         try {

@@ -3,9 +3,7 @@ import ConfirmarPdf from "App/Models/ConfirmarPdf";
 import type { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
 import { schema } from "@ioc:Adonis/Core/Validator";
 import Funcionario from "../../Models/Funcionario";
-import pdf from "pdf-creator-node";
-import fs from "fs";
-import { uploadPdfEmpresa, upload } from "App/Controllers/Http/S3";
+import { upload } from "App/Controllers/Http/S3";
 import FuncionarioArea from "App/Models/FuncionarioArea";
 import {
   FuncionarioSchemaInsert,
@@ -19,7 +17,6 @@ import Database, {
 import User from "App/Models/User";
 import ConfirmaFichaPonto from "App/Models/ConfirmaFichaPonto";
 import crypto from "crypto";
-import { templateIRPF } from "App/templates/pdf/template_irpf";
 import GlobalController from "./GlobalController";
 import { format } from "date-fns";
 
@@ -446,35 +443,6 @@ export default class FuncionariosController {
     }
   }
 
-  private async generatePdf(dados, template) {
-    try {
-      var options = {
-        format: "A3",
-        orientation: "portrait",
-        border: "10mm",
-        type: "pdf",
-      };
-      const filename = Math.random() + "_doc" + ".pdf";
-      var document = {
-        html: template,
-        data: {
-          dados: dados,
-        },
-        path: "./pdfsTemp/" + filename,
-      };
-
-      let file = pdf
-        .create(document, options)
-        .then((res) => {
-          return res;
-        })
-        .catch((error) => {
-          return error;
-        });
-      return await file;
-    } catch (error) {}
-  }
-
   public async confirmPdf({ request, response, auth }: HttpContextContract) {
     try {
       const foto = request.file("foto");
@@ -604,47 +572,11 @@ export default class FuncionariosController {
       response.badRequest("Erro interno");
     }
   }
+
   private tratarIrpfAvaiables(dados) {
     let retorno: any = [];
     dados.map((element) => retorno.push(element.ANO));
     return retorno;
-  }
-
-  public async getIrpf({ request, response, auth }: HttpContextContract) {
-    try {
-      let ano = request.params().ano;
-
-      /*if (!validarAno(ano)) {
-        response.badRequest({error: "Ano informado inválido"});
-        return;
-      } */
-
-      let funcionario = await Funcionario.findBy(
-        "id_funcionario",
-        auth.user?.id_funcionario
-      );
-      let dadosIRPF = await Database.connection("oracle").rawQuery(`
-        SELECT * FROM GUDMA.VW_ML_FLP_IRPF
-        WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
-        AND ANO = '${ano}'
-      `);
-      let empresa = await Empresa.findBy("id_empresa", auth.user?.id_empresa);
-      dadosIRPF[0].NOME_EMPRESA = empresa?.nomeempresarial;
-      dadosIRPF[0].CNPJ_EMPRESA = empresa?.cnpj;
-
-      let pdfTemp = await this.generatePdf(dadosIRPF[0], templateIRPF);
-      let file = await uploadPdfEmpresa(
-        pdfTemp.filename,
-        auth.user?.id_empresa
-      );
-
-      if (file) {
-        fs.unlink(pdfTemp.filename, () => {});
-        response.json({ pdf: file.Location });
-      }
-    } catch (error) {
-      response.badRequest("Erro interno");
-    }
   }
 
   public async vacation({ request, response, auth }: HttpContextContract) {
