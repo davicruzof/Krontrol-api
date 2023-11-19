@@ -351,7 +351,7 @@ export default class Receipts {
         return response.badRequest({ error: "data is required" });
       }
 
-      const { year, month } = dados.data;
+      const [year, month] = dados.data.split("-");
 
       const competencia = `${month}/${year}`;
 

@@ -291,7 +291,7 @@ class Receipts {
             if (!dados.data || !auth.user) {
                 return response.badRequest({ error: "data is required" });
             }
-            const { year, month } = dados.data;
+            const [year, month] = dados.data.split("-");
             const competencia = `${month}/${year}`;
             const liberacaoPdf = await this.isMonthFreedom(auth.user?.id_empresa, 2, competencia);
             if (!liberacaoPdf) {
