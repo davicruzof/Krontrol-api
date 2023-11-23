@@ -170,7 +170,7 @@ export const templateIRPF = `
         </td>
         <td style="border: 1px solid #000; padding: 8px;">
             <div style="text-align: end; font-size:10px;">
-            0
+            R$: 0,00
             </div>
         </td>
         </tr>
@@ -220,7 +220,7 @@ export const templateIRPF = `
         </td>
         <td style="border: 1px solid #000; padding: 4px;">
             <div style="text-align: end; font-size: 10px;">
-            0
+            R$: 0,00
             </div>
         </td>
         </tr>
@@ -232,7 +232,7 @@ export const templateIRPF = `
         </td>
         <td style="border: 1px solid #000; padding: 4px;">
             <div style="text-align: end; font-size: 10px;">
-            0
+            R$: 0,00
             </div>
         </td>
         </tr>
@@ -246,7 +246,7 @@ export const templateIRPF = `
         </td>
         <td style="border: 1px solid #000; padding: 4px;">
             <div style="text-align: end; font-size: 10px;">
-            0
+            R$: 0,00
             </div>
         </td>
         </tr>
@@ -259,7 +259,7 @@ export const templateIRPF = `
         </td>
         <td style="border: 1px solid #000; padding: 4px;">
             <div style="text-align: end; font-size: 10px;">
-            0
+            R$: 0,00
             </div>
         </td>
         </tr>
@@ -273,7 +273,7 @@ export const templateIRPF = `
         </td>
         <td style="border: 1px solid #000; padding: 4px;">
             <div style="text-align: end; font-size: 10px;">
-            0
+            R$: 0,00
             </div>
         </td>
         </tr>
@@ -297,7 +297,7 @@ export const templateIRPF = `
         </td>
         <td style="border: 1px solid #000; padding: 4px;">
             <div style="text-align: end; font-size: 10px;">
-            0
+            R$: 0,00
             </div>
         </td>
         </tr>
@@ -335,7 +335,7 @@ export const templateIRPF = `
         </td>
         <td style="border: 1px solid #000; padding: 8px;">
             <div style="text-align: end; font-size: 10px;">
-            0
+            R$: 0,00
             </div>
         </td>
         </tr>

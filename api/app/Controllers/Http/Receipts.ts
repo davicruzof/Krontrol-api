@@ -455,10 +455,37 @@ export default class Receipts {
     try {
       let ano = request.params().ano;
 
+      if (!ano) {
+        response.badRequest({ error: "Ano é obrigatório" });
+        return;
+      }
+
+      if (!auth.user) {
+        response.badRequest({ error: "Usuário não encontrado" });
+        return;
+      }
+
+      const liberacaoPdf = await Database.connection("pg").rawQuery(
+        `SELECT * FROM public.vw_ml_flp_liberacao_recibos
+            where tipo_id = 3
+            AND bloqueio_liberacao = false
+            AND irpf = '${ano}'
+            AND empresa_id = ${auth.user.id_empresa}
+            `
+      );
+
+      if (liberacaoPdf.rows.length == 0) {
+        response.badRequest({
+          error: "Empresa não liberou para gerar o recibo",
+        });
+        return;
+      }
+
       let funcionario = await Funcionario.findBy(
         "id_funcionario",
         auth.user?.id_funcionario
       );
+
       let dadosIRPF = await Database.connection("oracle").rawQuery(`
         SELECT * FROM GUDMA.VW_ML_FLP_IRPF
         WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
