@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const Database_1 = __importDefault(global[Symbol.for('ioc.use')]("Adonis/Lucid/Database"));
 const axios_1 = __importDefault(require("axios"));
-const BASE_URL_SP_TRANS = "http://api.olhovivo.sptrans.com.br/v2.1";
+const BASE_URL_SP_TRANS = "https://api.olhovivo.sptrans.com.br/v2.1";
 const TOKEN = "89280465aae637ace9e666d35a0eb2b16ecdb69860571245ef8c2ae5270b75d3";
 const api = axios_1.default.create({
     baseURL: BASE_URL_SP_TRANS,
