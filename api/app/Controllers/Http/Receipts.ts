@@ -523,6 +523,8 @@ export default class Receipts {
 
       dadosIRPF[0].VLR_DEDMP = this.formattedCurrency(dadosIRPF[0].VLR_DEDMP);
 
+      dadosIRPF[0].VLR_DEMP = this.formattedCurrency(dadosIRPF[0].VLR_DEMP);
+
       let pdfTemp = await this.generatePdf(dadosIRPF[0], templateIRPF);
 
       let file = await uploadPdfEmpresa(

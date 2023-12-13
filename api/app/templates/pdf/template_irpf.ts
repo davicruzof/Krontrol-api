@@ -297,7 +297,7 @@ export const templateIRPF = `
         </td>
         <td style="border: 1px solid #000; padding: 4px;">
             <div style="text-align: end; font-size: 10px;">
-            R$: 0,00
+            {{dados.VLR_DEMP}}
             </div>
         </td>
         </tr>
@@ -335,7 +335,7 @@ export const templateIRPF = `
         </td>
         <td style="border: 1px solid #000; padding: 8px;">
             <div style="text-align: end; font-size: 10px;">
-            R$: 0,00
+            {{dados.VALOR}}
             </div>
         </td>
         </tr>
@@ -362,7 +362,7 @@ export const templateIRPF = `
     </div>
 
     <div style="min-height: 100px; border: 1px solid #000; margin: 2px">
-
+      {{dados.INF_COMPL}}
     </div>
 
     <b style="font-size: 14px;">8. RESPONSAVEL PELAS INFORMACOES</b>

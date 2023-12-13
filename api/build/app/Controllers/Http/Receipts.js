@@ -394,6 +394,7 @@ class Receipts {
             dadosIRPF[0].VLR_ASSMEDICA = this.formattedCurrency(dadosIRPF[0].VLR_ASSMEDICA);
             dadosIRPF[0].VLR_ODONTO = this.formattedCurrency(dadosIRPF[0].VLR_ODONTO);
             dadosIRPF[0].VLR_DEDMP = this.formattedCurrency(dadosIRPF[0].VLR_DEDMP);
+            dadosIRPF[0].VLR_DEMP = this.formattedCurrency(dadosIRPF[0].VLR_DEMP);
             let pdfTemp = await this.generatePdf(dadosIRPF[0], template_irpf_1.templateIRPF);
             let file = await (0, S3_1.uploadPdfEmpresa)(pdfTemp.filename, auth.user?.id_empresa);
             if (file) {
