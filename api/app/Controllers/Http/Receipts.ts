@@ -507,7 +507,9 @@ export default class Receipts {
 
       dadosIRPF[0].NOME_EMPRESA = empresa?.nomeempresarial;
       dadosIRPF[0].CNPJ_EMPRESA = empresa?.cnpj;
-      dadosIRPF[0].VLR_DECIMO = dadosIRPFDecimo?.[0].VALOR;
+      dadosIRPF[0].VLR_DECIMO = this.formattedCurrency(
+        dadosIRPFDecimo?.[0].VALOR
+      );
 
       dadosIRPF[0].VLR_DEC13 = this.formattedCurrency(dadosIRPF[0].VLR_DEC13);
       dadosIRPF[0].VLR_RENDIMENTO = this.formattedCurrency(

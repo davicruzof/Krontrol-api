@@ -389,7 +389,7 @@ class Receipts {
             let empresa = await Empresa_1.default.findBy("id_empresa", auth.user?.id_empresa);
             dadosIRPF[0].NOME_EMPRESA = empresa?.nomeempresarial;
             dadosIRPF[0].CNPJ_EMPRESA = empresa?.cnpj;
-            dadosIRPF[0].VLR_DECIMO = dadosIRPFDecimo?.[0].VALOR;
+            dadosIRPF[0].VLR_DECIMO = this.formattedCurrency(dadosIRPFDecimo?.[0].VALOR);
             dadosIRPF[0].VLR_DEC13 = this.formattedCurrency(dadosIRPF[0].VLR_DEC13);
             dadosIRPF[0].VLR_RENDIMENTO = this.formattedCurrency(dadosIRPF[0].VLR_RENDIMENTO);
             dadosIRPF[0].VLR_CPO = this.formattedCurrency(dadosIRPF[0].VLR_CPO);
