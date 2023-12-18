@@ -497,9 +497,17 @@ export default class Receipts {
         return;
       }
 
+      let dadosIRPFDecimo = await Database.connection("oracle").rawQuery(`
+        SELECT * FROM GUDMA.VW_ML_FLP_IRPF_DECIMO
+        WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
+        AND ANO_REFERENCIA = '${ano}'
+      `);
+
       let empresa = await Empresa.findBy("id_empresa", auth.user?.id_empresa);
+
       dadosIRPF[0].NOME_EMPRESA = empresa?.nomeempresarial;
       dadosIRPF[0].CNPJ_EMPRESA = empresa?.cnpj;
+      dadosIRPF[0].VLR_DECIMO = dadosIRPFDecimo?.[0].VALOR;
 
       dadosIRPF[0].VLR_DEC13 = this.formattedCurrency(dadosIRPF[0].VLR_DEC13);
       dadosIRPF[0].VLR_RENDIMENTO = this.formattedCurrency(
@@ -522,8 +530,6 @@ export default class Receipts {
       dadosIRPF[0].VLR_ODONTO = this.formattedCurrency(dadosIRPF[0].VLR_ODONTO);
 
       dadosIRPF[0].VLR_DEDMP = this.formattedCurrency(dadosIRPF[0].VLR_DEDMP);
-
-      dadosIRPF[0].VLR_DEMP = this.formattedCurrency(dadosIRPF[0].VLR_DEMP);
 
       let pdfTemp = await this.generatePdf(dadosIRPF[0], templateIRPF);
 

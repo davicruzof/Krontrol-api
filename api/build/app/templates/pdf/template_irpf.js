@@ -300,7 +300,7 @@ exports.templateIRPF = `
         </td>
         <td style="border: 1px solid #000; padding: 4px;">
             <div style="text-align: end; font-size: 10px;">
-            {{dados.VLR_DEMP}}
+            {{dados.VLR_DEDMP}}
             </div>
         </td>
         </tr>
@@ -338,7 +338,7 @@ exports.templateIRPF = `
         </td>
         <td style="border: 1px solid #000; padding: 8px;">
             <div style="text-align: end; font-size: 10px;">
-            {{dados.VALOR}}
+            {{dados.VLR_DECIMO}}
             </div>
         </td>
         </tr>
