@@ -106,6 +106,9 @@ Route.group(() => {
       "Receipts.EventsReceiptFormByFuncionario"
     ).middleware("auth");
     Route.get("/incomeTax/:ano", "Receipts.IncomeTax").middleware("auth");
+    Route.get("/decimoPdf/:ano", "Receipts.decimoPdfGenerator").middleware(
+      "auth"
+    );
   }).prefix("/receipts");
 
   Route.group(() => {

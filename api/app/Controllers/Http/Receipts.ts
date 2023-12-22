@@ -511,13 +511,19 @@ export default class Receipts {
     response,
   }: HttpContextContract) {
     try {
-      const dados = request.body();
+      let ano = request.params().ano;
 
-      if (!dados.year || !auth.user) {
-        return response.badRequest({ error: "data is required" });
+      if (!ano) {
+        response.badRequest({ error: "Ano é obrigatório" });
+        return;
       }
 
-      const competencia = `12/${dados.year}`;
+      if (!auth.user) {
+        response.badRequest({ error: "Usuário não encontrado" });
+        return;
+      }
+
+      const competencia = `12/${ano}`;
 
       const liberacaoPdf = await this.isMonthFreedom(
         auth.user?.id_empresa,
@@ -570,7 +576,7 @@ export default class Receipts {
                                     FROM  globus.vw_flp_fichaeventosrecibo hol
                                 WHERE
                                 hol.codintfunc = ${funcionario?.id_funcionario_erp} and to_char(competficha, 'MM/YYYY') = '${competencia}'
-                                and hol.TIPOFOLHA = 1
+                                and hol.TIPOFOLHA = 5
                                 order by hol.tipoeven desc,hol.codevento asc
                                 `);
 
