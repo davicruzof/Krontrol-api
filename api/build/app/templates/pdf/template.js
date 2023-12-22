@@ -63,7 +63,7 @@ exports.templateDotCard = `
             <th></th>
             <th>
                 <span>
-                    FONE: {{dados.cabecalho.telefone}} - CNPJ: CNPJ: {{dados.cabecalho.inscricaoEmpresa}}
+                    FONE: {{dados.cabecalho.telefone}} - CNPJ: {{dados.cabecalho.inscricaoEmpresa}}
                 </span>
             </th>
             <th></th>

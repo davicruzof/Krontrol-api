@@ -60,7 +60,7 @@ export const templateDECIMO = `
             <th></th>
             <th>
                 <span>
-                    FONE: {{dados.cabecalho.telefone}} - CNPJ: CNPJ: {{dados.cabecalho.inscricaoEmpresa}}
+                    FONE: {{dados.cabecalho.telefone}} - CNPJ: {{dados.cabecalho.inscricaoEmpresa}}
                 </span>
             </th>
             <th></th>
@@ -71,7 +71,7 @@ export const templateDECIMO = `
             <th></th>
             <th>
                 <span>
-                    DEMONSTRATIVO DE PAGAMENTO DÉCIMO TERCEIRO SALÁRIO
+                    DEMONSTRATIVO DÉCIMO TERCEIRO SALÁRIO
                 </span>
             </th>
             <th></th>
