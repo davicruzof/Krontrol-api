@@ -527,7 +527,7 @@ export default class Receipts {
 
       const liberacaoPdf = await this.isMonthFreedom(
         auth.user?.id_empresa,
-        2,
+        4,
         competencia
       );
 
