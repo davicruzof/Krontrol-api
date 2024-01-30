@@ -5,11 +5,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const Database_1 = __importDefault(global[Symbol.for('ioc.use')]("Adonis/Lucid/Database"));
 class DepartamentosController {
-    async list({ response }) {
+    async list({ response, auth }) {
+        if (!auth.user?.id_empresa) {
+            return response.json({ message: "Usuário não pertence a uma empresa" });
+        }
         let result = await Database_1.default.connection("pg")
             .from("ml_ctr_programa_area")
             .select("*")
-            .where("solicitacao", "=", "1");
+            .where("solicitacao", "=", "1")
+            .where("id_empresa", auth.user.id_empresa);
         response.json(result);
     }
     async list_area_departamento({ request, response, }) {
