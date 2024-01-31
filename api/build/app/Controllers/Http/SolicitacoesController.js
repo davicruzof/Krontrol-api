@@ -10,6 +10,7 @@ const SolicitacaoFerias_1 = __importDefault(global[Symbol.for('ioc.use')]("App/M
 const Solicitacao_2 = global[Symbol.for('ioc.use')]("App/Schemas/Solicitacao");
 const Notifications_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/Notifications"));
 const luxon_1 = require("luxon");
+const MotivoSolicitacao_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/MotivoSolicitacao"));
 class SolicitacoesController {
     async create({ request, response, auth }) {
         await request.validate({ schema: Validator_1.schema.create(Solicitacao_2.solicitacaoSchema) });
@@ -180,6 +181,26 @@ class SolicitacoesController {
             if (auth.user) {
                 const parameter = await SolicitacaoFerias_1.default.query().where("id_empresa", auth.user?.id_empresa);
                 response.json(parameter);
+            }
+        }
+        catch (error) {
+            response.json(error);
+        }
+    }
+    async getMotivos({ request, response, auth }) {
+        let dados = request.body();
+        if (!dados.modulo_id) {
+            return response.json({ error: "Informe o módulo" });
+        }
+        try {
+            if (auth.user) {
+                const listMotivos = await MotivoSolicitacao_1.default.query()
+                    .where("empresa_id", auth.user?.id_empresa)
+                    .where("modulo_id", dados.modulo_id);
+                if (listMotivos.length == 0) {
+                    return response.json({ error: "Nenhum motivo encontrado" });
+                }
+                response.json(listMotivos);
             }
         }
         catch (error) {

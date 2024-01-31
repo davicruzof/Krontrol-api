@@ -136,6 +136,7 @@ Route_1.default.group(() => {
         Route_1.default.post("/listByUser", "SolicitacoesController.listByUser");
         Route_1.default.put("/update", "SolicitacoesController.update");
         Route_1.default.get("/getParameter", "SolicitacoesController.getParameter");
+        Route_1.default.post("/getMotivos", "SolicitacoesController.getMotivos");
     })
         .prefix("/requests")
         .middleware("auth");

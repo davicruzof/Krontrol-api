@@ -6,6 +6,7 @@ import SolicitacaoFerias from "App/Models/SolicitacaoFerias";
 import { solicitacaoSchema } from "App/Schemas/Solicitacao";
 import Notifications from "App/Models/Notifications";
 import { DateTime } from "luxon";
+import MotivoSolicitacao from "App/Models/MotivoSolicitacao";
 
 export default class SolicitacoesController {
   public async create({ request, response, auth }: HttpContextContract) {
@@ -199,6 +200,30 @@ export default class SolicitacoesController {
           auth.user?.id_empresa
         );
         response.json(parameter);
+      }
+    } catch (error) {
+      response.json(error);
+    }
+  }
+
+  public async getMotivos({ request, response, auth }: HttpContextContract) {
+    let dados = request.body();
+
+    if (!dados.modulo_id) {
+      return response.json({ error: "Informe o módulo" });
+    }
+
+    try {
+      if (auth.user) {
+        const listMotivos = await MotivoSolicitacao.query()
+          .where("empresa_id", auth.user?.id_empresa)
+          .where("modulo_id", dados.modulo_id);
+
+        if (listMotivos.length == 0) {
+          return response.json({ error: "Nenhum motivo encontrado" });
+        }
+
+        response.json(listMotivos);
       }
     } catch (error) {
       response.json(error);
