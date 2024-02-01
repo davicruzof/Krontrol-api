@@ -58,6 +58,9 @@ export default class Solicitacao extends BaseModel {
   public id_avaliacao: number;
 
   @column()
+  public id_motivo: number;
+
+  @column()
   public dt_informada: Date;
 
   @column.dateTime({ autoCreate: true })

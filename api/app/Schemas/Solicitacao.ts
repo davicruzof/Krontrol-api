@@ -4,6 +4,7 @@ export const solicitacaoSchema = {
   id_area: schema.number(),
   id_modulo: schema.number(),
   justificativa: schema.string(),
+  id_motivo: schema.number(),
 };
 
 export const SolicitacaoRespostaSchema = {
