@@ -489,9 +489,9 @@ class Receipts {
     }
     formatDataIcomeTax(dados) {
         return {
-            iprf: dados[0],
-            med: dados[0].PLAN_MED,
-            medDep: dados[0].PLAN_MED_DEP,
+            iprf: dados,
+            med: dados.PLAN_MED,
+            medDep: dados.PLAN_MED_DEP,
         };
     }
     async IncomeTax({ request, response, auth }) {
