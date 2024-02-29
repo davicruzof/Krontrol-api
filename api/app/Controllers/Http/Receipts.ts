@@ -621,11 +621,11 @@ export default class Receipts {
     return valorFormatado;
   };
 
-  private formatDataIcomeTax(dados) {
+  private formatDataIcomeTax(dados, med, medDep) {
     return {
       iprf: dados,
-      med: dados.PLAN_MED,
-      medDep: dados.PLAN_MED_DEP,
+      med,
+      medDep,
     };
   }
 
@@ -752,16 +752,15 @@ export default class Receipts {
         AND ANO_CALENDARIO = '${ano}'
       `);
 
+      let med = [];
+
       if (dadosIRPASSMEDTIT && dadosIRPASSMEDTIT.length > 0) {
-        const deps = dadosIRPASSMEDTIT.map((item) => {
+        med = dadosIRPASSMEDTIT.map((item) => {
           return {
             ...item,
             ASSMED_TIT: this.formattedCurrency(item.ASSMED_TIT),
           };
         });
-        dadosIRPF[0].PLAN_MED = deps;
-      } else {
-        dadosIRPF[0].PLAN_MED = [];
       }
 
       const dadosIRPASSMEDDEP = await Database.connection("oracle").rawQuery(`
@@ -770,49 +769,21 @@ export default class Receipts {
         AND ANO_CALENDARIO = '${ano}'
       `);
 
+      let medDep = [];
+
       if (dadosIRPASSMEDDEP && dadosIRPASSMEDDEP.length > 0) {
-        const deps = dadosIRPASSMEDDEP.map((item) => {
+        medDep = dadosIRPASSMEDDEP.map((item) => {
           return {
             ...item,
             ASSMED_DEP: this.formattedCurrency(item.ASSMED_DEP),
           };
         });
-        dadosIRPF[0].PLAN_MED_DEP = deps;
-      } else {
-        dadosIRPF[0].PLAN_MED_DEP = [];
       }
 
       const pdfTemp = await this.generatePdf(
-        this.formatDataIcomeTax(dadosIRPF[0]),
+        this.formatDataIcomeTax(dadosIRPF[0], med, medDep),
         templateIRPF
       );
-
-      // {{#each dados.med}}
-      //   <div style="font-size: 10px;">
-      //     Operadora: {{this.OPERADORA}}
-      //   </div>
-      //   <div style="font-size: 10px;">
-      //     Valor: {{this.ASSMED_TIT}}
-      //   </div>
-      // }}
-
-      // <div style="font-size: 10px;">
-      //   Dependentes
-      // </div>
-      // {{#each dados.medDep}}
-      //   <div style="font-size: 10px;">
-      //     Operadora: {{this.OPERADORA}}
-      //   </div>
-      //   <div style="font-size: 10px;">
-      //     CPF: {{this.OPERADORA}}
-      //   </div>
-      //   <div style="font-size: 10px;">
-      //     NOME: {{this.OPERADORA}}
-      //   </div>
-      //   <div style="font-size: 10px;">
-      //     Valor: {{this.VLR_TITULAR}}
-      //   </div>
-      // {{/each}}
 
       const file = await uploadPdfEmpresa(
         pdfTemp.filename,

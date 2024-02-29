@@ -487,11 +487,11 @@ class Receipts {
             response.json(error);
         }
     }
-    formatDataIcomeTax(dados) {
+    formatDataIcomeTax(dados, med, medDep) {
         return {
             iprf: dados,
-            med: dados.PLAN_MED,
-            medDep: dados.PLAN_MED_DEP,
+            med,
+            medDep,
         };
     }
     async IncomeTax({ request, response, auth }) {
@@ -567,36 +567,30 @@ class Receipts {
         WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
         AND ANO_CALENDARIO = '${ano}'
       `);
+            let med = [];
             if (dadosIRPASSMEDTIT && dadosIRPASSMEDTIT.length > 0) {
-                const deps = dadosIRPASSMEDTIT.map((item) => {
+                med = dadosIRPASSMEDTIT.map((item) => {
                     return {
                         ...item,
                         ASSMED_TIT: this.formattedCurrency(item.ASSMED_TIT),
                     };
                 });
-                dadosIRPF[0].PLAN_MED = deps;
-            }
-            else {
-                dadosIRPF[0].PLAN_MED = [];
             }
             const dadosIRPASSMEDDEP = await Database_1.default.connection("oracle").rawQuery(`
         SELECT * FROM GUDMA.VW_ML_IRPF_ASSMED_DEP
         WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
         AND ANO_CALENDARIO = '${ano}'
       `);
+            let medDep = [];
             if (dadosIRPASSMEDDEP && dadosIRPASSMEDDEP.length > 0) {
-                const deps = dadosIRPASSMEDDEP.map((item) => {
+                medDep = dadosIRPASSMEDDEP.map((item) => {
                     return {
                         ...item,
                         ASSMED_DEP: this.formattedCurrency(item.ASSMED_DEP),
                     };
                 });
-                dadosIRPF[0].PLAN_MED_DEP = deps;
             }
-            else {
-                dadosIRPF[0].PLAN_MED_DEP = [];
-            }
-            const pdfTemp = await this.generatePdf(this.formatDataIcomeTax(dadosIRPF[0]), template_irpf_1.templateIRPF);
+            const pdfTemp = await this.generatePdf(this.formatDataIcomeTax(dadosIRPF[0], med, medDep), template_irpf_1.templateIRPF);
             const file = await (0, S3_1.uploadPdfEmpresa)(pdfTemp.filename, auth.user?.id_empresa);
             if (file) {
                 fs_1.default.unlink(pdfTemp.filename, () => { });
