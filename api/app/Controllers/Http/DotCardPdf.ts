@@ -45,8 +45,8 @@ export default class DotCardPdf {
 
   private isMonthFreedom = async (id_empresa, id_pdf, mes) => {
     const liberacaoPdf = await Database.connection("pg").rawQuery(
-      `SELECT * FROM public.vw_ml_flp_liberacao_recibos 
-            where tipo_id = ${id_pdf} 
+      `SELECT * FROM public.vw_ml_flp_liberacao_recibos
+            where tipo_id = ${id_pdf}
             AND bloqueio_liberacao = false
             AND mes_liberado = '${mes}'
             AND empresa_id = ${id_empresa}

@@ -316,16 +316,16 @@ export const templateIRPF = `
 
     <table>
         <tr style="width: 100%;">
-        <td style="width: 80%; border: 1px solid #000; padding: 4px;">
-            <div style="font-size: 10px;">
-            1. Décimo terceiro salário
-            </div>
-        </td>
-        <td style="border: 1px solid #000; padding: 8px;">
-            <div style="text-align: end; font-size: 10px;">
-            {{dados.VLR_DEC13}}
-            </div>
-        </td>
+          <td style="width: 80%; border: 1px solid #000; padding: 4px;">
+              <div style="font-size: 10px;">
+              1. Décimo terceiro salário
+              </div>
+          </td>
+          <td style="border: 1px solid #000; padding: 8px;">
+              <div style="text-align: end; font-size: 10px;">
+              {{dados.VLR_DEC13}}
+              </div>
+          </td>
         </tr>
         <tr style="width: 100%;">
         <td style="width: 80%; border: 1px solid #000; padding: 8px;">
@@ -362,6 +362,45 @@ export const templateIRPF = `
     </div>
 
     <div style="min-height: 100px; border: 1px solid #000; margin: 2px">
+      <div style="font-size: 10px;">
+        Rendimentos isentos outros:
+      </div>
+      <div style="font-size: 10px; margin-left: 4px;">
+        - Abono precuniário: {{dados.PRECUNIARIO}}
+      </div>
+      <div style="font-size: 10px;">
+        Participação nos lucros ou resultados (PLR): {{dados.PLR}}
+      </div>
+      <div style="font-size: 10px;">
+        Titular
+      </div>
+
+      {{#each dados.PLAN_MED}}
+        <div style="font-size: 10px;">
+          Operadora: {{this.OPERADORA}}
+        </div>
+        <div style="font-size: 10px;">
+          Valor: {{this.ASSMED_TIT}}
+        </div>
+      }}
+
+      <div style="font-size: 10px;">
+        Dependentes
+      </div>
+      {{#each dados.PLAN_MED_DEPS}}
+        <div style="font-size: 10px;">
+          Operadora: {{this.OPERADORA}}
+        </div>
+        <div style="font-size: 10px;">
+          CPF: {{this.OPERADORA}}
+        </div>
+        <div style="font-size: 10px;">
+          NOME: {{this.OPERADORA}}
+        </div>
+        <div style="font-size: 10px;">
+          Valor: {{this.VLR_TITULAR}}
+        </div>
+      {{/each}}
       {{dados.INF_COMPL}}
     </div>
 
@@ -371,7 +410,7 @@ export const templateIRPF = `
         <tr style="width: 100%;">
         <td style="width: 40%; border: 1px solid #000; padding: 8px;">
             <div style="font-size: 10px;">
-            Nome
+            Nome: {{dados.RESPONSAVEL}}
             </div>
         </td>
         <td style="width: 20%; border: 1px solid #000; padding: 8px;">

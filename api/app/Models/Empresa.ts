@@ -70,6 +70,9 @@ export default class Empresa extends BaseModel {
   @column()
   public logo: string;
 
+  @column()
+  public responsavel_irpf: string;
+
   @column.dateTime({ autoCreate: true })
   public dt_cadastro: DateTime;
 

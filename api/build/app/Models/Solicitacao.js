@@ -86,6 +86,10 @@ __decorate([
 ], Solicitacao.prototype, "id_avaliacao", void 0);
 __decorate([
     (0, Orm_1.column)(),
+    __metadata("design:type", Number)
+], Solicitacao.prototype, "id_motivo", void 0);
+__decorate([
+    (0, Orm_1.column)(),
     __metadata("design:type", Date)
 ], Solicitacao.prototype, "dt_informada", void 0);
 __decorate([

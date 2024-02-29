@@ -21,9 +21,11 @@ export default async function RequestFichaPonto(
       dt_movimento_inicio: dateRequestInitial,
       dt_movimento_fim: dateRequestFinish,
     });
+
     return data;
   } catch (err) {
     const { error } = (err as AxiosError<any, any>)?.response?.data;
+    console.log({ error });
     throw new Error(error);
   }
 }

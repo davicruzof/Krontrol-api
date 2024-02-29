@@ -23,6 +23,7 @@ async function RequestFichaPonto(id_funcionario_erp, dateRequestInitial, dateReq
     }
     catch (err) {
         const { error } = err?.response?.data;
+        console.log({ error });
         throw new Error(error);
     }
 }
