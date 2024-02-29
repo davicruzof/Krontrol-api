@@ -499,6 +499,11 @@ class Receipts {
                 return;
             }
             const funcionario = await Funcionario_1.default.findBy("id_funcionario", auth.user?.id_funcionario);
+            console.log(`
+         SELECT * FROM GUDMA.VW_ML_FLP_IRPF
+         WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
+         AND ANO = '${ano}'
+      `);
             const dadosIRPF = await Database_1.default.connection("oracle").rawQuery(`
         SELECT * FROM GUDMA.VW_ML_FLP_IRPF
         WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
@@ -512,17 +517,6 @@ class Receipts {
             dadosIRPF[0].CNPJ_EMPRESA = empresa?.cnpj;
             dadosIRPF[0].NOME_EMPRESA = empresa?.nomeempresarial;
             dadosIRPF[0].RESPONSAVEL = empresa?.responsavel_irpf;
-            const dadosIRPFDecimo = await Database_1.default.connection("oracle").rawQuery(`
-        SELECT * FROM GUDMA.VW_ML_FLP_IRPF_DECIMO
-        WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
-        AND ANO_REFERENCIA = '${ano}'
-      `);
-            if (dadosIRPFDecimo.length > 0) {
-                dadosIRPF[0].VLR_DECIMO = this.formattedCurrency(dadosIRPFDecimo?.[0].VALOR);
-            }
-            else {
-                dadosIRPF[0].VLR_DECIMO = this.formattedCurrency(0);
-            }
             dadosIRPF[0].VLR_DEC13 = this.formattedCurrency(dadosIRPF[0].VLR_DEC13);
             dadosIRPF[0].VLR_RENDIMENTO = this.formattedCurrency(dadosIRPF[0].VLR_RENDIMENTO);
             dadosIRPF[0].VLR_CPO = this.formattedCurrency(dadosIRPF[0].VLR_CPO);
@@ -533,57 +527,8 @@ class Receipts {
             dadosIRPF[0].VLR_ASSMEDICA = this.formattedCurrency(dadosIRPF[0].VLR_ASSMEDICA);
             dadosIRPF[0].VLR_ODONTO = this.formattedCurrency(dadosIRPF[0].VLR_ODONTO);
             dadosIRPF[0].VLR_DEDMP = this.formattedCurrency(dadosIRPF[0].VLR_DEDMP);
-            const dadosIRPFPrecuniario = await Database_1.default.connection("oracle")
-                .rawQuery(`
-        SELECT * FROM GUDMA.VW_ML_IRPF_PECUNIARIO
-        WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
-        AND ANO_CALENDARIO = '${ano}'
-      `);
-            if (dadosIRPFPrecuniario && dadosIRPFPrecuniario.length > 0) {
-                dadosIRPF[0].PECUNIARIO = this.formattedCurrency(dadosIRPFPrecuniario?.[0].VLR_PECUNIARIO);
-            }
-            const dadosIRPFPLR = await Database_1.default.connection("oracle").rawQuery(`
-        SELECT * FROM GUDMA.VW_ML_IRPF_PLR
-        WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
-        AND ANO_CALENDARIO = '${ano}'
-      `);
-            if (dadosIRPFPLR && dadosIRPFPLR.length > 0) {
-                dadosIRPF[0].PLR = this.formattedCurrency(dadosIRPFPLR?.[0].VLR_PLR);
-            }
-            const dadosIRPASSMEDTIT = await Database_1.default.connection("oracle").rawQuery(`
-        SELECT * FROM GUDMA.VW_ML_IRPF_ASSMED_TIT
-        WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
-        AND ANO_CALENDARIO = '${ano}'
-      `);
-            if (dadosIRPASSMEDTIT && dadosIRPASSMEDTIT.length > 0) {
-                const deps = dadosIRPASSMEDTIT.map((item) => {
-                    return {
-                        ...item,
-                        ASSMED_TIT: this.formattedCurrency(item.ASSMED_TIT),
-                    };
-                });
-                dadosIRPF[0].PLAN_MED = deps;
-            }
-            else {
-                dadosIRPF[0].PLAN_MED = [];
-            }
-            const dadosIRPASSMEDDEP = await Database_1.default.connection("oracle").rawQuery(`
-        SELECT * FROM GUDMA.VW_ML_IRPF_ASSMED_DEP
-        WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
-        AND ANO_CALENDARIO = '${ano}'
-      `);
-            if (dadosIRPASSMEDDEP && dadosIRPASSMEDDEP.length > 0) {
-                const deps = dadosIRPASSMEDDEP.map((item) => {
-                    return {
-                        ...item,
-                        ASSMED_DEP: this.formattedCurrency(item.ASSMED_DEP),
-                    };
-                });
-                dadosIRPF[0].PLAN_MED_DEP = deps;
-            }
-            else {
-                dadosIRPF[0].PLAN_MED_DEP = [];
-            }
+            dadosIRPF[0].PLAN_MED = [];
+            dadosIRPF[0].PLAN_MED_DEP = [];
             const pdfTemp = await this.generatePdf(dadosIRPF[0], template_irpf_1.templateIRPF);
             const file = await (0, S3_1.uploadPdfEmpresa)(pdfTemp.filename, auth.user?.id_empresa);
             if (file) {
