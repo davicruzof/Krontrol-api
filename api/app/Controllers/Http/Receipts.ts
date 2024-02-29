@@ -651,12 +651,12 @@ export default class Receipts {
       //   return;
       // }
 
-      let funcionario = await Funcionario.findBy(
+      const funcionario = await Funcionario.findBy(
         "id_funcionario",
         auth.user?.id_funcionario
       );
 
-      let dadosIRPF = await Database.connection("oracle").rawQuery(`
+      const dadosIRPF = await Database.connection("oracle").rawQuery(`
         SELECT * FROM GUDMA.VW_ML_FLP_IRPF
         WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
         AND ANO = '${ano}'
@@ -667,13 +667,14 @@ export default class Receipts {
         return;
       }
 
-      let dadosIRPFDecimo = await Database.connection("oracle").rawQuery(`
+      const dadosIRPFDecimo = await Database.connection("oracle").rawQuery(`
         SELECT * FROM GUDMA.VW_ML_FLP_IRPF_DECIMO
         WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
         AND ANO_REFERENCIA = '${ano}'
       `);
 
-      let dadosIRPFPrecuniario = await Database.connection("oracle").rawQuery(`
+      const dadosIRPFPrecuniario = await Database.connection("oracle")
+        .rawQuery(`
         SELECT * FROM GUDMA.VW_ML_IRPF_PECUNIARIO
         WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
         AND ANO_CALENDARIO = '${ano}'
@@ -685,7 +686,7 @@ export default class Receipts {
         );
       }
 
-      let dadosIRPFPLR = await Database.connection("oracle").rawQuery(`
+      const dadosIRPFPLR = await Database.connection("oracle").rawQuery(`
         SELECT * FROM GUDMA.VW_ML_IRPF_PLR
         WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
         AND ANO_CALENDARIO = '${ano}'
@@ -695,7 +696,7 @@ export default class Receipts {
         dadosIRPF[0].PLR = this.formattedCurrency(dadosIRPFPLR[0].VLR_PLR);
       }
 
-      let dadosIRPASSMEDTIT = await Database.connection("oracle").rawQuery(`
+      const dadosIRPASSMEDTIT = await Database.connection("oracle").rawQuery(`
         SELECT * FROM GUDMA.VW_ML_IRPF_ASSMED_TIT
         WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
         AND ANO_CALENDARIO = '${ano}'
@@ -709,9 +710,11 @@ export default class Receipts {
           };
         });
         dadosIRPF[0].PLAN_MED = deps;
+      } else {
+        dadosIRPF[0].PLAN_MED = [];
       }
 
-      let dadosIRPASSMEDDEP = await Database.connection("oracle").rawQuery(`
+      const dadosIRPASSMEDDEP = await Database.connection("oracle").rawQuery(`
         SELECT * FROM GUDMA.VW_ML_IRPF_ASSMED_DEP
         WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
         AND ANO_CALENDARIO = '${ano}'
@@ -725,9 +728,11 @@ export default class Receipts {
           };
         });
         dadosIRPF[0].PLAN_MED_DEP = deps;
+      } else {
+        dadosIRPF[0].PLAN_MED_DEP = [];
       }
 
-      let empresa = await Empresa.findBy("id_empresa", auth.user?.id_empresa);
+      const empresa = await Empresa.findBy("id_empresa", auth.user?.id_empresa);
 
       dadosIRPF[0].CNPJ_EMPRESA = empresa?.cnpj;
       dadosIRPF[0].NOME_EMPRESA = empresa?.nomeempresarial;
@@ -763,9 +768,9 @@ export default class Receipts {
 
       dadosIRPF[0].VLR_DEDMP = this.formattedCurrency(dadosIRPF[0].VLR_DEDMP);
 
-      let pdfTemp = await this.generatePdf(dadosIRPF[0], templateIRPF);
+      const pdfTemp = await this.generatePdf(dadosIRPF[0], templateIRPF);
 
-      let file = await uploadPdfEmpresa(
+      const file = await uploadPdfEmpresa(
         pdfTemp.filename,
         auth.user?.id_empresa
       );

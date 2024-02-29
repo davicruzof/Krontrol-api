@@ -498,8 +498,8 @@ class Receipts {
                 response.badRequest({ error: "Usuário não encontrado" });
                 return;
             }
-            let funcionario = await Funcionario_1.default.findBy("id_funcionario", auth.user?.id_funcionario);
-            let dadosIRPF = await Database_1.default.connection("oracle").rawQuery(`
+            const funcionario = await Funcionario_1.default.findBy("id_funcionario", auth.user?.id_funcionario);
+            const dadosIRPF = await Database_1.default.connection("oracle").rawQuery(`
         SELECT * FROM GUDMA.VW_ML_FLP_IRPF
         WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
         AND ANO = '${ano}'
@@ -508,12 +508,13 @@ class Receipts {
                 response.badRequest({ error: "Nenhum dado encontrado" });
                 return;
             }
-            let dadosIRPFDecimo = await Database_1.default.connection("oracle").rawQuery(`
+            const dadosIRPFDecimo = await Database_1.default.connection("oracle").rawQuery(`
         SELECT * FROM GUDMA.VW_ML_FLP_IRPF_DECIMO
         WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
         AND ANO_REFERENCIA = '${ano}'
       `);
-            let dadosIRPFPrecuniario = await Database_1.default.connection("oracle").rawQuery(`
+            const dadosIRPFPrecuniario = await Database_1.default.connection("oracle")
+                .rawQuery(`
         SELECT * FROM GUDMA.VW_ML_IRPF_PECUNIARIO
         WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
         AND ANO_CALENDARIO = '${ano}'
@@ -521,7 +522,7 @@ class Receipts {
             if (dadosIRPFPrecuniario && dadosIRPFPrecuniario.length > 0) {
                 dadosIRPF[0].PRECUNIARIO = this.formattedCurrency(dadosIRPFPrecuniario[0].VLR_PRECUNIARIO);
             }
-            let dadosIRPFPLR = await Database_1.default.connection("oracle").rawQuery(`
+            const dadosIRPFPLR = await Database_1.default.connection("oracle").rawQuery(`
         SELECT * FROM GUDMA.VW_ML_IRPF_PLR
         WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
         AND ANO_CALENDARIO = '${ano}'
@@ -529,7 +530,7 @@ class Receipts {
             if (dadosIRPFPLR && dadosIRPFPLR.length > 0) {
                 dadosIRPF[0].PLR = this.formattedCurrency(dadosIRPFPLR[0].VLR_PLR);
             }
-            let dadosIRPASSMEDTIT = await Database_1.default.connection("oracle").rawQuery(`
+            const dadosIRPASSMEDTIT = await Database_1.default.connection("oracle").rawQuery(`
         SELECT * FROM GUDMA.VW_ML_IRPF_ASSMED_TIT
         WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
         AND ANO_CALENDARIO = '${ano}'
@@ -543,7 +544,10 @@ class Receipts {
                 });
                 dadosIRPF[0].PLAN_MED = deps;
             }
-            let dadosIRPASSMEDDEP = await Database_1.default.connection("oracle").rawQuery(`
+            else {
+                dadosIRPF[0].PLAN_MED = [];
+            }
+            const dadosIRPASSMEDDEP = await Database_1.default.connection("oracle").rawQuery(`
         SELECT * FROM GUDMA.VW_ML_IRPF_ASSMED_DEP
         WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
         AND ANO_CALENDARIO = '${ano}'
@@ -557,7 +561,10 @@ class Receipts {
                 });
                 dadosIRPF[0].PLAN_MED_DEP = deps;
             }
-            let empresa = await Empresa_1.default.findBy("id_empresa", auth.user?.id_empresa);
+            else {
+                dadosIRPF[0].PLAN_MED_DEP = [];
+            }
+            const empresa = await Empresa_1.default.findBy("id_empresa", auth.user?.id_empresa);
             dadosIRPF[0].CNPJ_EMPRESA = empresa?.cnpj;
             dadosIRPF[0].NOME_EMPRESA = empresa?.nomeempresarial;
             dadosIRPF[0].RESPONSAVEL = empresa?.responsavel_irpf;
@@ -577,8 +584,8 @@ class Receipts {
             dadosIRPF[0].VLR_ASSMEDICA = this.formattedCurrency(dadosIRPF[0].VLR_ASSMEDICA);
             dadosIRPF[0].VLR_ODONTO = this.formattedCurrency(dadosIRPF[0].VLR_ODONTO);
             dadosIRPF[0].VLR_DEDMP = this.formattedCurrency(dadosIRPF[0].VLR_DEDMP);
-            let pdfTemp = await this.generatePdf(dadosIRPF[0], template_irpf_1.templateIRPF);
-            let file = await (0, S3_1.uploadPdfEmpresa)(pdfTemp.filename, auth.user?.id_empresa);
+            const pdfTemp = await this.generatePdf(dadosIRPF[0], template_irpf_1.templateIRPF);
+            const file = await (0, S3_1.uploadPdfEmpresa)(pdfTemp.filename, auth.user?.id_empresa);
             if (file) {
                 fs_1.default.unlink(pdfTemp.filename, () => { });
                 response.json({ pdf: file.Location });
