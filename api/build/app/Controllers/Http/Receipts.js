@@ -566,13 +566,21 @@ class Receipts {
         WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
         AND ANO_CALENDARIO = '${ano}'
       `);
-            let med = [];
+            let med = "";
             if (dadosIRPASSMEDTIT && dadosIRPASSMEDTIT.length > 0) {
-                med = dadosIRPASSMEDTIT.map((item) => {
-                    return {
-                        ...item,
-                        ASSMED_TIT: this.formattedCurrency(item.ASSMED_TIT),
-                    };
+                dadosIRPASSMEDTIT.map((item) => {
+                    med =
+                        med +
+                            `
+              <div>
+                <div style="font-size: 10px;">
+                  Operadora: ${item.OPERADORA}
+                </div>
+                <div style="font-size: 10px;">
+                  Valor: ${this.formattedCurrency(item.ASSMED_TIT)}
+                </div>
+              </div>
+            `;
                 });
             }
             const dadosIRPASSMEDDEP = await Database_1.default.connection("oracle").rawQuery(`

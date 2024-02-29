@@ -748,14 +748,22 @@ export default class Receipts {
         AND ANO_CALENDARIO = '${ano}'
       `);
 
-      let med = [];
+      let med = "";
 
       if (dadosIRPASSMEDTIT && dadosIRPASSMEDTIT.length > 0) {
-        med = dadosIRPASSMEDTIT.map((item) => {
-          return {
-            ...item,
-            ASSMED_TIT: this.formattedCurrency(item.ASSMED_TIT),
-          };
+        dadosIRPASSMEDTIT.map((item) => {
+          med =
+            med +
+            `
+              <div>
+                <div style="font-size: 10px;">
+                  Operadora: ${item.OPERADORA}
+                </div>
+                <div style="font-size: 10px;">
+                  Valor: ${this.formattedCurrency(item.ASSMED_TIT)}
+                </div>
+              </div>
+            `;
         });
       }
 
@@ -784,6 +792,25 @@ export default class Receipts {
         },
         templateIRPF
       );
+
+      // <div>
+      //   {{#each dados.dependentes}}
+      //     <div>
+      //       <div style="font-size: 10px;">
+      //         Operadora: {{this.OPERADORA}}
+      //       </div>
+      //       <div style="font-size: 10px;">
+      //         CPF: {{this.CPF}}
+      //       </div>
+      //       <div style="font-size: 10px;">
+      //         NOME: {{this.DEPENDENTE}}
+      //       </div>
+      //       <div style="font-size: 10px;">
+      //         Valor: {{this.ASSMED_DEP}}
+      //       </div>
+      //     </div>
+      //   {{/each}}
+      // </div>
 
       const file = await uploadPdfEmpresa(
         pdfTemp.filename,
