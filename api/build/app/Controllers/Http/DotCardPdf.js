@@ -17,8 +17,8 @@ const RequestFicha_1 = __importDefault(require("./RequestFicha"));
 class DotCardPdf {
     constructor() {
         this.isMonthFreedom = async (id_empresa, id_pdf, mes) => {
-            const liberacaoPdf = await Database_1.default.connection("pg").rawQuery(`SELECT * FROM public.vw_ml_flp_liberacao_recibos 
-            where tipo_id = ${id_pdf} 
+            const liberacaoPdf = await Database_1.default.connection("pg").rawQuery(`SELECT * FROM public.vw_ml_flp_liberacao_recibos
+            where tipo_id = ${id_pdf}
             AND bloqueio_liberacao = false
             AND mes_liberado = '${mes}'
             AND empresa_id = ${id_empresa}
