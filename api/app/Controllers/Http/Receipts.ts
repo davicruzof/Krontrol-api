@@ -750,14 +750,14 @@ export default class Receipts {
 
       let med = [];
 
-      // if (dadosIRPASSMEDTIT && dadosIRPASSMEDTIT.length > 0) {
-      //   med = dadosIRPASSMEDTIT.map((item) => {
-      //     return {
-      //       ...item,
-      //       ASSMED_TIT: this.formattedCurrency(item.ASSMED_TIT),
-      //     };
-      //   });
-      // }
+      if (dadosIRPASSMEDTIT && dadosIRPASSMEDTIT.length > 0) {
+        med = dadosIRPASSMEDTIT.map((item) => {
+          return {
+            ...item,
+            ASSMED_TIT: this.formattedCurrency(item.ASSMED_TIT),
+          };
+        });
+      }
 
       const dadosIRPASSMEDDEP = await Database.connection("oracle").rawQuery(`
         SELECT * FROM GUDMA.VW_ML_IRPF_ASSMED_DEP
@@ -769,14 +769,14 @@ export default class Receipts {
 
       let medDep = [];
 
-      // if (dadosIRPASSMEDDEP && dadosIRPASSMEDDEP.length > 0) {
-      //   medDep = dadosIRPASSMEDDEP.map((item) => {
-      //     return {
-      //       ...item,
-      //       ASSMED_DEP: this.formattedCurrency(item.ASSMED_DEP),
-      //     };
-      //   });
-      // }
+      if (dadosIRPASSMEDDEP && dadosIRPASSMEDDEP.length > 0) {
+        medDep = dadosIRPASSMEDDEP.map((item) => {
+          return {
+            ...item,
+            ASSMED_DEP: this.formattedCurrency(item.ASSMED_DEP),
+          };
+        });
+      }
 
       const pdfTemp = await this.generatePdf(
         {
