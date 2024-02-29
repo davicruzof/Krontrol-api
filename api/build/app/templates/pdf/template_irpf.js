@@ -55,7 +55,7 @@ exports.templateIRPF = `
                 Imposto sobre a Renda da Pessoa Física
             </div>
             <div>
-                <b>Exercício de {{dados.EXERCICIO}}</b>
+                <b>Exercício de {{dados.iprf.EXERCICIO}}</b>
             </div>
             </center>
         </td>
@@ -71,7 +71,7 @@ exports.templateIRPF = `
                 Imposto sobre a Renda da Pessoa Física
             </div>
             <div>
-                <b>Ano-calendário {{dados.ANO}}</b>
+                <b>Ano-calendário {{dados.iprf.ANO}}</b>
             </div>
             </center>
         </td>
@@ -99,12 +99,12 @@ exports.templateIRPF = `
         <tr style="width: 100%;">
         <td style="width: 40%; border: 1px solid #000; padding: 8px;">
             <div style="font-size: 10px;">
-            CNPJ: {{dados.CNPJ_EMPRESA}}
+            CNPJ: {{dados.iprf.CNPJ_EMPRESA}}
             </div>
         </td>
         <td style="border: 1px solid #000; padding: 8px;">
             <div style="font-size: 10px;">
-            Empresa: {{dados.NOME_EMPRESA}}
+            Empresa: {{dados.iprf.NOME_EMPRESA}}
             </div>
         </td>
         </tr>
@@ -116,12 +116,12 @@ exports.templateIRPF = `
         <tr style="width: 100%;">
         <td style="width: 30%; border: 1px solid #000; padding: 8px;">
             <div style="font-size: 10px;">
-            CPF: {{dados.CPF}}
+            CPF: {{dados.iprf.CPF}}
             </div>
         </td>
         <td style="border: 1px solid #000; padding: 8px;">
             <div style="font-size: 10px;">
-            Nome Completo: {{dados.NOME}}
+            Nome Completo: {{dados.iprf.NOME}}
             </div>
         </td>
         </tr>
@@ -148,7 +148,7 @@ exports.templateIRPF = `
         </td>
         <td style="border: 1px solid #000; padding: 8px;">
             <div style="text-align: end; font-size:10px;">
-            {{dados.VLR_RENDIMENTO}}
+            {{dados.iprf.VLR_RENDIMENTO}}
             </div>
         </td>
         </tr>
@@ -160,7 +160,7 @@ exports.templateIRPF = `
         </td>
         <td style="border: 1px solid #000; padding: 8px;">
             <div style="text-align: end; font-size:10px;">
-            {{dados.VLR_CPO}}
+            {{dados.iprf.VLR_CPO}}
             </div>
         </td>
         </tr>
@@ -185,7 +185,7 @@ exports.templateIRPF = `
         </td>
         <td style="border: 1px solid #000; padding: 8px;">
             <div style="text-align: end; font-size:10px;">
-            {{dados.VLR_PENSAO_ALIM}}
+            {{dados.iprf.VLR_PENSAO_ALIM}}
             </div>
         </td>
         </tr>
@@ -197,7 +197,7 @@ exports.templateIRPF = `
         </td>
         <td style="border: 1px solid #000; padding: 8px;">
             <div style="text-align: end; font-size:10px;">
-            {{dados.VLR_IMP_RETIDO}}
+            {{dados.iprf.VLR_IMP_RETIDO}}
             </div>
         </td>
         </tr>
@@ -288,7 +288,7 @@ exports.templateIRPF = `
         </td>
         <td style="border: 1px solid #000; padding: 4px;">
             <div style="text-align: end; font-size: 10px;">
-            {{dados.VLR_INDENIZACAO}}
+            {{dados.iprf.VLR_INDENIZACAO}}
             </div>
         </td>
         </tr>
@@ -300,7 +300,7 @@ exports.templateIRPF = `
         </td>
         <td style="border: 1px solid #000; padding: 4px;">
             <div style="text-align: end; font-size: 10px;">
-            {{dados.VLR_DEDMP}}
+            {{dados.iprf.VLR_DEDMP}}
             </div>
         </td>
         </tr>
@@ -326,7 +326,7 @@ exports.templateIRPF = `
           </td>
           <td style="border: 1px solid #000; padding: 8px;">
               <div style="text-align: end; font-size: 10px;">
-              {{dados.VLR_DEC13}}
+              {{dados.iprf.VLR_DEC13}}
               </div>
           </td>
         </tr>
@@ -338,7 +338,7 @@ exports.templateIRPF = `
         </td>
         <td style="border: 1px solid #000; padding: 8px;">
             <div style="text-align: end; font-size: 10px;">
-            {{dados.VLR_DECIMO}}
+            {{dados.iprf.VLR_DECIMO}}
             </div>
         </td>
         </tr>
@@ -350,7 +350,7 @@ exports.templateIRPF = `
         </td>
         <td style="border: 1px solid #000; padding: 8px;">
             <div style="text-align: end; font-size: 10px;">
-            {{dados.VLR_OUTROS}}
+            {{dados.iprf.VLR_OUTROS}}
             </div>
         </td>
         </tr>
@@ -369,17 +369,44 @@ exports.templateIRPF = `
         Rendimentos isentos outros:
       </div>
       <div style="font-size: 10px; margin-left: 4px;">
-        - Abono pecuniário: {{dados.PECUNIARIO}}
+        - Abono pecuniário: {{dados.iprf.PECUNIARIO}}
       </div>
       <div style="font-size: 10px;">
-        Participação nos lucros ou resultados (PLR): {{dados.PLR}}
+        Participação nos lucros ou resultados (PLR): {{dados.iprf.PLR}}
       </div>
       <div style="font-size: 10px;">
         Titular
       </div>
 
+      {{#each dados.med}}
+        <div style="font-size: 10px;">
+          Operadora: {{this.OPERADORA}}
+        </div>
+        <div style="font-size: 10px;">
+          Valor: {{this.ASSMED_TIT}}
+        </div>
+      }}
 
-      {{dados.INF_COMPL}}
+      <div style="font-size: 10px;">
+        Dependentes
+      </div>
+      {{#each dados.medDep}}
+        <div style="font-size: 10px;">
+          Operadora: {{this.OPERADORA}}
+        </div>
+        <div style="font-size: 10px;">
+          CPF: {{this.OPERADORA}}
+        </div>
+        <div style="font-size: 10px;">
+          NOME: {{this.OPERADORA}}
+        </div>
+        <div style="font-size: 10px;">
+          Valor: {{this.VLR_TITULAR}}
+        </div>
+      {{/each}}
+
+
+      {{dados.iprf.INF_COMPL}}
     </div>
 
     <b style="font-size: 14px;">8. RESPONSAVEL PELAS INFORMACOES</b>
@@ -388,7 +415,7 @@ exports.templateIRPF = `
         <tr style="width: 100%;">
         <td style="width: 40%; border: 1px solid #000; padding: 8px;">
             <div style="font-size: 10px;">
-            Nome: {{dados.RESPONSAVEL}}
+            Nome: {{dados.iprf.RESPONSAVEL}}
             </div>
         </td>
         <td style="width: 20%; border: 1px solid #000; padding: 8px;">

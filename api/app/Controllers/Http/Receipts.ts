@@ -621,6 +621,14 @@ export default class Receipts {
     return valorFormatado;
   };
 
+  private formatDataIcomeTax(dados) {
+    return {
+      iprf: dados[0],
+      med: dados[0].PLAN_MED,
+      medDep: dados[0].PLAN_MED_DEP,
+    };
+  }
+
   public async IncomeTax({ request, response, auth }: HttpContextContract) {
     try {
       let ano = request.params().ano;
@@ -679,19 +687,19 @@ export default class Receipts {
       dadosIRPF[0].NOME_EMPRESA = empresa?.nomeempresarial;
       dadosIRPF[0].RESPONSAVEL = empresa?.responsavel_irpf;
 
-      // const dadosIRPFDecimo = await Database.connection("oracle").rawQuery(`
-      //   SELECT * FROM GUDMA.VW_ML_FLP_IRPF_DECIMO
-      //   WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
-      //   AND ANO_REFERENCIA = '${ano}'
-      // `);
+      const dadosIRPFDecimo = await Database.connection("oracle").rawQuery(`
+        SELECT * FROM GUDMA.VW_ML_FLP_IRPF_DECIMO
+        WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
+        AND ANO_REFERENCIA = '${ano}'
+      `);
 
-      // if (dadosIRPFDecimo.length > 0) {
-      //   dadosIRPF[0].VLR_DECIMO = this.formattedCurrency(
-      //     dadosIRPFDecimo?.[0].VALOR
-      //   );
-      // } else {
-      //   dadosIRPF[0].VLR_DECIMO = this.formattedCurrency(0);
-      // }
+      if (dadosIRPFDecimo.length > 0) {
+        dadosIRPF[0].VLR_DECIMO = this.formattedCurrency(
+          dadosIRPFDecimo?.[0].VALOR
+        );
+      } else {
+        dadosIRPF[0].VLR_DECIMO = this.formattedCurrency(0);
+      }
 
       dadosIRPF[0].VLR_DEC13 = this.formattedCurrency(dadosIRPF[0].VLR_DEC13);
       dadosIRPF[0].VLR_RENDIMENTO = this.formattedCurrency(
@@ -774,34 +782,10 @@ export default class Receipts {
         dadosIRPF[0].PLAN_MED_DEP = [];
       }
 
-      // {{#each dados.PLAN_MED}}
-      //   <div style="font-size: 10px;">
-      //     Operadora: {{this.OPERADORA}}
-      //   </div>
-      //   <div style="font-size: 10px;">
-      //     Valor: {{this.ASSMED_TIT}}
-      //   </div>
-      // }}
-
-      // <div style="font-size: 10px;">
-      //   Dependentes
-      // </div>
-      // {{#each dados.PLAN_MED_DEPS}}
-      //   <div style="font-size: 10px;">
-      //     Operadora: {{this.OPERADORA}}
-      //   </div>
-      //   <div style="font-size: 10px;">
-      //     CPF: {{this.OPERADORA}}
-      //   </div>
-      //   <div style="font-size: 10px;">
-      //     NOME: {{this.OPERADORA}}
-      //   </div>
-      //   <div style="font-size: 10px;">
-      //     Valor: {{this.VLR_TITULAR}}
-      //   </div>
-      // {{/each}}
-
-      const pdfTemp = await this.generatePdf(dadosIRPF[0], templateIRPF);
+      const pdfTemp = await this.generatePdf(
+        this.formatDataIcomeTax(dadosIRPF[0]),
+        templateIRPF
+      );
 
       const file = await uploadPdfEmpresa(
         pdfTemp.filename,

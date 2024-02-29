@@ -487,6 +487,13 @@ class Receipts {
             response.json(error);
         }
     }
+    formatDataIcomeTax(dados) {
+        return {
+            iprf: dados[0],
+            med: dados[0].PLAN_MED,
+            medDep: dados[0].PLAN_MED_DEP,
+        };
+    }
     async IncomeTax({ request, response, auth }) {
         try {
             let ano = request.params().ano;
@@ -517,6 +524,17 @@ class Receipts {
             dadosIRPF[0].CNPJ_EMPRESA = empresa?.cnpj;
             dadosIRPF[0].NOME_EMPRESA = empresa?.nomeempresarial;
             dadosIRPF[0].RESPONSAVEL = empresa?.responsavel_irpf;
+            const dadosIRPFDecimo = await Database_1.default.connection("oracle").rawQuery(`
+        SELECT * FROM GUDMA.VW_ML_FLP_IRPF_DECIMO
+        WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
+        AND ANO_REFERENCIA = '${ano}'
+      `);
+            if (dadosIRPFDecimo.length > 0) {
+                dadosIRPF[0].VLR_DECIMO = this.formattedCurrency(dadosIRPFDecimo?.[0].VALOR);
+            }
+            else {
+                dadosIRPF[0].VLR_DECIMO = this.formattedCurrency(0);
+            }
             dadosIRPF[0].VLR_DEC13 = this.formattedCurrency(dadosIRPF[0].VLR_DEC13);
             dadosIRPF[0].VLR_RENDIMENTO = this.formattedCurrency(dadosIRPF[0].VLR_RENDIMENTO);
             dadosIRPF[0].VLR_CPO = this.formattedCurrency(dadosIRPF[0].VLR_CPO);
@@ -578,7 +596,7 @@ class Receipts {
             else {
                 dadosIRPF[0].PLAN_MED_DEP = [];
             }
-            const pdfTemp = await this.generatePdf(dadosIRPF[0], template_irpf_1.templateIRPF);
+            const pdfTemp = await this.generatePdf(this.formatDataIcomeTax(dadosIRPF[0]), template_irpf_1.templateIRPF);
             const file = await (0, S3_1.uploadPdfEmpresa)(pdfTemp.filename, auth.user?.id_empresa);
             if (file) {
                 fs_1.default.unlink(pdfTemp.filename, () => { });
