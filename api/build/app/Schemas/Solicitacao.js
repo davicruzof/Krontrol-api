@@ -6,6 +6,7 @@ exports.solicitacaoSchema = {
     id_area: Validator_1.schema.number(),
     id_modulo: Validator_1.schema.number(),
     justificativa: Validator_1.schema.string(),
+    id_motivo: Validator_1.schema.number(),
 };
 exports.SolicitacaoRespostaSchema = {
     id_solicitacao: Validator_1.schema.number(),

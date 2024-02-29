@@ -24,6 +24,7 @@ class SolicitacoesController {
                 id_modulo: dados.id_modulo,
                 justificativa: dados.justificativa,
                 dt_informada: dados?.dt_informada,
+                id_motivo: dados.id_motivo,
             });
         }
         catch (error) {
