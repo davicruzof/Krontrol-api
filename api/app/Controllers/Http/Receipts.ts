@@ -10,7 +10,7 @@ import { fichaPonto, templateDotCard } from "App/templates/pdf/template";
 import Funcao from "App/Models/Funcao";
 import AppVersion from "App/Models/AppVersion";
 import { DateTime } from "luxon";
-// import { templateIRPF } from "App/templates/pdf/template_irpf";
+import { templateIRPF } from "App/templates/pdf/template_irpf";
 import { templateDECIMO } from "App/templates/pdf/templateDecimo";
 
 export default class Receipts {
@@ -621,14 +621,6 @@ export default class Receipts {
     return valorFormatado;
   };
 
-  private formatDataIcomeTax(dados, med, medDep) {
-    return {
-      iprf: dados,
-      med,
-      medDep,
-    };
-  }
-
   public async IncomeTax({ request, response, auth }: HttpContextContract) {
     try {
       let ano = request.params().ano;
@@ -784,24 +776,24 @@ export default class Receipts {
         });
       }
 
-      // const pdfTemp = await this.generatePdf(
-      //   this.formatDataIcomeTax(dadosIRPF[0], med, medDep),
-      //   templateIRPF
-      // );
+      const pdfTemp = await this.generatePdf(
+        {
+          iprf: dadosIRPF[0],
+          med,
+          medDep,
+        },
+        templateIRPF
+      );
 
-      response.json({
-        data: this.formatDataIcomeTax(dadosIRPF[0], med, medDep),
-      });
+      const file = await uploadPdfEmpresa(
+        pdfTemp.filename,
+        auth.user?.id_empresa
+      );
 
-      // const file = await uploadPdfEmpresa(
-      //   pdfTemp.filename,
-      //   auth.user?.id_empresa
-      // );
-
-      // if (file) {
-      //   fs.unlink(pdfTemp.filename, () => {});
-      //   response.json({ pdf: file.Location });
-      // }
+      if (file) {
+        fs.unlink(pdfTemp.filename, () => {});
+        response.json({ pdf: file.Location });
+      }
     } catch (error) {
       response.badRequest({ error: "Nenhum dado encontrado", result: error });
     }

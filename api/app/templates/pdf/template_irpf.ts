@@ -376,11 +376,13 @@ export const templateIRPF = `
       </div>
 
       {{#each dados.med}}
-        <div style="font-size: 10px;">
-          Operadora: {{this.OPERADORA}}
-        </div>
-        <div style="font-size: 10px;">
-          Valor: {{this.ASSMED_TIT}}
+        <div>
+          <div style="font-size: 10px;">
+            Operadora: {{this.OPERADORA}}
+          </div>
+          <div style="font-size: 10px;">
+            Valor: {{this.ASSMED_TIT}}
+          </div>
         </div>
       }}
 
@@ -388,17 +390,19 @@ export const templateIRPF = `
         Dependentes
       </div>
       {{#each dados.medDep}}
-        <div style="font-size: 10px;">
-          Operadora: {{this.OPERADORA}}
-        </div>
-        <div style="font-size: 10px;">
-          CPF: {{this.OPERADORA}}
-        </div>
-        <div style="font-size: 10px;">
-          NOME: {{this.OPERADORA}}
-        </div>
-        <div style="font-size: 10px;">
-          Valor: {{this.VLR_TITULAR}}
+        <div>
+          <div style="font-size: 10px;">
+            Operadora: {{this.OPERADORA}}
+          </div>
+          <div style="font-size: 10px;">
+            CPF: {{this.CPF}}
+          </div>
+          <div style="font-size: 10px;">
+            NOME: {{this.DEPENDENTE}}
+          </div>
+          <div style="font-size: 10px;">
+            Valor: {{this.ASSMED_DEP}}
+          </div>
         </div>
       {{/each}}
 

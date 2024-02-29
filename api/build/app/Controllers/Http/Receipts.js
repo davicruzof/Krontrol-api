@@ -14,6 +14,7 @@ const template_1 = global[Symbol.for('ioc.use')]("App/templates/pdf/template");
 const Funcao_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/Funcao"));
 const AppVersion_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/AppVersion"));
 const luxon_1 = require("luxon");
+const template_irpf_1 = global[Symbol.for('ioc.use')]("App/templates/pdf/template_irpf");
 const templateDecimo_1 = global[Symbol.for('ioc.use')]("App/templates/pdf/templateDecimo");
 class Receipts {
     constructor() {
@@ -486,13 +487,6 @@ class Receipts {
             response.json(error);
         }
     }
-    formatDataIcomeTax(dados, med, medDep) {
-        return {
-            iprf: dados,
-            med,
-            medDep,
-        };
-    }
     async IncomeTax({ request, response, auth }) {
         try {
             let ano = request.params().ano;
@@ -595,9 +589,16 @@ class Receipts {
                     };
                 });
             }
-            response.json({
-                data: this.formatDataIcomeTax(dadosIRPF[0], med, medDep),
-            });
+            const pdfTemp = await this.generatePdf({
+                iprf: dadosIRPF[0],
+                med,
+                medDep,
+            }, template_irpf_1.templateIRPF);
+            const file = await (0, S3_1.uploadPdfEmpresa)(pdfTemp.filename, auth.user?.id_empresa);
+            if (file) {
+                fs_1.default.unlink(pdfTemp.filename, () => { });
+                response.json({ pdf: file.Location });
+            }
         }
         catch (error) {
             response.badRequest({ error: "Nenhum dado encontrado", result: error });
