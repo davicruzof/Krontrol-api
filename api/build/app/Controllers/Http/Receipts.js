@@ -580,7 +580,6 @@ class Receipts {
         WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
         AND ANO_CALENDARIO = '${ano}'
       `);
-            console.log(dadosIRPASSMEDTIT, dadosIRPASSMEDDEP);
             let medDep = [];
             if (dadosIRPASSMEDDEP && dadosIRPASSMEDDEP.length > 0) {
                 medDep = dadosIRPASSMEDDEP.map((item) => {
