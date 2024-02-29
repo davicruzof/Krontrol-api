@@ -504,7 +504,7 @@ class Receipts {
         WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
         AND ANO = '${ano}'
       `);
-            if (dadosIRPF.length == 0) {
+            if (!dadosIRPF || dadosIRPF.length == 0) {
                 response.badRequest({ error: "Nenhum dado encontrado" });
                 return;
             }
@@ -592,7 +592,7 @@ class Receipts {
             }
         }
         catch (error) {
-            response.badRequest("Erro interno", error);
+            response.badRequest({ error: "Nenhum dado encontrado", result: error });
         }
     }
 }
