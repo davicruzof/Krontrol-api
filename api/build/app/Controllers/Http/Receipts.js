@@ -592,7 +592,7 @@ class Receipts {
             }
         }
         catch (error) {
-            response.badRequest("Erro interno");
+            response.badRequest("Erro interno", error);
         }
     }
 }

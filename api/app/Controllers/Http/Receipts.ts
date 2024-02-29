@@ -780,7 +780,7 @@ export default class Receipts {
         response.json({ pdf: file.Location });
       }
     } catch (error) {
-      response.badRequest("Erro interno");
+      response.badRequest("Erro interno", error);
     }
   }
 }
