@@ -366,7 +366,7 @@ export const templateIRPF = `
         Rendimentos isentos outros:
       </div>
       <div style="font-size: 10px; margin-left: 4px;">
-        - Abono precuniário: {{dados.PRECUNIARIO}}
+        - Abono pecuniário: {{dados.PECUNIARIO}}
       </div>
       <div style="font-size: 10px;">
         Participação nos lucros ou resultados (PLR): {{dados.PLR}}
