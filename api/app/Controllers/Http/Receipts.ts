@@ -785,42 +785,6 @@ export default class Receipts {
         templateIRPF
       );
 
-      // <div>
-      //   {{#each dados.med}}
-      //     <div>
-      //       <div style="font-size: 10px;">
-      //         Operadora: {{this.OPERADORA}}
-      //       </div>
-      //       <div style="font-size: 10px;">
-      //         Valor: {{this.ASSMED_TIT}}
-      //       </div>
-      //     </div>
-      //   }}
-      // </div>
-
-      // <div style="font-size: 10px;">
-      //   Dependentes
-      // </div>
-
-      // <div>
-      //   {{#each dados.medDep}}
-      //     <div>
-      //       <div style="font-size: 10px;">
-      //         Operadora: {{this.OPERADORA}}
-      //       </div>
-      //       <div style="font-size: 10px;">
-      //         CPF: {{this.CPF}}
-      //       </div>
-      //       <div style="font-size: 10px;">
-      //         NOME: {{this.DEPENDENTE}}
-      //       </div>
-      //       <div style="font-size: 10px;">
-      //         Valor: {{this.ASSMED_DEP}}
-      //       </div>
-      //     </div>
-      //   {{/each}}
-      // </div>
-
       const file = await uploadPdfEmpresa(
         pdfTemp.filename,
         auth.user?.id_empresa
