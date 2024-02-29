@@ -673,18 +673,18 @@ export default class Receipts {
         AND ANO_REFERENCIA = '${ano}'
       `);
 
-      const dadosIRPFPrecuniario = await Database.connection("oracle")
-        .rawQuery(`
-        SELECT * FROM GUDMA.VW_ML_IRPF_PECUNIARIO
-        WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
-        AND ANO_CALENDARIO = '${ano}'
-      `);
+      // const dadosIRPFPrecuniario = await Database.connection("oracle")
+      //   .rawQuery(`
+      //   SELECT * FROM GUDMA.VW_ML_IRPF_PECUNIARIO
+      //   WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
+      //   AND ANO_CALENDARIO = '${ano}'
+      // `);
 
-      if (dadosIRPFPrecuniario && dadosIRPFPrecuniario.length > 0) {
-        dadosIRPF[0].PRECUNIARIO = this.formattedCurrency(
-          dadosIRPFPrecuniario[0].VLR_PRECUNIARIO
-        );
-      }
+      // if (dadosIRPFPrecuniario && dadosIRPFPrecuniario.length > 0) {
+      //   dadosIRPF[0].PRECUNIARIO = this.formattedCurrency(
+      //     dadosIRPFPrecuniario[0].VLR_PRECUNIARIO
+      //   );
+      // }
 
       // const dadosIRPFPLR = await Database.connection("oracle").rawQuery(`
       //   SELECT * FROM GUDMA.VW_ML_IRPF_PLR

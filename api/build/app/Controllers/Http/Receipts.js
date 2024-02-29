@@ -513,15 +513,6 @@ class Receipts {
         WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
         AND ANO_REFERENCIA = '${ano}'
       `);
-            const dadosIRPFPrecuniario = await Database_1.default.connection("oracle")
-                .rawQuery(`
-        SELECT * FROM GUDMA.VW_ML_IRPF_PECUNIARIO
-        WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
-        AND ANO_CALENDARIO = '${ano}'
-      `);
-            if (dadosIRPFPrecuniario && dadosIRPFPrecuniario.length > 0) {
-                dadosIRPF[0].PRECUNIARIO = this.formattedCurrency(dadosIRPFPrecuniario[0].VLR_PRECUNIARIO);
-            }
             dadosIRPF[0].PLAN_MED = [];
             dadosIRPF[0].PLAN_MED_DEP = [];
             const empresa = await Empresa_1.default.findBy("id_empresa", auth.user?.id_empresa);
