@@ -673,65 +673,6 @@ export default class Receipts {
         AND ANO_REFERENCIA = '${ano}'
       `);
 
-      // const dadosIRPFPrecuniario = await Database.connection("oracle")
-      //   .rawQuery(`
-      //   SELECT * FROM GUDMA.VW_ML_IRPF_PECUNIARIO
-      //   WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
-      //   AND ANO_CALENDARIO = '${ano}'
-      // `);
-
-      // if (dadosIRPFPrecuniario && dadosIRPFPrecuniario.length > 0) {
-      //   dadosIRPF[0].PRECUNIARIO = this.formattedCurrency(
-      //     dadosIRPFPrecuniario[0].VLR_PRECUNIARIO
-      //   );
-      // }
-
-      // const dadosIRPFPLR = await Database.connection("oracle").rawQuery(`
-      //   SELECT * FROM GUDMA.VW_ML_IRPF_PLR
-      //   WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
-      //   AND ANO_CALENDARIO = '${ano}'
-      // `);
-
-      // if (dadosIRPFPLR && dadosIRPFPLR.length > 0) {
-      //   dadosIRPF[0].PLR = this.formattedCurrency(dadosIRPFPLR[0].VLR_PLR);
-      // }
-
-      // const dadosIRPASSMEDTIT = await Database.connection("oracle").rawQuery(`
-      //   SELECT * FROM GUDMA.VW_ML_IRPF_ASSMED_TIT
-      //   WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
-      //   AND ANO_CALENDARIO = '${ano}'
-      // `);
-
-      // if (dadosIRPASSMEDTIT && dadosIRPASSMEDTIT.length > 0) {
-      //   const deps = dadosIRPASSMEDTIT.map((item: any) => {
-      //     return {
-      //       ...item,
-      //       ASSMED_TIT: this.formattedCurrency(item.ASSMED_TIT),
-      //     };
-      //   });
-      //   dadosIRPF[0].PLAN_MED = deps;
-      // } else {
-      dadosIRPF[0].PLAN_MED = [];
-      // }
-
-      // const dadosIRPASSMEDDEP = await Database.connection("oracle").rawQuery(`
-      //   SELECT * FROM GUDMA.VW_ML_IRPF_ASSMED_DEP
-      //   WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
-      //   AND ANO_CALENDARIO = '${ano}'
-      // `);
-
-      // if (dadosIRPASSMEDDEP && dadosIRPASSMEDDEP.length > 0) {
-      //   const deps = dadosIRPASSMEDDEP.map((item: any) => {
-      //     return {
-      //       ...item,
-      //       ASSMED_DEP: this.formattedCurrency(item.ASSMED_DEP),
-      //     };
-      //   });
-      //   dadosIRPF[0].PLAN_MED_DEP = deps;
-      // } else {
-      dadosIRPF[0].PLAN_MED_DEP = [];
-      // }
-
       const empresa = await Empresa.findBy("id_empresa", auth.user?.id_empresa);
 
       dadosIRPF[0].CNPJ_EMPRESA = empresa?.cnpj;

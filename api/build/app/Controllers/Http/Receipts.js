@@ -513,8 +513,6 @@ class Receipts {
         WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
         AND ANO_REFERENCIA = '${ano}'
       `);
-            dadosIRPF[0].PLAN_MED = [];
-            dadosIRPF[0].PLAN_MED_DEP = [];
             const empresa = await Empresa_1.default.findBy("id_empresa", auth.user?.id_empresa);
             dadosIRPF[0].CNPJ_EMPRESA = empresa?.cnpj;
             dadosIRPF[0].NOME_EMPRESA = empresa?.nomeempresarial;
