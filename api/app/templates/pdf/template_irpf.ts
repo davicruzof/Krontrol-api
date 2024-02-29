@@ -376,41 +376,41 @@ export const templateIRPF = `
       </div>
 
 
-      <table>
-        {{#each dados.med}}
-          <tr>
-            <td style="font-size: 10px;">
+      <div>
+        {{#each dados.titular}}
+          <div>
+            <div style="font-size: 10px;">
               Operadora: {{this.OPERADORA}}
-            </td>
-            <td style="font-size: 10px;">
+            </div>
+            <div style="font-size: 10px;">
               Valor: {{this.ASSMED_TIT}}
-            </td>
-          </tr>
+            </div>
+          </div>
         }}
-      </table>
+      </div>
 
       <div style="font-size: 10px;">
         Dependentes
       </div>
 
-      <table>
-        {{#each dados.medDep}}
-          <tr>
-            <td style="font-size: 10px;">
+      <div>
+        {{#each dados.dependentes}}
+          <div>
+            <div style="font-size: 10px;">
               Operadora: {{this.OPERADORA}}
-            </td>
-            <td style="font-size: 10px;">
+            </div>
+            <div style="font-size: 10px;">
               CPF: {{this.CPF}}
-            </td>
-            <td style="font-size: 10px;">
+            </div>
+            <div style="font-size: 10px;">
               NOME: {{this.DEPENDENTE}}
-            </td>
-            <td style="font-size: 10px;">
+            </div>
+            <div style="font-size: 10px;">
               Valor: {{this.ASSMED_DEP}}
-            </td>
-          </tr>
+            </div>
+          </div>
         {{/each}}
-      </table>
+      </div>
 
 
       {{dados.iprf.INF_COMPL}}

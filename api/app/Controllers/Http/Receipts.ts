@@ -779,8 +779,8 @@ export default class Receipts {
       const pdfTemp = await this.generatePdf(
         {
           iprf: dadosIRPF[0],
-          med,
-          medDep,
+          titular: med,
+          dependentes: medDep,
         },
         templateIRPF
       );

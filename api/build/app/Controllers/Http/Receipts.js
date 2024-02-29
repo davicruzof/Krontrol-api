@@ -591,8 +591,8 @@ class Receipts {
             }
             const pdfTemp = await this.generatePdf({
                 iprf: dadosIRPF[0],
-                med,
-                medDep,
+                titular: med,
+                dependentes: medDep,
             }, template_irpf_1.templateIRPF);
             const file = await (0, S3_1.uploadPdfEmpresa)(pdfTemp.filename, auth.user?.id_empresa);
             if (file) {
