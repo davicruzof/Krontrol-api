@@ -696,14 +696,16 @@ export default class Receipts {
         dadosIRPF[0].PLR = this.formattedCurrency(dadosIRPFPLR[0].VLR_PLR);
       }
 
-      const dadosIRPASSMEDTIT = await Database.connection("oracle").rawQuery(`
-        SELECT * FROM GUDMA.VW_ML_IRPF_ASSMED_TIT
-        WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
-        AND ANO_CALENDARIO = '${ano}'
-      `);
+      // const dadosIRPASSMEDTIT = await Database.connection("oracle").rawQuery(`
+      //   SELECT * FROM GUDMA.VW_ML_IRPF_ASSMED_TIT
+      //   WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
+      //   AND ANO_CALENDARIO = '${ano}'
+      // `);
+
+      const dadosIRPASSMEDTIT = [];
 
       if (dadosIRPASSMEDTIT && dadosIRPASSMEDTIT.length > 0) {
-        const deps = dadosIRPASSMEDTIT.map((item) => {
+        const deps = dadosIRPASSMEDTIT.map((item: any) => {
           return {
             ...item,
             ASSMED_TIT: this.formattedCurrency(item.ASSMED_TIT),
@@ -714,14 +716,15 @@ export default class Receipts {
         dadosIRPF[0].PLAN_MED = [];
       }
 
-      const dadosIRPASSMEDDEP = await Database.connection("oracle").rawQuery(`
-        SELECT * FROM GUDMA.VW_ML_IRPF_ASSMED_DEP
-        WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
-        AND ANO_CALENDARIO = '${ano}'
-      `);
+      const dadosIRPASSMEDDEP = [];
+      // const dadosIRPASSMEDDEP = await Database.connection("oracle").rawQuery(`
+      //   SELECT * FROM GUDMA.VW_ML_IRPF_ASSMED_DEP
+      //   WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
+      //   AND ANO_CALENDARIO = '${ano}'
+      // `);
 
       if (dadosIRPASSMEDDEP && dadosIRPASSMEDDEP.length > 0) {
-        const deps = dadosIRPASSMEDDEP.map((item) => {
+        const deps = dadosIRPASSMEDDEP.map((item: any) => {
           return {
             ...item,
             ASSMED_DEP: this.formattedCurrency(item.ASSMED_DEP),

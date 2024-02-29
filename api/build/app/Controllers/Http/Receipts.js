@@ -530,11 +530,7 @@ class Receipts {
             if (dadosIRPFPLR && dadosIRPFPLR.length > 0) {
                 dadosIRPF[0].PLR = this.formattedCurrency(dadosIRPFPLR[0].VLR_PLR);
             }
-            const dadosIRPASSMEDTIT = await Database_1.default.connection("oracle").rawQuery(`
-        SELECT * FROM GUDMA.VW_ML_IRPF_ASSMED_TIT
-        WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
-        AND ANO_CALENDARIO = '${ano}'
-      `);
+            const dadosIRPASSMEDTIT = [];
             if (dadosIRPASSMEDTIT && dadosIRPASSMEDTIT.length > 0) {
                 const deps = dadosIRPASSMEDTIT.map((item) => {
                     return {
@@ -547,11 +543,7 @@ class Receipts {
             else {
                 dadosIRPF[0].PLAN_MED = [];
             }
-            const dadosIRPASSMEDDEP = await Database_1.default.connection("oracle").rawQuery(`
-        SELECT * FROM GUDMA.VW_ML_IRPF_ASSMED_DEP
-        WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
-        AND ANO_CALENDARIO = '${ano}'
-      `);
+            const dadosIRPASSMEDDEP = [];
             if (dadosIRPASSMEDDEP && dadosIRPASSMEDDEP.length > 0) {
                 const deps = dadosIRPASSMEDDEP.map((item) => {
                     return {
