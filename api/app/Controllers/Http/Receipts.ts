@@ -635,21 +635,23 @@ export default class Receipts {
         return;
       }
 
-      // const liberacaoPdf = await Database.connection("pg").rawQuery(
-      //   `SELECT * FROM public.vw_ml_flp_liberacao_recibos
-      //       where tipo_id = 3
-      //       AND bloqueio_liberacao = false
-      //       AND irpf = '${ano}'
-      //       AND empresa_id = ${auth.user.id_empresa}
-      //       `
-      // );
+      ano = ano === "2024" ? "2023" : ano;
 
-      // if (liberacaoPdf.rows.length == 0) {
-      //   response.badRequest({
-      //     error: "Empresa não liberou para gerar o recibo",
-      //   });
-      //   return;
-      // }
+      const liberacaoPdf = await Database.connection("pg").rawQuery(
+        `SELECT * FROM public.vw_ml_flp_liberacao_recibos
+            where tipo_id = 3
+            AND bloqueio_liberacao = false
+            AND irpf = '${ano}'
+            AND empresa_id = ${auth.user.id_empresa}
+            `
+      );
+
+      if (liberacaoPdf.rows.length == 0) {
+        response.badRequest({
+          error: "Empresa não liberou para gerar o recibo",
+        });
+        return;
+      }
 
       const funcionario = await Funcionario.findBy(
         "id_funcionario",
