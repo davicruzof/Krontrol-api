@@ -751,20 +751,17 @@ export default class Receipts {
       let med = "";
 
       if (dadosIRPASSMEDTIT && dadosIRPASSMEDTIT.length > 0) {
-        med = `<div style="font-size: 10px;">
-            Dependentes
-          </div>`;
-
         dadosIRPASSMEDTIT.map((item) => {
+          const valor = this.formattedCurrency(item.ASSMED_TIT);
           med =
             med +
             `
-              <div>
+              <div style="margin-top: 4px; margin-left: 8px;">
                 <div style="font-size: 10px;">
                   Operadora: ${item.OPERADORA}
                 </div>
-                <div style="font-size: 10px;">
-                  Valor: ${this.formattedCurrency(item.ASSMED_TIT)}
+                <div style="font-size: 10px; margin-left: 4px;">
+                  Valor: ${valor}
                 </div>
               </div>
             `;
@@ -780,22 +777,26 @@ export default class Receipts {
       let medDep = "";
 
       if (dadosIRPASSMEDDEP && dadosIRPASSMEDDEP.length > 0) {
+        medDep = `<div style="font-size: 10px; margin-top: 8px; margin-left: 4px;">
+            Dependentes
+          </div>`;
         dadosIRPASSMEDDEP.map((item) => {
+          const valor = this.formattedCurrency(item.ASSMED_DEP);
           medDep =
             medDep +
             `
-            <div>
+            <div style="margin-top: 4px; margin-left: 8px;">
               <div style="font-size: 10px;">
                 Operadora: ${item.OPERADORA}
               </div>
-              <div style="font-size: 10px;">
+              <div style="font-size: 10px; margin-left: 4px;">
                 CPF: ${item.CPF}
               </div>
-              <div style="font-size: 10px;">
+              <div style="font-size: 10px; margin-left: 4px;">
                 NOME: ${item.DEPENDENTE}
               </div>
-              <div style="font-size: 10px;">
-                Valor: ${item.ASSMED_DEP}
+              <div style="font-size: 10px; margin-left: 4px;">
+                Valor: ${valor}
               </div>
             </div>
           `;
@@ -809,10 +810,12 @@ export default class Receipts {
 
           ${medDep}
 
-          {{dados.iprf.INF_COMPL}}
+          <div>
+            ${dadosIRPF[0].INF_COMPL}
+          </div>
         </div>
 
-        <b style="font-size: 14px;">8. RESPONSAVEL PELAS INFORMACOES</b>
+        <b style="font-size: 14px; margin-top: 8px;">8. RESPONSAVEL PELAS INFORMACOES</b>
 
         <table>
             <tr style="width: 100%;">

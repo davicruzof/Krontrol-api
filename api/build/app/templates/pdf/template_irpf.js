@@ -364,17 +364,17 @@ exports.templateIRPF = `
         <b style="font-size: 10px;">7. Informações complementares</b>
     </div>
 
-    <div style="min-height: 100px; border: 1px solid #000; margin: 2px">
-      <div style="font-size: 10px;">
+    <div style="min-height: 100px; border: 1px solid #000; margin: 2px;">
+      <div style="font-size: 10px; margin-left: 4px; margin-top: 4px;">
         Rendimentos isentos outros:
       </div>
-      <div style="font-size: 10px; margin-left: 4px;">
+      <div style="font-size: 10px; margin-left: 8px;">
         - Abono pecuniário: {{dados.iprf.PECUNIARIO}}
       </div>
-      <div style="font-size: 10px;">
+      <div style="font-size: 10px; margin-left: 4px;">
         Participação nos lucros ou resultados (PLR): {{dados.iprf.PLR}}
       </div>
-      <div style="font-size: 10px;">
+      <div style="font-size: 10px; margin-left: 4px;">
         Titular
       </div>
 
