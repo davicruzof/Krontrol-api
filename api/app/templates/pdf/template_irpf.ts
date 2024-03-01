@@ -376,43 +376,4 @@ export const templateIRPF = `
       </div>
 
 
-      <div>
-        {{dados.titular}}
-      </div>
-
-      <div style="font-size: 10px;">
-        Dependentes
-      </div>
-
-
-
-
-      {{dados.iprf.INF_COMPL}}
-    </div>
-
-    <b style="font-size: 14px;">8. RESPONSAVEL PELAS INFORMACOES</b>
-
-    <table>
-        <tr style="width: 100%;">
-        <td style="width: 40%; border: 1px solid #000; padding: 8px;">
-            <div style="font-size: 10px;">
-            Nome: {{dados.iprf.RESPONSAVEL}}
-            </div>
-        </td>
-        <td style="width: 20%; border: 1px solid #000; padding: 8px;">
-            <div style="font-size: 10px;">
-            Data: / /
-            </div>
-        </td>
-        <td style="border: 1px solid #000; padding: 8px;">
-            <div style="font-size: 10px;">
-            Assinatura:
-            </div>
-        </td>
-        </tr>
-    </table>
-
-    </body>
-
-    </html>
-`;
+      `;

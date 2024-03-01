@@ -568,6 +568,9 @@ class Receipts {
       `);
             let med = "";
             if (dadosIRPASSMEDTIT && dadosIRPASSMEDTIT.length > 0) {
+                med = `<div style="font-size: 10px;">
+            Dependentes
+          </div>`;
                 dadosIRPASSMEDTIT.map((item) => {
                     med =
                         med +
@@ -588,20 +591,68 @@ class Receipts {
         WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
         AND ANO_CALENDARIO = '${ano}'
       `);
-            let medDep = [];
+            let medDep = "";
             if (dadosIRPASSMEDDEP && dadosIRPASSMEDDEP.length > 0) {
-                medDep = dadosIRPASSMEDDEP.map((item) => {
-                    return {
-                        ...item,
-                        ASSMED_DEP: this.formattedCurrency(item.ASSMED_DEP),
-                    };
+                dadosIRPASSMEDDEP.map((item) => {
+                    medDep =
+                        medDep +
+                            `
+            <div>
+              <div style="font-size: 10px;">
+                Operadora: ${item.OPERADORA}
+              </div>
+              <div style="font-size: 10px;">
+                CPF: ${item.CPF}
+              </div>
+              <div style="font-size: 10px;">
+                NOME: ${item.DEPENDENTE}
+              </div>
+              <div style="font-size: 10px;">
+                Valor: ${item.ASSMED_DEP}
+              </div>
+            </div>
+          `;
                 });
             }
+            const templateMont = `
+          <div>
+            ${med}
+          </div>
+
+          ${medDep}
+
+          {{dados.iprf.INF_COMPL}}
+        </div>
+
+        <b style="font-size: 14px;">8. RESPONSAVEL PELAS INFORMACOES</b>
+
+        <table>
+            <tr style="width: 100%;">
+            <td style="width: 40%; border: 1px solid #000; padding: 8px;">
+                <div style="font-size: 10px;">
+                Nome: ${empresa?.responsavel_irpf}
+                </div>
+            </td>
+            <td style="width: 20%; border: 1px solid #000; padding: 8px;">
+                <div style="font-size: 10px;">
+                Data: / /
+                </div>
+            </td>
+            <td style="border: 1px solid #000; padding: 8px;">
+                <div style="font-size: 10px;">
+                Assinatura:
+                </div>
+            </td>
+            </tr>
+        </table>
+
+        </body>
+
+        </html>
+    `;
             const pdfTemp = await this.generatePdf({
                 iprf: dadosIRPF[0],
-                titular: med,
-                dependentes: medDep,
-            }, template_irpf_1.templateIRPF);
+            }, template_irpf_1.templateIRPF + templateMont);
             const file = await (0, S3_1.uploadPdfEmpresa)(pdfTemp.filename, auth.user?.id_empresa);
             if (file) {
                 fs_1.default.unlink(pdfTemp.filename, () => { });
