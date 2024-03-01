@@ -617,7 +617,7 @@ class Receipts {
                 });
             }
             let complementar = "";
-            if (dadosIRPF[0].INF_COMPL != null || dadosIRPF[0].INF_COMPL != "null") {
+            if (dadosIRPF[0]?.INF_COMPL && dadosIRPF[0]?.INF_COMPL !== "null") {
                 complementar = dadosIRPF[0].INF_COMPL;
             }
             const templateMont = `
