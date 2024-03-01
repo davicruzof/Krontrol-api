@@ -569,7 +569,7 @@ class Receipts {
             let med = "";
             if (dadosIRPASSMEDTIT && dadosIRPASSMEDTIT.length > 0) {
                 dadosIRPASSMEDTIT.map((item) => {
-                    const valor = this.formattedCurrency(item.ASSMED_TIT);
+                    const valor = this.formattedCurrency(+item.ASSMED_TIT);
                     med =
                         med +
                             `
@@ -595,7 +595,7 @@ class Receipts {
             Dependentes
           </div>`;
                 dadosIRPASSMEDDEP.map((item) => {
-                    const valor = this.formattedCurrency(item.ASSMED_DEP);
+                    const valor = this.formattedCurrency(+item.ASSMED_DEP);
                     medDep =
                         medDep +
                             `
@@ -616,6 +616,10 @@ class Receipts {
           `;
                 });
             }
+            let complementar = "";
+            if (dadosIRPF[0].INF_COMPL != null || dadosIRPF[0].INF_COMPL != "null") {
+                complementar = dadosIRPF[0].INF_COMPL;
+            }
             const templateMont = `
           <div>
             ${med}
@@ -624,7 +628,7 @@ class Receipts {
           ${medDep}
 
           <div>
-            ${dadosIRPF[0].INF_COMPL}
+            ${complementar}
           </div>
         </div>
 
