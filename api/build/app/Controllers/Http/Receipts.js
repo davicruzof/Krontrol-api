@@ -634,7 +634,7 @@ class Receipts {
                                 `
             <div style="margin-top: 4px; margin-left: 8px;">
               <div style="font-size: 10px;">
-                ${item}
+                Pens: ${item}
               </div>
             </div>
           `;
