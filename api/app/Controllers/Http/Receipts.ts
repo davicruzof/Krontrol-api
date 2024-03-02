@@ -658,12 +658,6 @@ export default class Receipts {
         auth.user?.id_funcionario
       );
 
-      console.log(`
-         SELECT * FROM GUDMA.VW_ML_FLP_IRPF
-         WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
-         AND ANO = '${ano}'
-      `);
-
       const dadosIRPF = await Database.connection("oracle").rawQuery(`
         SELECT * FROM GUDMA.VW_ML_FLP_IRPF
         WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
@@ -808,7 +802,20 @@ export default class Receipts {
       let complementar = "";
 
       if (dadosIRPF[0]?.INF_COMPL && dadosIRPF[0]?.INF_COMPL !== "null") {
-        complementar = dadosIRPF[0].INF_COMPL;
+        const aux = dadosIRPF[0].INF_COMPL.split("Pens:");
+        aux.map((item) => {
+          if (item) {
+            complementar =
+              complementar +
+              `
+            <div style="margin-top: 4px; margin-left: 8px;">
+              <div style="font-size: 10px;">
+                ${item}
+              </div>
+            </div>
+          `;
+          }
+        });
       }
 
       const templateMont = `

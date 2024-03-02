@@ -512,11 +512,6 @@ class Receipts {
                 return;
             }
             const funcionario = await Funcionario_1.default.findBy("id_funcionario", auth.user?.id_funcionario);
-            console.log(`
-         SELECT * FROM GUDMA.VW_ML_FLP_IRPF
-         WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
-         AND ANO = '${ano}'
-      `);
             const dadosIRPF = await Database_1.default.connection("oracle").rawQuery(`
         SELECT * FROM GUDMA.VW_ML_FLP_IRPF
         WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
@@ -631,7 +626,20 @@ class Receipts {
             }
             let complementar = "";
             if (dadosIRPF[0]?.INF_COMPL && dadosIRPF[0]?.INF_COMPL !== "null") {
-                complementar = dadosIRPF[0].INF_COMPL;
+                const aux = dadosIRPF[0].INF_COMPL.split("Pens:");
+                aux.map((item) => {
+                    if (item) {
+                        complementar =
+                            complementar +
+                                `
+            <div style="margin-top: 4px; margin-left: 8px;">
+              <div style="font-size: 10px;">
+                ${item}
+              </div>
+            </div>
+          `;
+                    }
+                });
             }
             const templateMont = `
           <div>
