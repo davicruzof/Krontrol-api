@@ -9,12 +9,12 @@ const GrupoEvento_2 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/
 class GrupoEventosController {
     async getById({ request, response }) {
         const id_associacao = request.body();
-        let grupoEvento = await GrupoEvento_2.default.findBy('id_associacao', id_associacao);
+        let grupoEvento = await GrupoEvento_2.default.findBy("id_associacao", id_associacao);
         if (grupoEvento) {
             response.json(grupoEvento);
         }
         else {
-            response.json({ error: 'Não encontrado!' });
+            response.json({ error: "Não encontrado!" });
         }
     }
     async getAll({ response }) {
@@ -23,7 +23,9 @@ class GrupoEventosController {
     }
     async create({ request, response, auth }) {
         try {
-            await request.validate({ schema: Validator_1.schema.create(GrupoEvento_1.GrupoEventoSchemaInsert) });
+            await request.validate({
+                schema: Validator_1.schema.create(GrupoEvento_1.GrupoEventoSchemaInsert),
+            });
             const dados = request.all();
             await GrupoEvento_2.default.create({
                 id_empresa_grupo: dados.id_empresa_grupo,
@@ -31,9 +33,9 @@ class GrupoEventosController {
                 id_telemetria_grupo: dados.id_telemetria_grupo,
                 id_telemetria_evento: dados.id_telemetria_evento,
                 id_funcionario_cadastro: auth.user?.id_funcionario,
-                id_status: dados.id_status
+                id_status: dados.id_status,
             });
-            response.json({ sucess: 'Criado com sucesso!' });
+            response.json({ sucess: "Criado com sucesso!" });
         }
         catch (error) {
             response.json(error);
@@ -41,18 +43,22 @@ class GrupoEventosController {
     }
     async update({ request, response, auth }) {
         try {
-            await request.validate({ schema: Validator_1.schema.create(GrupoEvento_1.GrupoEventoSchemaUpdate) });
+            await request.validate({
+                schema: Validator_1.schema.create(GrupoEvento_1.GrupoEventoSchemaUpdate),
+            });
             const dados = request.body();
-            const grupoEvento = await GrupoEvento_2.default.findBy('id_associacao', dados.id_associacao);
+            const grupoEvento = await GrupoEvento_2.default.findBy("id_associacao", dados.id_associacao);
             if (grupoEvento) {
-                await grupoEvento.merge({
+                await grupoEvento
+                    .merge({
                     id_empresa_grupo: dados.id_empresa_grupo,
                     id_empresa: dados.id_empresa,
                     id_telemetria_grupo: dados.id_telemetria_grupo,
                     id_telemetria_evento: dados.id_telemetria_evento,
-                    id_funcionario_alteracao: auth.user?.id_funcionario
-                }).save();
-                response.json({ sucess: 'Atualizado com sucesso!' });
+                    id_funcionario_alteracao: auth.user?.id_funcionario,
+                })
+                    .save();
+                response.json({ sucess: "Atualizado com sucesso!" });
             }
         }
         catch (error) {

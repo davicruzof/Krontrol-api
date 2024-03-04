@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sleep = void 0;
+exports.validarAno = exports.isValidDate = exports.sleep = void 0;
 function TestaCPF(strCPF) {
     var Soma;
     var Resto;
@@ -31,4 +31,23 @@ function sleep(ms) {
     });
 }
 exports.sleep = sleep;
+function isValidDate(dateString) {
+    let date = new Date(dateString);
+    return !isNaN(date.getTime());
+}
+exports.isValidDate = isValidDate;
+function validarAno(ano) {
+    if (isNaN(ano)) {
+        return false;
+    }
+    ano = parseInt(ano);
+    if (ano < 1000 || ano > 9999) {
+        return false;
+    }
+    if ((ano % 4 === 0 && ano % 100 !== 0) || ano % 400 === 0) {
+        return true;
+    }
+    return false;
+}
+exports.validarAno = validarAno;
 //# sourceMappingURL=functions.js.map

@@ -1,16 +1,15 @@
-import BaseSchema from '@ioc:Adonis/Lucid/Schema'
+import BaseSchema from "@ioc:Adonis/Lucid/Schema";
 
 export default class extends BaseSchema {
-  protected tableName = 'ml_fol_funcionario'
+  protected tableName = "ml_fol_funcionario";
 
-  public async up () {
+  public async up() {
     this.schema.alterTable(this.tableName, (table) => {
-      table.integer('id_situacao').defaultTo(1).alter();
-    })
+      table.integer("id_situacao").defaultTo(1).alter();
+    });
   }
 
-  public async down () {
-    this.schema.alterTable(this.tableName, (table) => {
-    })
+  public async down() {
+    this.schema.alterTable(this.tableName, () => {});
   }
 }

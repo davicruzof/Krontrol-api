@@ -25,5 +25,7 @@ exports.default = Env_1.default.rules({
     ORACLE_USER: Env_1.default.schema.string(),
     ORACLE_PASSWORD: Env_1.default.schema.string.optional(),
     ORACLE_DB_NAME: Env_1.default.schema.string(),
+    DATALBUS_API_LOGIN: Env_1.default.schema.string(),
+    DATALBUS_API_PASSWORD: Env_1.default.schema.string(),
 });
 //# sourceMappingURL=env.js.map

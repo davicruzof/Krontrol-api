@@ -5,14 +5,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const Database_1 = __importDefault(global[Symbol.for('ioc.use')]("Adonis/Lucid/Database"));
 class PdfsController {
-    async upload({ request, response }) {
-        const files = request.files('files');
+    async upload({ request }) {
+        const files = request.files("files");
         return files;
     }
     async getConfirmedsById({ request, response }) {
         const id = request.body().id;
         if (id) {
-            let dados = await Database_1.default.connection('pg').rawQuery(`
+            let dados = await Database_1.default.connection("pg").rawQuery(`
                 SELECT c.*, f.nome,f.id_funcionario_erp,f.id_empresa,f.registro
                 FROM ml_pdf_confirmed c
                 INNER JOIN ml_fol_funcionario f on (c.id_funcionario = f.id_funcionario)
@@ -24,8 +24,8 @@ class PdfsController {
             response.badRequest({ error: "Erro interno" });
         }
     }
-    async getAllConfirmeds({ request, response }) {
-        let dados = await Database_1.default.connection('pg').rawQuery(`
+    async getAllConfirmeds({ response }) {
+        let dados = await Database_1.default.connection("pg").rawQuery(`
                 SELECT c.*, to_char(c.data_cadastro, 'DD/MM/YYYY HH24:MM:SS') as data_cadastro, f.nome,f.id_funcionario_erp,f.id_empresa,f.registro
                 FROM ml_pdf_confirmed c
                 INNER JOIN ml_fol_funcionario f on (c.id_funcionario = f.id_funcionario)

@@ -27,7 +27,7 @@ exports.EmpresaSchemaUpdate = {
     cnpj: Validator_1.schema.string.nullableAndOptional(),
     nomeempresarial: Validator_1.schema.string.nullableAndOptional(),
     logradouro: Validator_1.schema.string.nullableAndOptional(),
-    numero: Validator_1.schema.number.nullableAndOptional(),
+    numero: Validator_1.schema.string.nullableAndOptional(),
     complemento: Validator_1.schema.string.nullableAndOptional(),
     cep: Validator_1.schema.string.nullableAndOptional(),
     bairro: Validator_1.schema.string.nullableAndOptional(),

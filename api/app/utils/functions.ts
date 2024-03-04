@@ -25,3 +25,26 @@ export function sleep(ms) {
     setTimeout(resolve, ms);
   });
 }
+
+export function isValidDate(dateString) {
+  let date = new Date(dateString);
+  return !isNaN(date.getTime());
+}
+
+export function validarAno(ano) {
+  if (isNaN(ano)) {
+    return false;
+  }
+
+  ano = parseInt(ano);
+
+  if (ano < 1000 || ano > 9999) {
+    return false;
+  }
+
+  if ((ano % 4 === 0 && ano % 100 !== 0) || ano % 400 === 0) {
+    return true;
+  }
+
+  return false;
+}

@@ -16,9 +16,9 @@ class EventosController {
                 id_evento_telemetria: dados.id_evento_telemetria,
                 evento: dados.evento,
                 id_empresa_telemetria: dados.id_empresa_telemetria,
-                id_funcionario_cadastro: auth.user?.id_funcionario
+                id_funcionario_cadastro: auth.user?.id_funcionario,
             });
-            response.json({ sucess: 'Criado com sucesso!' });
+            response.json({ sucess: "Criado com sucesso!" });
         }
         catch (error) {
             response.json(error);
@@ -27,23 +27,25 @@ class EventosController {
     async getAll({ response }) {
         let eventos = await Evento_2.default.all();
         response.json({
-            eventos
+            eventos,
         });
     }
     async update({ request, response, auth }) {
         try {
             await request.validate({ schema: Validator_1.schema.create(Evento_1.EventoSchemaUpdate) });
             const dados = request.body();
-            const evento = await Evento_2.default.findBy('id_evento', dados.id_evento);
+            const evento = await Evento_2.default.findBy("id_evento", dados.id_evento);
             if (evento) {
-                await evento.merge({
+                await evento
+                    .merge({
                     id_evento: dados.id_evento,
                     id_evento_telemetria: dados.id_evento_telemetria,
                     evento: dados.evento,
                     id_empresa_telemetria: dados.id_empresa_telemetria,
                     id_funcionario_alteracao: auth.user?.id_funcionario,
-                    id_status: dados.id_status
-                }).save();
+                    id_status: dados.id_status,
+                })
+                    .save();
             }
         }
         catch (error) {

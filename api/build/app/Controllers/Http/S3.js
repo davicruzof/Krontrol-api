@@ -11,25 +11,28 @@ const Empresa_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/Empr
 const standalone_1 = require("@adonisjs/core/build/standalone");
 const createBucket = async (params) => {
     try {
-        const data = await aws_sdk_1.s3Client.send(new client_s3_1.CreateBucketCommand({ Bucket: params.Bucket }));
+        await aws_sdk_1.s3Client.send(new client_s3_1.CreateBucketCommand({ Bucket: params.Bucket }));
     }
     catch (error) {
-        return (new standalone_1.Exception(error));
+        return new standalone_1.Exception(error);
     }
 };
 exports.createBucket = createBucket;
 const upload = async (params) => {
-    await params.file.moveToDisk('files', {
-        name: params.filename
+    await params.file.moveToDisk("files", {
+        name: params.filename,
     });
-    const buffer = fs_1.default.createReadStream('tmp/uploads/files/' + params.filename);
-    let putObjectPromise = aws_sdk_1.s3connection.upload({
+    const buffer = fs_1.default.createReadStream("tmp/uploads/files/" + params.filename);
+    let putObjectPromise = aws_sdk_1.s3connection
+        .upload({
         Bucket: params.bucket,
-        Key: params.folder + '/' + params.path,
-        ACL: 'public-read',
+        Key: params.folder + "/" + params.path,
+        ACL: "public-read",
         Body: buffer,
-        ContentType: params.type
-    }).promise().then(function (data) {
+        ContentType: params.type,
+    })
+        .promise()
+        .then(function (data) {
         return data;
     });
     return await putObjectPromise;
@@ -37,15 +40,18 @@ const upload = async (params) => {
 exports.upload = upload;
 const uploadPdfEmpresa = async (filepath, id_empresa) => {
     let buffer = fs_1.default.createReadStream(filepath);
-    let empresa = await Empresa_1.default.findBy('id_empresa', id_empresa);
+    let empresa = await Empresa_1.default.findBy("id_empresa", id_empresa);
     if (empresa) {
-        let putObjectPromise = aws_sdk_1.s3connection.upload({
+        let putObjectPromise = aws_sdk_1.s3connection
+            .upload({
             Bucket: empresa.bucket,
-            Key: 'pdfs/' + Math.random() + '_doc' + '.pdf',
-            ACL: 'public-read',
+            Key: "pdfs/" + Math.random() + "_doc" + ".pdf",
+            ACL: "public-read",
             Body: buffer,
-            ContentType: '.pdf'
-        }).promise().then(function (data) {
+            ContentType: ".pdf",
+        })
+            .promise()
+            .then(function (data) {
             return data;
         });
         return await putObjectPromise;

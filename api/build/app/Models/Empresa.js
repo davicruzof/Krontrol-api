@@ -13,7 +13,7 @@ const luxon_1 = require("luxon");
 const Orm_1 = global[Symbol.for('ioc.use')]("Adonis/Lucid/Orm");
 class Empresa extends Orm_1.BaseModel {
     static get table() {
-        return 'ml_ctr_empresa';
+        return "ml_ctr_empresa";
     }
 }
 __decorate([
@@ -100,6 +100,10 @@ __decorate([
     (0, Orm_1.column)(),
     __metadata("design:type", String)
 ], Empresa.prototype, "logo", void 0);
+__decorate([
+    (0, Orm_1.column)(),
+    __metadata("design:type", String)
+], Empresa.prototype, "responsavel_irpf", void 0);
 __decorate([
     Orm_1.column.dateTime({ autoCreate: true }),
     __metadata("design:type", luxon_1.DateTime)

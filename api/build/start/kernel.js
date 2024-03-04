@@ -28,11 +28,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const Server_1 = __importDefault(global[Symbol.for('ioc.use')]("Adonis/Core/Server"));
 const Event_1 = __importDefault(global[Symbol.for('ioc.use')]("Adonis/Core/Event"));
-Server_1.default.middleware.register([
-    () => Promise.resolve().then(() => __importStar(global[Symbol.for('ioc.use')]("Adonis/Core/BodyParser"))),
-]);
+Server_1.default.middleware.register([() => Promise.resolve().then(() => __importStar(global[Symbol.for('ioc.use')]("Adonis/Core/BodyParser")))]);
 Server_1.default.middleware.registerNamed({
-    auth: 'App/Middleware/Auth'
+    auth: "App/Middleware/Auth",
 });
 Event_1.default.on('db:query', function ({ sql, bindings }) {
     console.log(sql, bindings);

@@ -8,45 +8,67 @@ const Hash_1 = __importDefault(global[Symbol.for('ioc.use')]("Adonis/Core/Hash")
 const User_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/User"));
 const Funcionario_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/Funcionario"));
 const Database_1 = __importDefault(global[Symbol.for('ioc.use')]("Adonis/Lucid/Database"));
-const loginSchema = Validator_1.schema.create({
+const GlobalController_1 = __importDefault(require("./GlobalController"));
+const userSchema = Validator_1.schema.create({
     cpf: Validator_1.schema.string(),
     id_empresa: Validator_1.schema.number(),
-    senha: Validator_1.schema.string()
-});
-const changePassword = Validator_1.schema.create({
-    senha_atual: Validator_1.schema.string(),
-    senha_nova: Validator_1.schema.string()
+    senha: Validator_1.schema.string(),
 });
 class AuthController {
+    constructor() {
+        this.getEmployee = async (cpf, id_empresa) => {
+            const funcionario = await Funcionario_1.default.query()
+                .where("cpf", cpf)
+                .where("id_empresa", id_empresa)
+                .whereNot("id_situacao", 2)
+                .first();
+            return funcionario;
+        };
+        this.getUser = async (funcionario) => {
+            const user = await User_1.default.query()
+                .where("id_funcionario", funcionario.id_funcionario)
+                .where("id_empresa", funcionario.id_empresa)
+                .first();
+            return user;
+        };
+        this.verifyPassword = async (user, senha) => {
+            return await Hash_1.default.verify(user.senha, senha);
+        };
+        this.getEmployeeById = async (id_funcionario) => {
+            const queryGetUser = `
+      SELECT usu.id_usuario,usu.id_status,func.id_funcionario,
+      func.id_grupo,func.id_empresa,func.nome,func.cpf,
+      func.id_funcionario_erp,
+      func.celular,func.email,func.dt_nascimento
+      FROM ml_fol_funcionario func
+        INNER JOIN ml_usu_usuario usu ON (usu.id_funcionario = func.id_funcionario)
+      WHERE func.id_funcionario = ${id_funcionario}`;
+            let dadosFuncionario = await Database_1.default.connection("pg").rawQuery(queryGetUser);
+            return dadosFuncionario.rows[0];
+        };
+    }
     async login({ request, response, auth }) {
         try {
-            await request.validate({ schema: loginSchema });
+            await request.validate({ schema: userSchema });
             const { cpf, id_empresa, senha } = request.body();
-            const funcionario = await Funcionario_1.default
-                .query()
-                .where('cpf', cpf)
-                .where('id_empresa', id_empresa)
-                .where('id_situacao', 1)
-                .first();
-            if (funcionario) {
-                const usuario = await User_1.default
-                    .query()
-                    .where('id_funcionario', funcionario.id_funcionario)
-                    .where('id_empresa', funcionario.id_empresa)
-                    .first();
-                if (usuario) {
-                    if (!(await Hash_1.default.verify(usuario.senha, senha))) {
-                        return response.unauthorized({ error: "Dados inválidos" });
-                    }
-                    else {
-                        const token = await auth.use('api').generate(usuario);
-                        return token;
-                    }
-                }
+            const employee = await this.getEmployee(cpf, id_empresa);
+            if (!employee) {
+                return response.unauthorized({ error: "Funcionário inválido" });
             }
-            else {
-                response.json({ error: "Dados inválidos" });
+            if (employee.id_situacao === 2) {
+                return response.unauthorized({ error: "Funcionário Inativo" });
             }
+            const user = await this.getUser(employee);
+            if (!user) {
+                return response.unauthorized({ error: "Usuário inválido" });
+            }
+            const isValidPassword = await this.verifyPassword(user, senha);
+            if (!isValidPassword) {
+                return response.unauthorized({ error: "Dados inválidos" });
+            }
+            response.json(await auth.use("api").generate(user, {
+                expiresIn: "10 days",
+            }));
         }
         catch (error) {
             response.badRequest(error.messages);
@@ -58,85 +80,65 @@ class AuthController {
         }
     }
     async me({ auth, response }) {
-        let dadosFuncionario = await Database_1.default
-            .connection('pg')
-            .rawQuery(`
-                        SELECT
-                        usu.id_usuario,
-                        usu.id_status,
-                        func.id_funcionario,
-                        func.id_grupo,
-                        func.id_empresa,
-                        func.nome,
-                        func.cpf,
-                        func.celular,
-                        func.email,
-                        func.cnh_validade,
-                        func.dt_nascimento
-                        FROM ml_fol_funcionario func
-                            INNER JOIN ml_usu_usuario usu ON (usu.id_funcionario = func.id_funcionario)
-                        WHERE func.id_funcionario = ${auth.user?.id_funcionario}`);
-        let departamentos = await Database_1.default.connection('pg').rawQuery(`
-            SELECT fa.id_area,ar.area 
-            FROM ml_ctr_funcionario_area fa INNER JOIN ml_ctr_programa_area ar ON (fa.id_area = ar.id_area)
-            WHERE fa.id_funcionario = ${auth.user?.id_funcionario}
-        `);
-        let user = dadosFuncionario.rows[0];
-        return response.json({
-            user,
-            departamentos: departamentos.rows
-        });
+        const global = new GlobalController_1.default();
+        if (auth.user) {
+            const [departments, user] = await Promise.all([
+                global.getDepartments(auth.user.id_funcionario),
+                this.getEmployeeById(auth.user.id_funcionario),
+            ]);
+            return response.json({
+                user,
+                departamentos: departments,
+            });
+        }
     }
     async change({ auth, request, response }) {
         try {
+            const changePassword = Validator_1.schema.create({
+                senha_atual: Validator_1.schema.string(),
+                senha_nova: Validator_1.schema.string(),
+            });
             await request.validate({ schema: changePassword });
             let dados = request.body();
-            if (await Hash_1.default.verify(auth.user?.senha, dados.senha_atual)) {
-                auth.user.senha = dados.senha_nova;
-                auth.user.save();
-                response.json({ sucess: 'Senha Atualizada com sucesso' });
+            if (auth.user) {
+                if (await Hash_1.default.verify(auth.user.senha, dados.senha_atual)) {
+                    auth.user.senha = dados.senha_nova;
+                    auth.user.save();
+                    response.json({ sucess: "Senha Atualizada com sucesso" });
+                }
+                else {
+                    response.badRequest({ error: "Dados inválidos" });
+                }
             }
             else {
-                response.badRequest({ error: 'Dados inválidos' });
+                response.badRequest({ error: "Usuário inválido" });
             }
         }
         catch (error) {
             response.json(error);
         }
     }
-    async recovery({ auth, request, response }) {
+    async recovery({ request, response }) {
         try {
-            await request.validate({ schema: Validator_1.schema.create({
-                    cpf: Validator_1.schema.string(),
-                    id_empresa: Validator_1.schema.number(),
-                    senha: Validator_1.schema.string()
-                }) });
-            let dados = request.body();
-            let funcionario = await Funcionario_1.default
-                .query()
-                .select('id_funcionario')
-                .select('cpf')
-                .select('nome')
-                .select('celular')
-                .select('dt_nascimento')
-                .where('cpf', '=', dados.cpf)
-                .where('id_empresa', '=', dados.id_empresa)
-                .where('ml_fol_funcionario.id_situacao', '=', 1)
+            const dados = await request.validate({ schema: userSchema });
+            const funcionario = await Funcionario_1.default.query()
+                .where({
+                cpf: dados.cpf,
+                id_empresa: dados.id_empresa,
+            })
+                .whereNot("ml_fol_funcionario.id_situacao", "=", 2)
+                .select("id_funcionario", "cpf", "nome", "celular", "dt_nascimento")
                 .first();
-            if (funcionario) {
-                let usuario = await User_1.default.findBy('id_funcionario', funcionario.id_funcionario);
-                if (usuario) {
-                    usuario.senha = dados.senha;
-                    usuario.save();
-                    response.json({ sucess: 'Senha alterada com sucesso' });
-                }
-                else {
-                    response.json({ error: 'Usuário não encontrado' });
-                }
+            if (!funcionario) {
+                return response.json({ error: "Dados inválidos" });
             }
-            else {
-                response.json({ error: 'Dados inválidos' });
+            const usuario = await User_1.default.findBy("id_funcionario", funcionario.id_funcionario);
+            if (!usuario) {
+                return response.json({ error: "Usuário não encontrado" });
             }
+            usuario.senha = dados.senha;
+            await usuario.save();
+            response.json({ success: "Senha alterada com sucesso" });
         }
         catch (error) {
             response.json(error.messages);

@@ -10,26 +10,26 @@ const Veiculo_2 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/Veic
 const Empresa_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/Empresa"));
 const crypto_1 = __importDefault(require("crypto"));
 class VeiculosController {
-    async create({ request, response, auth }) {
+    async create({ request, response }) {
         try {
             await request.validate({ schema: Validator_1.schema.create(Veiculo_1.VeiculoSchemaInsert) });
             const dados = request.body();
-            const file = request.file('foto');
-            let veiculo = await Veiculo_2.default.findBy('chassi', dados.chassi);
+            const file = request.file("foto");
+            let veiculo = await Veiculo_2.default.findBy("chassi", dados.chassi);
             if (veiculo) {
                 response.badRequest({ error: "Veículo já cadastrado" });
             }
             else {
-                let empresa = await Empresa_1.default.findBy('id_empresa', dados.id_empresa);
-                let hashImg = crypto_1.default.randomBytes(10).toString('hex');
+                let empresa = await Empresa_1.default.findBy("id_empresa", dados.id_empresa);
+                let hashImg = crypto_1.default.randomBytes(10).toString("hex");
                 let filename = `${hashImg}-${file?.clientName}`;
                 let s3Object = await (0, S3_1.upload)({
-                    folder: 'fotos_veiculo',
+                    folder: "fotos_veiculo",
                     filename: filename,
                     bucket: empresa?.bucket,
                     path: filename,
                     file: file,
-                    type: file?.extname
+                    type: file?.extname,
                 });
                 await Veiculo_2.default.create({
                     chassi: dados.chassi,
@@ -45,7 +45,7 @@ class VeiculosController {
                     media_consumo: dados.media_consumo,
                     id_status: dados.id_status,
                     id_destinacao: dados.id_destinacao,
-                    foto: s3Object.Location
+                    foto: s3Object.Location,
                 });
                 response.json({ sucess: "Inserido com sucesso" });
             }
@@ -54,11 +54,11 @@ class VeiculosController {
             response.badRequest(error.messages);
         }
     }
-    async update({ request, response, auth }) {
+    async update({ request, response }) {
         try {
             await request.validate({ schema: Validator_1.schema.create(Veiculo_1.VeiculoSchemaUpdate) });
             let dados = request.body();
-            let veiculo = await Veiculo_2.default.findBy('id_veiculo', dados.id_veiculo);
+            let veiculo = await Veiculo_2.default.findBy("id_veiculo", dados.id_veiculo);
             if (veiculo) {
                 veiculo.merge(dados);
                 veiculo.save();
@@ -75,9 +75,7 @@ class VeiculosController {
     async getById({ request, response }) {
         const { id_veiculo } = request.body();
         if (id_veiculo) {
-            const veiculo = await Veiculo_2.default
-                .query()
-                .where('id_veiculo', id_veiculo);
+            const veiculo = await Veiculo_2.default.query().where("id_veiculo", id_veiculo);
             if (veiculo) {
                 response.json(veiculo);
             }
@@ -90,9 +88,7 @@ class VeiculosController {
         }
     }
     async getAll({ response }) {
-        let veiculos = await Veiculo_2.default
-            .query()
-            .preload('garagem');
+        let veiculos = await Veiculo_2.default.query().preload("garagem");
         response.json(veiculos);
     }
 }
