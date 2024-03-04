@@ -223,8 +223,10 @@ export default class DotCardPdf {
 
       fs.unlink(pdfTemp.filename, () => {});
       response.json({
-        pdf: file.Location,
-        confirmado: confirmacao[0] ? true : false,
+        data: {
+          pdf: file.Location,
+          confirmado: confirmacao[0] ? true : false,
+        },
       });
     } catch (error) {
       response.badRequest(error);

@@ -163,8 +163,10 @@ class DotCardPdf {
             }
             fs_1.default.unlink(pdfTemp.filename, () => { });
             response.json({
-                pdf: file.Location,
-                confirmado: confirmacao[0] ? true : false,
+                data: {
+                    pdf: file.Location,
+                    confirmado: confirmacao[0] ? true : false,
+                },
             });
         }
         catch (error) {
