@@ -84,6 +84,11 @@ class DotCardPdf {
         });
         return dadosTemp;
     }
+    getLastDayOfMonth(year, month) {
+        const dt = luxon_1.DateTime.local(year, month);
+        const lastDay = dt.endOf("month").day;
+        return lastDay;
+    }
     async dotCardPdfGenerator({ request, response, auth, }) {
         try {
             const dados = request.body();
@@ -94,13 +99,32 @@ class DotCardPdf {
             }
             const data = `${dados.data.year}/${dados.data.month}`;
             const competencia = `${dados.data.month}/${dados.data.year}`;
-            const dateRequestInitial = luxon_1.DateTime.fromISO(new Date(`${data}/27`).toISOString().replace(".000Z", ""))
-                .minus({ months: 1 })
+            const firstDay = "01";
+            let lastDay = this.getLastDayOfMonth(+dados.data.year, +dados.data.month);
+            let dateRequestInitial = luxon_1.DateTime.fromISO(new Date(`${data}/${firstDay}`).toISOString().replace(".000Z", ""))
                 .toFormat("dd-LL-yyyy")
                 .toString();
-            const dateRequestFinish = luxon_1.DateTime.fromISO(new Date(`${data}/26`).toISOString().replace(".000Z", ""))
+            let dateRequestFinish = luxon_1.DateTime.fromISO(new Date(`${data}/${lastDay}`).toISOString().replace(".000Z", ""))
                 .toFormat("dd-LL-yyyy")
                 .toString();
+            if (+dados.data.year < 2024 ||
+                (+dados.data.year === 2024 && +dados.data.month < 2)) {
+                dateRequestInitial = luxon_1.DateTime.fromISO(new Date(`${data}/27`).toISOString().replace(".000Z", ""))
+                    .minus({ months: 1 })
+                    .toFormat("dd-LL-yyyy")
+                    .toString();
+                dateRequestFinish = luxon_1.DateTime.fromISO(new Date(`${data}/26`).toISOString().replace(".000Z", ""))
+                    .toFormat("dd-LL-yyyy")
+                    .toString();
+            }
+            if (competencia === "02/2024") {
+                dateRequestInitial = luxon_1.DateTime.fromISO(new Date(`${data}/27`).toISOString().replace(".000Z", ""))
+                    .toFormat("dd-LL-yyyy")
+                    .toString();
+                dateRequestFinish = luxon_1.DateTime.fromISO(new Date(`${data}/29`).toISOString().replace(".000Z", ""))
+                    .toFormat("dd-LL-yyyy")
+                    .toString();
+            }
             const isMonthReleased = await this.isMonthFreedom(auth.user?.id_empresa, 1, competencia);
             if (!isMonthReleased) {
                 return response.badRequest({
