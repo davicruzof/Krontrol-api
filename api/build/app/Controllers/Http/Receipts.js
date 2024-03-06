@@ -612,13 +612,7 @@ class Receipts {
                 Operadora: ${item.OPERADORA}
               </div>
               <div style="font-size: 10px; margin-left: 4px;">
-                CPF: ${item.CPF}
-              </div>
-              <div style="font-size: 10px; margin-left: 4px;">
-                NOME: ${item.DEPENDENTE}
-              </div>
-              <div style="font-size: 10px; margin-left: 4px;">
-                Valor: ${valor}
+                CPF: ${item.CPF} NOME: ${item.DEPENDENTE} Valor: ${valor}
               </div>
             </div>
           `;
@@ -653,7 +647,7 @@ class Receipts {
           </div>
         </div>
 
-        <b style="font-size: 14px; margin-top: 8px;">8. RESPONSAVEL PELAS INFORMACOES</b>
+        <b style="font-size: 14px; margin-top: 16px;">8. RESPONSAVEL PELAS INFORMACOES</b>
 
         <table>
             <tr style="width: 100%;">
