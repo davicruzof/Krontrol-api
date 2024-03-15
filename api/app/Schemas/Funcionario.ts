@@ -1,46 +1,46 @@
-
-import { schema } from '@ioc:Adonis/Core/Validator';
-
+import { schema } from "@ioc:Adonis/Core/Validator";
 
 export const FuncionarioSchemaInsert = {
-    id_grupo: schema.number(),
+  id_grupo: schema.number(),
 
-    id_empresa: schema.number(),
+  id_empresa: schema.number(),
 
-    nome : schema.string(),
+  nome: schema.string(),
 
-    registro : schema.string.nullable(),
+  registro: schema.string.nullable(),
 
-    id_funcionario_erp : schema.number.nullable(),
+  id_funcionario_erp: schema.number.nullable(),
 
-    id_funcao : schema.number(),
+  id_funcionario_erp_anterior: schema.number.nullable(),
 
-    id_cnh : schema.number.nullable(),
+  id_funcao: schema.number(),
 
-    cpf: schema.string(),
+  id_cnh: schema.number.nullable(),
 
-    celular : schema.string(),
+  cpf: schema.string(),
 
-    email : schema.string(),
+  celular: schema.string(),
 
-    rfid : schema.string.nullable(),
+  email: schema.string(),
 
-    id_situacao : schema.number.nullable(),
+  rfid: schema.string.nullable(),
 
-    cnh_emissao : schema.date.nullable(),
+  id_situacao: schema.number.nullable(),
 
-    id_funcionario_cadastro : schema.date.nullable(),
+  cnh_emissao: schema.date.nullable(),
 
-    dt_nascimento : schema.date(),    
+  id_funcionario_cadastro: schema.date.nullable(),
 
-    id_sexo : schema.number(),
-    
-    pis : schema.string()
-}
+  dt_nascimento: schema.date(),
+
+  id_sexo: schema.number(),
+
+  pis: schema.string(),
+};
 
 export const updateProfileFuncionario = {
-    nome: schema.string.nullableAndOptional(),
-    dt_nascimento: schema.date.nullableAndOptional(),
-    email: schema.string.nullableAndOptional(),
-    celular: schema.string.nullableAndOptional()
-}
+  nome: schema.string.nullableAndOptional(),
+  dt_nascimento: schema.date.nullableAndOptional(),
+  email: schema.string.nullableAndOptional(),
+  celular: schema.string.nullableAndOptional(),
+};

@@ -8,6 +8,7 @@ exports.FuncionarioSchemaInsert = {
     nome: Validator_1.schema.string(),
     registro: Validator_1.schema.string.nullable(),
     id_funcionario_erp: Validator_1.schema.number.nullable(),
+    id_funcionario_erp_anterior: Validator_1.schema.number.nullable(),
     id_funcao: Validator_1.schema.number(),
     id_cnh: Validator_1.schema.number.nullable(),
     cpf: Validator_1.schema.string(),
@@ -19,12 +20,12 @@ exports.FuncionarioSchemaInsert = {
     id_funcionario_cadastro: Validator_1.schema.date.nullable(),
     dt_nascimento: Validator_1.schema.date(),
     id_sexo: Validator_1.schema.number(),
-    pis: Validator_1.schema.string()
+    pis: Validator_1.schema.string(),
 };
 exports.updateProfileFuncionario = {
     nome: Validator_1.schema.string.nullableAndOptional(),
     dt_nascimento: Validator_1.schema.date.nullableAndOptional(),
     email: Validator_1.schema.string.nullableAndOptional(),
-    celular: Validator_1.schema.string.nullableAndOptional()
+    celular: Validator_1.schema.string.nullableAndOptional(),
 };
 //# sourceMappingURL=Funcionario.js.map
