@@ -118,12 +118,8 @@ class DotCardPdf {
                     .toString();
             }
             if (competencia === "02/2024") {
-                dateRequestInitial = luxon_1.DateTime.fromISO(new Date(`${data}/27`).toISOString().replace(".000Z", ""))
-                    .toFormat("dd-LL-yyyy")
-                    .toString();
-                dateRequestFinish = luxon_1.DateTime.fromISO(new Date(`${data}/29`).toISOString().replace(".000Z", ""))
-                    .toFormat("dd-LL-yyyy")
-                    .toString();
+                dateRequestInitial = "27/01/2024";
+                dateRequestFinish = "29/02/2024";
             }
             const isMonthReleased = await this.isMonthFreedom(auth.user?.id_empresa, 1, competencia);
             if (!isMonthReleased) {
