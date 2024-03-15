@@ -20,7 +20,7 @@ const Cnh_1 = __importDefault(require("./Cnh"));
 const Funcao_1 = __importDefault(require("./Funcao"));
 class Funcionario extends Orm_1.BaseModel {
     static get table() {
-        return 'ml_fol_funcionario';
+        return "ml_fol_funcionario";
     }
 }
 __decorate([
@@ -47,6 +47,10 @@ __decorate([
     (0, Orm_1.column)(),
     __metadata("design:type", Number)
 ], Funcionario.prototype, "id_funcionario_erp", void 0);
+__decorate([
+    (0, Orm_1.column)(),
+    __metadata("design:type", Number)
+], Funcionario.prototype, "id_funcionario_erp_anterior", void 0);
 __decorate([
     (0, Orm_1.column)({ serializeAs: null }),
     __metadata("design:type", Number)
@@ -116,19 +120,19 @@ __decorate([
     __metadata("design:type", Number)
 ], Funcionario.prototype, "id_situacao", void 0);
 __decorate([
-    (0, Orm_1.belongsTo)(() => Situacao_1.default, { foreignKey: 'id_situacao' }),
+    (0, Orm_1.belongsTo)(() => Situacao_1.default, { foreignKey: "id_situacao" }),
     __metadata("design:type", Object)
 ], Funcionario.prototype, "situacao", void 0);
 __decorate([
-    (0, Orm_1.belongsTo)(() => Sexo_1.default, { foreignKey: 'id_sexo' }),
+    (0, Orm_1.belongsTo)(() => Sexo_1.default, { foreignKey: "id_sexo" }),
     __metadata("design:type", Object)
 ], Funcionario.prototype, "sexo", void 0);
 __decorate([
-    (0, Orm_1.belongsTo)(() => Cnh_1.default, { foreignKey: 'id_cnh' }),
+    (0, Orm_1.belongsTo)(() => Cnh_1.default, { foreignKey: "id_cnh" }),
     __metadata("design:type", Object)
 ], Funcionario.prototype, "cnh", void 0);
 __decorate([
-    (0, Orm_1.belongsTo)(() => Funcao_1.default, { foreignKey: 'id_funcao_erp' }),
+    (0, Orm_1.belongsTo)(() => Funcao_1.default, { foreignKey: "id_funcao_erp" }),
     __metadata("design:type", Object)
 ], Funcionario.prototype, "funcao", void 0);
 exports.default = Funcionario;

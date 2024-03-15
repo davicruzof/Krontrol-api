@@ -310,7 +310,7 @@ class Receipts {
                                     TRIM(F.VALORPAGO) AS VALORPAGO,
                                     TRIM(F.SALDOATUAL) AS SALDOATUAL
                                     FROM VW_ML_PON_FICHAPONTO F
-                                    WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
+                                    WHERE ID_FUNCIONARIO_ERP in ('${funcionario?.id_funcionario_erp}', '${funcionario?.id_funcionario_erp_anterior}')
                                     AND DATA_MOVIMENTO BETWEEN to_date('${dateRequestInitial}','DD-MM-YYYY') and to_date('${dateRequestFinish}','DD-MM-YYYY')
                                     ORDER BY BH_COMPETENCIA, DATA_MOVIMENTO
                       `);
@@ -325,7 +325,7 @@ class Receipts {
           SELECT DISTINCT EVENTO, TRIM(HR_DIA) as HR_DIA
           FROM
             VW_ML_PON_RESUMO_HOLERITE FH
-          WHERE FH.ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
+          WHERE FH.ID_FUNCIONARIO_ERP in ('${funcionario?.id_funcionario_erp}', '${funcionario?.id_funcionario_erp_anterior}')
           AND FH.COMPETENCIA = '${competencia}'
         `);
             }
@@ -466,7 +466,7 @@ class Receipts {
                                     TIPOEVEN
                                     FROM  globus.vw_flp_fichaeventosrecibo hol
                                 WHERE
-                                hol.codintfunc = ${funcionario?.id_funcionario_erp} and to_char(competficha, 'MM/YYYY') = '${competencia}'
+                                hol.codintfunc in ('${funcionario?.id_funcionario_erp}', '${funcionario?.id_funcionario_erp_anterior}') and to_char(competficha, 'MM/YYYY') = '${competencia}'
                                 and hol.TIPOFOLHA = 5
                                 order by hol.tipoeven desc,hol.codevento asc
                                 `);
@@ -514,7 +514,7 @@ class Receipts {
             const funcionario = await Funcionario_1.default.findBy("id_funcionario", auth.user?.id_funcionario);
             const dadosIRPF = await Database_1.default.connection("oracle").rawQuery(`
         SELECT * FROM GUDMA.VW_ML_FLP_IRPF
-        WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
+        WHERE ID_FUNCIONARIO_ERP in ('${funcionario?.id_funcionario_erp}', '${funcionario?.id_funcionario_erp_anterior}')
         AND ANO = '${ano}'
       `);
             if (!dadosIRPF || dadosIRPF.length == 0) {
@@ -527,7 +527,7 @@ class Receipts {
             dadosIRPF[0].RESPONSAVEL = empresa?.responsavel_irpf;
             const dadosIRPFDecimo = await Database_1.default.connection("oracle").rawQuery(`
         SELECT * FROM GUDMA.VW_ML_FLP_IRPF_DECIMO
-        WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
+        WHERE ID_FUNCIONARIO_ERP in ('${funcionario?.id_funcionario_erp}', '${funcionario?.id_funcionario_erp_anterior}')
         AND ANO_REFERENCIA = '${ano}'
       `);
             if (dadosIRPFDecimo.length > 0) {
@@ -549,7 +549,7 @@ class Receipts {
             const dadosIRPFPrecuniario = await Database_1.default.connection("oracle")
                 .rawQuery(`
         SELECT * FROM GUDMA.VW_ML_IRPF_PECUNIARIO
-        WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
+        WHERE ID_FUNCIONARIO_ERP in ('${funcionario?.id_funcionario_erp}', '${funcionario?.id_funcionario_erp_anterior}')
         AND ANO_CALENDARIO = '${ano}'
       `);
             if (dadosIRPFPrecuniario && dadosIRPFPrecuniario.length > 0) {
@@ -560,7 +560,7 @@ class Receipts {
             }
             const dadosIRPFPLR = await Database_1.default.connection("oracle").rawQuery(`
         SELECT * FROM GUDMA.VW_ML_IRPF_PLR
-        WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
+        WHERE ID_FUNCIONARIO_ERP in ('${funcionario?.id_funcionario_erp}', '${funcionario?.id_funcionario_erp_anterior}')
         AND ANO_CALENDARIO = '${ano}'
       `);
             if (dadosIRPFPLR && dadosIRPFPLR.length > 0) {
@@ -571,7 +571,7 @@ class Receipts {
             }
             const dadosIRPASSMEDTIT = await Database_1.default.connection("oracle").rawQuery(`
         SELECT * FROM GUDMA.VW_ML_IRPF_ASSMED_TIT
-        WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
+        WHERE ID_FUNCIONARIO_ERP in ('${funcionario?.id_funcionario_erp}', '${funcionario?.id_funcionario_erp_anterior}')
         AND ANO_CALENDARIO = '${ano}'
       `);
             let med = "";
@@ -594,7 +594,7 @@ class Receipts {
             }
             const dadosIRPASSMEDDEP = await Database_1.default.connection("oracle").rawQuery(`
         SELECT * FROM GUDMA.VW_ML_IRPF_ASSMED_DEP
-        WHERE ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
+        WHERE ID_FUNCIONARIO_ERP in ('${funcionario?.id_funcionario_erp}', '${funcionario?.id_funcionario_erp_anterior}')
         AND ANO_CALENDARIO = '${ano}'
       `);
             let medDep = "";

@@ -163,7 +163,7 @@ class DotCardPdf {
           SELECT DISTINCT EVENTO, TRIM(HR_DIA) as HR_DIA
           FROM
             VW_ML_PON_RESUMO_HOLERITE FH
-          WHERE FH.ID_FUNCIONARIO_ERP = '${funcionario?.id_funcionario_erp}'
+          WHERE FH.ID_FUNCIONARIO_ERP in ('${funcionario?.id_funcionario_erp}', '${funcionario?.id_funcionario_erp_anterior}')
           AND FH.COMPETENCIA = '${competencia}'
         `);
             }
