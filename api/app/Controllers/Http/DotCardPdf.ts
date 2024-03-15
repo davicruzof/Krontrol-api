@@ -144,17 +144,8 @@ export default class DotCardPdf {
       }
 
       if (competencia === "02/2024") {
-        dateRequestInitial = DateTime.fromISO(
-          new Date(`${data}/27`).toISOString().replace(".000Z", "")
-        )
-          .toFormat("dd-LL-yyyy")
-          .toString();
-
-        dateRequestFinish = DateTime.fromISO(
-          new Date(`${data}/29`).toISOString().replace(".000Z", "")
-        )
-          .toFormat("dd-LL-yyyy")
-          .toString();
+        dateRequestInitial = "27/01/2024";
+        dateRequestFinish = "29/02/2024";
       }
 
       const isMonthReleased = await this.isMonthFreedom(
