@@ -28,14 +28,11 @@ export default class OthersController {
       const resultAuth = await api.post(`/Login/Autenticar?token=${TOKEN}`);
 
       if (resultAuth.data) {
-        const dados = await api.get(
-          `/Posicao/Garagem?codigoEmpresa=${id_empresa}`,
-          {
-            headers: {
-              Cookie: resultAuth.headers["set-cookie"],
-            },
-          }
-        );
+        const dados = await api.get(`/Posicao?codigoEmpresa=${id_empresa}`, {
+          headers: {
+            Cookie: resultAuth.headers["set-cookie"],
+          },
+        });
 
         return dados.data;
       }

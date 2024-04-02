@@ -23,7 +23,7 @@ class OthersController {
             const id_empresa = await this.getEnterpriseId(auth);
             const resultAuth = await api.post(`/Login/Autenticar?token=${TOKEN}`);
             if (resultAuth.data) {
-                const dados = await api.get(`/Posicao/Garagem?codigoEmpresa=${id_empresa}`, {
+                const dados = await api.get(`/Posicao?codigoEmpresa=${id_empresa}`, {
                     headers: {
                         Cookie: resultAuth.headers["set-cookie"],
                     },
