@@ -212,6 +212,7 @@ Route.group(() => {
   //Outras rotas
   Route.group(() => {
     Route.get("/position", "OthersController.getPositions");
+    Route.post("/searchVehicle", "OthersController.searchVehicle");
   })
     .prefix("/others")
     .middleware("auth");

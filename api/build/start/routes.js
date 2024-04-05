@@ -126,6 +126,7 @@ Route_1.default.group(() => {
         .middleware("auth");
     Route_1.default.group(() => {
         Route_1.default.get("/position", "OthersController.getPositions");
+        Route_1.default.post("/searchVehicle", "OthersController.searchVehicle");
     })
         .prefix("/others")
         .middleware("auth");

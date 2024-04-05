@@ -36,6 +36,90 @@ class OthersController {
             response.badRequest({ error: "Erro interno 2" });
         }
     }
+    async searchVehicle({ response, auth, request }) {
+        try {
+            const { prefix } = request.body();
+            if (!prefix) {
+                response.badRequest({ error: "Prefixo não informado" });
+            }
+            const id_empresa = await this.getEnterpriseId(auth);
+            const resultAuth = await api.post(`/Login/Autenticar?token=${TOKEN}`);
+            if (resultAuth.data) {
+                const positionsGarage = await this.getPositionsGarage(resultAuth, id_empresa, +prefix);
+                if (positionsGarage !== null) {
+                    return response.json({
+                        positions: positionsGarage,
+                        success: true,
+                    });
+                }
+                else {
+                    const positionsStreet = await this.getPositionsStreet(resultAuth, id_empresa, +prefix);
+                    if (positionsStreet !== null) {
+                        return response.json({
+                            positions: positionsStreet,
+                            success: true,
+                        });
+                    }
+                }
+                return response.json({
+                    success: false,
+                    errorMessage: "Prefixo não encontrado",
+                });
+            }
+            return response.json({
+                success: false,
+            });
+        }
+        catch (error) {
+            response.badRequest({ error: "Erro interno 2" });
+        }
+    }
+    async getPositionsGarage(resultAuth, id_empresa, prefix) {
+        try {
+            const data = await this.getListPrefix(resultAuth, id_empresa, "garage");
+            if (data) {
+                const result = this.searchPrefix(prefix, data.l);
+                return result?.a ? result : null;
+            }
+            return null;
+        }
+        catch (error) {
+            return error;
+        }
+    }
+    async getPositionsStreet(resultAuth, id_empresa, prefix) {
+        try {
+            const data = await this.getListPrefix(resultAuth, id_empresa, "street");
+            if (data) {
+                const result = this.searchPrefix(prefix, data.l);
+                return result?.a ? result : null;
+            }
+            return null;
+        }
+        catch (error) {
+            return error;
+        }
+    }
+    async getListPrefix(resultAuth, id_empresa, type) {
+        const url = type === "street" ? "/Posicao" : "/Posicao/Garagem";
+        const { data } = await api.get(`${url}?codigoEmpresa=${id_empresa}`, {
+            headers: {
+                Cookie: resultAuth.headers["set-cookie"],
+            },
+        });
+        return data;
+    }
+    searchPrefix(prefix, items) {
+        let result = {};
+        items.map((item) => {
+            item.vs.filter((v) => {
+                if (v.p === prefix) {
+                    result = v;
+                }
+            });
+        });
+        return result;
+    }
 }
 exports.default = OthersController;
 //# sourceMappingURL=OthersController.js.map
