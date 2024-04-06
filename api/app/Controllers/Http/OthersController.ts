@@ -33,6 +33,17 @@ export interface V {
   is?: any;
 }
 
+interface returnLocation {
+  linha: string;
+  prefixo: number;
+  sentido: number;
+  data: string;
+  coordinates: {
+    latitude: number;
+    longitude: number;
+  };
+}
+
 export default class OthersController {
   private async getEnterpriseId(auth: AuthContract) {
     const params = await Database.connection("pg").rawQuery(`
@@ -125,7 +136,7 @@ export default class OthersController {
       if (data) {
         const result = this.searchPrefix(prefix, data.l);
 
-        return result?.a ? result : null;
+        return result.linha ? result : null;
       }
 
       return null;
@@ -145,7 +156,7 @@ export default class OthersController {
       if (data) {
         const result = this.searchPrefix(prefix, data.l);
 
-        return result?.a ? result : null;
+        return result.linha ? result : null;
       }
 
       return null;
@@ -169,16 +180,34 @@ export default class OthersController {
     return data;
   }
 
-  private searchPrefix(prefix: number, items: RootInterface[]): V {
-    let result: V = {} as V;
+  private searchPrefix(prefix: number, items: RootInterface[]): returnLocation {
+    let result: returnLocation = {} as returnLocation;
     items.map((item) => {
       item.vs.filter((v) => {
         if (v.p === prefix) {
-          result = v;
+          result = {
+            linha: item.c,
+            prefixo: v.p,
+            sentido: item.sl,
+            data: this.formatDate(v.ta),
+            coordinates: {
+              latitude: v.py,
+              longitude: v.px,
+            },
+          };
         }
       });
     });
 
     return result;
+  }
+
+  private formatDate(dateString: string): string {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // Os meses são indexados a partir de 0
+    const year = date.getFullYear();
+
+    return `${day}-${month}-${year}`;
   }
 }

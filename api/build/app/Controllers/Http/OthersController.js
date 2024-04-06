@@ -79,7 +79,7 @@ class OthersController {
             const data = await this.getListPrefix(resultAuth, id_empresa, "garage");
             if (data) {
                 const result = this.searchPrefix(prefix, data.l);
-                return result?.a ? result : null;
+                return result.linha ? result : null;
             }
             return null;
         }
@@ -92,7 +92,7 @@ class OthersController {
             const data = await this.getListPrefix(resultAuth, id_empresa, "street");
             if (data) {
                 const result = this.searchPrefix(prefix, data.l);
-                return result?.a ? result : null;
+                return result.linha ? result : null;
             }
             return null;
         }
@@ -114,11 +114,27 @@ class OthersController {
         items.map((item) => {
             item.vs.filter((v) => {
                 if (v.p === prefix) {
-                    result = v;
+                    result = {
+                        linha: item.c,
+                        prefixo: v.p,
+                        sentido: item.sl,
+                        data: this.formatDate(v.ta),
+                        coordinates: {
+                            latitude: v.py,
+                            longitude: v.px,
+                        },
+                    };
                 }
             });
         });
         return result;
+    }
+    formatDate(dateString) {
+        const date = new Date(dateString);
+        const day = String(date.getDate()).padStart(2, "0");
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const year = date.getFullYear();
+        return `${day}-${month}-${year}`;
     }
 }
 exports.default = OthersController;
