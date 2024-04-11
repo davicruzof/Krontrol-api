@@ -118,8 +118,8 @@ class DotCardPdf {
                     .toString();
             }
             if (competencia === "02/2024") {
-                dateRequestInitial = "27/01/2024";
-                dateRequestFinish = "29/02/2024";
+                dateRequestInitial = "27-01-2024";
+                dateRequestFinish = "29-02-2024";
             }
             const isMonthReleased = await this.isMonthFreedom(auth.user?.id_empresa, 1, competencia);
             if (!isMonthReleased) {
