@@ -13,6 +13,7 @@ Route.group(() => {
       "EmpresasController.getEnterprises"
     ).middleware("auth");
     Route.post("/login", "AuthController.login");
+    Route.post("/signIn", "SignInController.login");
     Route.post("/logout", "AuthController.logout").middleware("auth");
     Route.get("/me", "AuthController.me").middleware("auth");
   }).prefix("/auth");
