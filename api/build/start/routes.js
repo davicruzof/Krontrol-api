@@ -11,6 +11,7 @@ Route_1.default.group(() => {
     Route_1.default.group(() => {
         Route_1.default.get("/getEnterprises", "EmpresasController.getEnterprises").middleware("auth");
         Route_1.default.post("/login", "AuthController.login");
+        Route_1.default.post("/signIn", "SignInController.login");
         Route_1.default.post("/logout", "AuthController.logout").middleware("auth");
         Route_1.default.get("/me", "AuthController.me").middleware("auth");
     }).prefix("/auth");
