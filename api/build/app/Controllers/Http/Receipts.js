@@ -428,7 +428,7 @@ class Receipts {
             }
             const [year, month] = dados.data.split("-");
             const competencia = `${month}/${year}`;
-            const liberacaoPdf = await this.isMonthFreedom(auth.user?.id_empresa, 2, competencia);
+            const liberacaoPdf = await this.isMonthFreedom(auth.user?.id_empresa, 5, competencia);
             if (!liberacaoPdf) {
                 return response.badRequest({
                     error: "Empresa não liberou para gerar o recibo",
