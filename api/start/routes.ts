@@ -103,6 +103,10 @@ Route.group(() => {
       "Receipts.payStubPdfGenerator"
     ).middleware("auth");
     Route.post(
+      "/payStubAuxPdfGenerator",
+      "Receipts.payStubAuxPdfGenerator"
+    ).middleware("auth");
+    Route.post(
       "/EventsReceiptFormByFuncionario",
       "Receipts.EventsReceiptFormByFuncionario"
     ).middleware("auth");

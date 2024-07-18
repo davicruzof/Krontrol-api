@@ -53,6 +53,7 @@ Route_1.default.group(() => {
     Route_1.default.group(() => {
         Route_1.default.post("/dotCardPdfGenerator", "Receipts.dotCardPdfGenerator").middleware("auth");
         Route_1.default.post("/payStubPdfGenerator", "Receipts.payStubPdfGenerator").middleware("auth");
+        Route_1.default.post("/payStubAuxPdfGenerator", "Receipts.payStubAuxPdfGenerator").middleware("auth");
         Route_1.default.post("/EventsReceiptFormByFuncionario", "Receipts.EventsReceiptFormByFuncionario").middleware("auth");
         Route_1.default.get("/incomeTax/:ano", "Receipts.IncomeTax").middleware("auth");
         Route_1.default.get("/decimoPdf/:ano", "Receipts.decimoPdfGenerator").middleware("auth");
