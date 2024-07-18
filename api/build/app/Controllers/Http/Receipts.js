@@ -154,7 +154,8 @@ class Receipts {
             else if (element.DESCEVEN == "TOTAL DE PROVENTOS") {
                 dadosTemp.totais.PROVENTOS = element.VALORFICHA;
             }
-            else if (element.DESCEVEN == "LIQUIDO DA FOLHA") {
+            else if (element.DESCEVEN == "LIQUIDO DA FOLHA" ||
+                element.DESCEVEN == "LIQUIDO DA FOLHA COMPL") {
                 dadosTemp.totais.LIQUIDO = element.VALORFICHA;
             }
             else if (element.TIPOEVEN != "B") {
