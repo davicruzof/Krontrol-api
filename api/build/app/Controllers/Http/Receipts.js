@@ -463,7 +463,7 @@ class Receipts {
                                     FROM  globus.vw_flp_fichaeventosrecibo hol
                                 WHERE
                                 hol.codintfunc = ${funcionario?.id_funcionario_erp} and to_char(competficha, 'MM/YYYY') = '${competencia}'
-                                and hol.TIPOFOLHA = 1
+                                and hol.TIPOFOLHA = 4
                                 order by hol.tipoeven desc,hol.codevento asc
                                 `);
             const empresa = await Empresa_1.default.findBy("id_empresa", auth.user?.id_empresa);
