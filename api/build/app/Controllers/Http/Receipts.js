@@ -86,48 +86,58 @@ class Receipts {
                 DESCONTOS: 0,
                 PROVENTOS: 0,
                 LIQUIDO: 0,
+                LIQUIDO_PLR: 0,
+                PLR: 0,
             },
             bases: {
                 BASE_FGTS_FOLHA: 0,
                 BASE_INSS_FOLHA: 0,
                 FGTS_FOLHA: 0,
                 BASE_IRRF_FOLHA: 0,
+                BASE_IRRF_PLR: 0,
             },
             descricao: new Array(),
         };
-        const mapeamentoBases = {
-            "BASE FGTS FOLHA": "BASE_FGTS_FOLHA",
-            "LIQUIDO DE PLR": "LIQUIDO_DE_PLR",
-            "BASE IRRF PLR": "BASE_IRRF_PLR",
-            PRL: "PRL",
-            "FGTS FOLHA": "FGTS_FOLHA",
-            "BASE IRRF FOLHA": "BASE_IRRF_FOLHA",
-            "BASE INSS FOLHA": "BASE_INSS_FOLHA",
-        };
-        const mapeamentoTotais = {
-            "TOTAL DE DESCONTOS": "DESCONTOS",
-            "TOTAL DE PROVENTOS": "PROVENTOS",
-        };
         dados.forEach((element) => {
-            if (mapeamentoBases[element.DESCEVEN]) {
-                dadosTemp.bases[mapeamentoBases[element.DESCEVEN]] = element.VALORFICHA;
+            if (element.DESCEVEN == "LIQUIDO PLR") {
+                dadosTemp.totais.LIQUIDO_PLR = element.VALORFICHA;
             }
-            else if (mapeamentoTotais[element.DESCEVEN]) {
-                dadosTemp.totais[mapeamentoTotais[element.DESCEVEN]] =
-                    element.VALORFICHA;
+            else if (element.DESCEVEN == "BASE IRRF PLR") {
+                dadosTemp.bases.BASE_IRRF_PLR = element.VALORFICHA;
             }
-            else if (element.DESCEVEN === "LIQUIDO DA FOLHA" ||
-                element.DESCEVEN === "LIQUIDO DA FOLHA COMPL") {
+            else if (element.DESCEVEN == "PLR") {
+                dadosTemp.totais.PLR = element.VALORFICHA;
+            }
+            else if (element.DESCEVEN == "BASE FGTS FOLHA") {
+                dadosTemp.bases.BASE_FGTS_FOLHA = element.VALORFICHA;
+            }
+            else if (element.DESCEVEN == "FGTS FOLHA") {
+                dadosTemp.bases.FGTS_FOLHA = element.VALORFICHA;
+            }
+            else if (element.DESCEVEN == "BASE IRRF FOLHA") {
+                dadosTemp.bases.BASE_IRRF_FOLHA = element.VALORFICHA;
+            }
+            else if (element.DESCEVEN == "BASE INSS FOLHA") {
+                dadosTemp.bases.BASE_INSS_FOLHA = element.VALORFICHA;
+            }
+            else if (element.DESCEVEN == "TOTAL DE DESCONTOS") {
+                dadosTemp.totais.DESCONTOS = element.VALORFICHA;
+            }
+            else if (element.DESCEVEN == "TOTAL DE PROVENTOS") {
+                dadosTemp.totais.PROVENTOS = element.VALORFICHA;
+            }
+            else if (element.DESCEVEN == "LIQUIDO DA FOLHA" ||
+                element.DESCEVEN == "LIQUIDO DA FOLHA COMPL") {
                 dadosTemp.totais.LIQUIDO = element.VALORFICHA;
             }
-            else if (element.TIPOEVEN !== "B") {
-                if (element.VALORFICHA[0] === ",") {
+            else if (element.TIPOEVEN != "B") {
+                if (element.VALORFICHA[0] == ",") {
                     element.VALORFICHA = "0" + element.VALORFICHA;
                 }
                 element.VALORFICHA = element.VALORFICHA.toLocaleString("pt-BR", {
                     minimumFractionDigits: 2,
                 });
-                if (element.REFERENCIA !== "") {
+                if (element.REFERENCIA != "") {
                     element.REFERENCIA = element.REFERENCIA.toLocaleString("pt-BR", {
                         minimumFractionDigits: 2,
                     });
@@ -385,7 +395,7 @@ class Receipts {
                 return response.badRequest({ error: "Erro ao pegar empresa!" });
             }
             payStub[0].registro = funcionario?.registro;
-            const pdfTemp = await this.generatePdf(this.tratarDadosEvents(payStub, empresa), template_1.templateDotCard);
+            const pdfTemp = await this.generatePdf(this.tratarDadosEvents(payStub, empresa), template_1.templatePayStubPlr);
             const file = await (0, S3_1.uploadPdfEmpresa)(pdfTemp.filename, auth.user?.id_empresa);
             if (!file || !file.Location) {
                 return response.badRequest({ error: "Erro ao gerar url do pdf!" });
