@@ -327,80 +327,43 @@ Route.group(() => {
 
   //Rotas Funcionario
   Route.group(() => {
-    Route.post("/create", "FuncionariosController.create").middleware("auth");
-    Route.post("/getById", "FuncionariosController.getById").middleware("auth");
-    Route.get("/getAll", "FuncionariosController.getAll").middleware("auth");
-    Route.get(
-      "/irpf-avaiables",
-      "FuncionariosController.irpfAvaiables"
-    ).middleware("auth");
-    Route.get(
-      "/vacation-pdf/:competencia",
-      "FuncionariosController.vacation"
-    ).middleware("auth");
-    Route.post("/add-area", "FuncionariosController.addArea").middleware(
-      "auth"
-    );
-    Route.post("/remove-area", "FuncionariosController.removeArea").middleware(
-      "auth"
-    );
-    Route.post(
-      "/updateProfile",
-      "FuncionariosController.updateProfile"
-    ).middleware("auth");
+    Route.post("/create", "FuncionariosController.create");
+    Route.post("/getById", "FuncionariosController.getById");
+    Route.get("/getAll", "FuncionariosController.getAll");
+    Route.get("/irpf-avaiables", "FuncionariosController.irpfAvaiables");
+    Route.get("/vacation-pdf/:competencia", "FuncionariosController.vacation");
+    Route.post("/add-area", "FuncionariosController.addArea");
+    Route.post("/remove-area", "FuncionariosController.removeArea");
+    Route.post("/updateProfile", "FuncionariosController.updateProfile");
     Route.post("/checkByCpf", "FuncionariosController.checkByCpf");
-    Route.post("/dotCard", "FuncionariosController.dotCard").middleware("auth");
-    Route.post(
-      "/confirmDotCard",
-      "FuncionariosController.confirmDotCard"
-    ).middleware("auth");
-    Route.post("/inactivate", "FuncionariosController.inactivate").middleware(
-      "auth"
-    );
-    Route.post(
-      "/deleteAccount",
-      "FuncionariosController.deleteAccount"
-    ).middleware("auth");
-    Route.post("/confirmPdf", "FuncionariosController.confirmPdf").middleware(
-      "auth"
-    );
-    Route.get("/getVideos", "FuncionariosController.getVideos").middleware(
-      "auth"
-    );
-    Route.post(
-      "/confirmVideo",
-      "FuncionariosController.confirmarVideo"
-    ).middleware("auth");
-    Route.get(
-      "/vacationNotice",
-      "FuncionariosController.avisoFerias"
-    ).middleware("auth");
-    Route.get("/params", "FuncionariosController.getParams").middleware("auth");
-  }).prefix("/employee");
+    Route.post("/dotCard", "FuncionariosController.dotCard");
+    Route.post("/confirmDotCard", "FuncionariosController.confirmDotCard");
+    Route.post("/inactivate", "FuncionariosController.inactivate");
+    Route.post("/deleteAccount", "FuncionariosController.deleteAccount");
+    Route.post("/confirmPdf", "FuncionariosController.confirmPdf");
+    Route.get("/getVideos", "FuncionariosController.getVideos");
+    Route.post("/confirmVideo", "FuncionariosController.confirmarVideo");
+    Route.get("/vacationNotice", "FuncionariosController.avisoFerias");
+    Route.get("/params", "FuncionariosController.getParams");
+  })
+    .prefix("/employee")
+    .middleware("auth");
 
   //Rotas Recibos
   Route.group(() => {
-    Route.post(
-      "/dotCardPdfGenerator",
-      "Receipts.dotCardPdfGenerator"
-    ).middleware("auth");
-    Route.post(
-      "/payStubPdfGenerator",
-      "Receipts.payStubPdfGenerator"
-    ).middleware("auth");
-    Route.post(
-      "/payStubAuxPdfGenerator",
-      "Receipts.payStubAuxPdfGenerator"
-    ).middleware("auth");
+    Route.post("/payStubPdfGenerator", "Receipts.payStubPdfGenerator");
+    Route.post("/payStubAuxPdfGenerator", "Receipts.payStubAuxPdfGenerator");
     Route.post(
       "/EventsReceiptFormByFuncionario",
       "Receipts.EventsReceiptFormByFuncionario"
-    ).middleware("auth");
-    Route.get("/incomeTax/:ano", "Receipts.IncomeTax").middleware("auth");
-    Route.get("/decimoPdf/:ano", "Receipts.decimoPdfGenerator").middleware(
-      "auth"
     );
-  }).prefix("/receipts");
+    Route.get("/incomeTax/:ano", "Receipts.IncomeTax");
+    Route.get("/decimoPdf/:ano", "Receipts.decimoPdfGenerator");
+    Route.post("/pointRecord", "PointRecord.pointRecordGenerator");
+    Route.post("/payStubPlr", "Receipts.plrPdfGenerator");
+  })
+    .prefix("/receipts")
+    .middleware("auth");
 
   Route.group(() => {
     Route.post(
@@ -414,15 +377,12 @@ Route.group(() => {
   }).prefix("/AppVersion");
 
   Route.group(() => {
-    Route.get("/", "InformativosController.getInformativos").middleware("auth");
-    Route.get(
-      "/notify",
-      "InformativosController.getInformativosNotify"
-    ).middleware("auth");
-    Route.put("/", "InformativosController.updateInformativo").middleware(
-      "auth"
-    );
-  }).prefix("/informativos");
+    Route.get("/", "InformativosController.getInformativos");
+    Route.get("/notify", "InformativosController.getInformativosNotify");
+    Route.put("/", "InformativosController.updateInformativo");
+  })
+    .prefix("/informativos")
+    .middleware("auth");
 
   //Rotas Veiculos
   Route.group(() => {

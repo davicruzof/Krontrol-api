@@ -210,33 +210,38 @@ Route_1.default.group(() => {
         .prefix("/enterprises")
         .middleware("auth");
     Route_1.default.group(() => {
-        Route_1.default.post("/create", "FuncionariosController.create").middleware("auth");
-        Route_1.default.post("/getById", "FuncionariosController.getById").middleware("auth");
-        Route_1.default.get("/getAll", "FuncionariosController.getAll").middleware("auth");
-        Route_1.default.get("/irpf-avaiables", "FuncionariosController.irpfAvaiables").middleware("auth");
-        Route_1.default.get("/vacation-pdf/:competencia", "FuncionariosController.vacation").middleware("auth");
-        Route_1.default.post("/add-area", "FuncionariosController.addArea").middleware("auth");
-        Route_1.default.post("/remove-area", "FuncionariosController.removeArea").middleware("auth");
-        Route_1.default.post("/updateProfile", "FuncionariosController.updateProfile").middleware("auth");
+        Route_1.default.post("/create", "FuncionariosController.create");
+        Route_1.default.post("/getById", "FuncionariosController.getById");
+        Route_1.default.get("/getAll", "FuncionariosController.getAll");
+        Route_1.default.get("/irpf-avaiables", "FuncionariosController.irpfAvaiables");
+        Route_1.default.get("/vacation-pdf/:competencia", "FuncionariosController.vacation");
+        Route_1.default.post("/add-area", "FuncionariosController.addArea");
+        Route_1.default.post("/remove-area", "FuncionariosController.removeArea");
+        Route_1.default.post("/updateProfile", "FuncionariosController.updateProfile");
         Route_1.default.post("/checkByCpf", "FuncionariosController.checkByCpf");
-        Route_1.default.post("/dotCard", "FuncionariosController.dotCard").middleware("auth");
-        Route_1.default.post("/confirmDotCard", "FuncionariosController.confirmDotCard").middleware("auth");
-        Route_1.default.post("/inactivate", "FuncionariosController.inactivate").middleware("auth");
-        Route_1.default.post("/deleteAccount", "FuncionariosController.deleteAccount").middleware("auth");
-        Route_1.default.post("/confirmPdf", "FuncionariosController.confirmPdf").middleware("auth");
-        Route_1.default.get("/getVideos", "FuncionariosController.getVideos").middleware("auth");
-        Route_1.default.post("/confirmVideo", "FuncionariosController.confirmarVideo").middleware("auth");
-        Route_1.default.get("/vacationNotice", "FuncionariosController.avisoFerias").middleware("auth");
-        Route_1.default.get("/params", "FuncionariosController.getParams").middleware("auth");
-    }).prefix("/employee");
+        Route_1.default.post("/dotCard", "FuncionariosController.dotCard");
+        Route_1.default.post("/confirmDotCard", "FuncionariosController.confirmDotCard");
+        Route_1.default.post("/inactivate", "FuncionariosController.inactivate");
+        Route_1.default.post("/deleteAccount", "FuncionariosController.deleteAccount");
+        Route_1.default.post("/confirmPdf", "FuncionariosController.confirmPdf");
+        Route_1.default.get("/getVideos", "FuncionariosController.getVideos");
+        Route_1.default.post("/confirmVideo", "FuncionariosController.confirmarVideo");
+        Route_1.default.get("/vacationNotice", "FuncionariosController.avisoFerias");
+        Route_1.default.get("/params", "FuncionariosController.getParams");
+    })
+        .prefix("/employee")
+        .middleware("auth");
     Route_1.default.group(() => {
-        Route_1.default.post("/dotCardPdfGenerator", "Receipts.dotCardPdfGenerator").middleware("auth");
-        Route_1.default.post("/payStubPdfGenerator", "Receipts.payStubPdfGenerator").middleware("auth");
-        Route_1.default.post("/payStubAuxPdfGenerator", "Receipts.payStubAuxPdfGenerator").middleware("auth");
-        Route_1.default.post("/EventsReceiptFormByFuncionario", "Receipts.EventsReceiptFormByFuncionario").middleware("auth");
-        Route_1.default.get("/incomeTax/:ano", "Receipts.IncomeTax").middleware("auth");
-        Route_1.default.get("/decimoPdf/:ano", "Receipts.decimoPdfGenerator").middleware("auth");
-    }).prefix("/receipts");
+        Route_1.default.post("/payStubPdfGenerator", "Receipts.payStubPdfGenerator");
+        Route_1.default.post("/payStubAuxPdfGenerator", "Receipts.payStubAuxPdfGenerator");
+        Route_1.default.post("/EventsReceiptFormByFuncionario", "Receipts.EventsReceiptFormByFuncionario");
+        Route_1.default.get("/incomeTax/:ano", "Receipts.IncomeTax");
+        Route_1.default.get("/decimoPdf/:ano", "Receipts.decimoPdfGenerator");
+        Route_1.default.post("/pointRecord", "PointRecord.pointRecordGenerator");
+        Route_1.default.post("/payStubPlr", "Receipts.plrPdfGenerator");
+    })
+        .prefix("/receipts")
+        .middleware("auth");
     Route_1.default.group(() => {
         Route_1.default.post("/dotCardPdfGenerator", "DotCardPdf.dotCardPdfGenerator").middleware("auth");
     }).prefix("/DotCardPdf");
@@ -244,10 +249,12 @@ Route_1.default.group(() => {
         Route_1.default.post("/version", "VersionApp.create").middleware("auth");
     }).prefix("/AppVersion");
     Route_1.default.group(() => {
-        Route_1.default.get("/", "InformativosController.getInformativos").middleware("auth");
-        Route_1.default.get("/notify", "InformativosController.getInformativosNotify").middleware("auth");
-        Route_1.default.put("/", "InformativosController.updateInformativo").middleware("auth");
-    }).prefix("/informativos");
+        Route_1.default.get("/", "InformativosController.getInformativos");
+        Route_1.default.get("/notify", "InformativosController.getInformativosNotify");
+        Route_1.default.put("/", "InformativosController.updateInformativo");
+    })
+        .prefix("/informativos")
+        .middleware("auth");
     Route_1.default.group(() => {
         Route_1.default.post("/create", "VeiculosController.create");
         Route_1.default.post("/getById", "VeiculosController.getById");
