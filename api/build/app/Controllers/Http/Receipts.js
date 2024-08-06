@@ -271,6 +271,69 @@ class Receipts {
             response.json(error);
         }
     }
+    async payStubAuxPdfGenerator({ request, auth, response, }) {
+        try {
+            const dados = request.body();
+            if (!dados.data || !auth.user) {
+                return response.badRequest({ error: "data is required" });
+            }
+            const [year, month] = dados.data.split("-");
+            const competencia = `${month}/${year}`;
+            const liberacaoPdf = await this.isMonthFreedom(auth.user?.id_empresa, 5, competencia);
+            if (!liberacaoPdf) {
+                return response.badRequest({
+                    error: "Empresa não liberou para gerar o recibo",
+                });
+            }
+            const funcionario = await Funcionario_1.default.findBy("id_funcionario", auth.user?.id_funcionario);
+            if (!funcionario) {
+                return response.badRequest({ error: "funcionario não encontrado!" });
+            }
+            const appUpdate = await AppVersion_1.default.findBy("id_funcionario", auth.user?.id_funcionario);
+            if (!appUpdate) {
+                return response.badRequest({ error: "app desatualizado" });
+            }
+            let payStub = await Database_1.default.connection("oracle").rawQuery(`
+                                    SELECT DISTINCT
+                                    to_char(competficha, 'MM-YYYY') as COMPETFICHA,
+                                    CODEVENTO,
+                                    CODINTFUNC,
+                                    to_char(VALORFICHA, 'FM999G999G999D90', 'nls_numeric_characters='',.''') AS VALORFICHA,
+                                    REFERENCIA,
+                                    NOMEFUNC,
+                                    DESCEVEN,
+                                    RSOCIALEMPRESA,
+                                    INSCRICAOEMPRESA,
+                                    DESCFUNCAO,
+                                    CIDADEFL,
+                                    IESTADUALFL,
+                                    ENDERECOFL,
+                                    NUMEROENDFL,
+                                    COMPLENDFL,
+                                    TIPOEVEN
+                                    FROM  globus.vw_flp_fichaeventosrecibo hol
+                                WHERE
+                                hol.codintfunc = ${funcionario?.id_funcionario_erp} and to_char(competficha, 'MM/YYYY') = '${competencia}'
+                                and hol.TIPOFOLHA = 4
+                                order by hol.tipoeven desc,hol.codevento asc
+                                `);
+            const empresa = await Empresa_1.default.findBy("id_empresa", auth.user?.id_empresa);
+            if (!empresa) {
+                return response.badRequest({ error: "Erro ao pegar empresa!" });
+            }
+            payStub[0].registro = funcionario?.registro;
+            const pdfTemp = await this.generatePdf(this.tratarDadosEvents(payStub, empresa), template_1.templateDotCard);
+            const file = await (0, S3_1.uploadPdfEmpresa)(pdfTemp.filename, auth.user?.id_empresa);
+            if (!file || !file.Location) {
+                return response.badRequest({ error: "Erro ao gerar url do pdf!" });
+            }
+            fs_1.default.unlink(pdfTemp.filename, () => { });
+            response.json({ pdf: file.Location });
+        }
+        catch (error) {
+            response.json(error);
+        }
+    }
     async plrPdfGenerator({ request, auth, response, }) {
         try {
             const dados = request.body();
