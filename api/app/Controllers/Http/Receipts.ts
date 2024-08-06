@@ -93,7 +93,7 @@ export default class Receipts {
     };
 
     dados.forEach((element) => {
-      if (element.DESCEVEN == "LIQUIDO PLR") {
+      if (element.DESCEVEN == "LIQUIDO DE PLR") {
         dadosTemp.totais.LIQUIDO_PLR = element.VALORFICHA;
       } else if (element.DESCEVEN == "BASE IRRF PLR") {
         dadosTemp.bases.BASE_IRRF_PLR = element.VALORFICHA;
