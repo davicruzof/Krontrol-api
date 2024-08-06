@@ -689,56 +689,15 @@ exports.templatePayStubPlr = `
             <th style="
                         border: 1px solid black;
                         width: 20%;">
-                Base FGTS
-            </th>
-            <th style="
-                        border: 1px solid black;
-                        width: 20%;">
-                FGTS
-            </th>
-            <th style="
-                        border: 1px solid black;
-                        width: 20%;">
-                Base IRRF
-            </th>
-            <th style="
-                        border: 1px solid black;
-                        width: 20%;">
                 Base IRRF PLR
             </th>
             <th style="
                         border: 1px solid black;
                         width: 20%;">
-                Base INSS
-            </th>
-            <th style="
-                        border: 1px solid black;
-                        width: 20%;">
-                LIQUIDO
+                LIQUIDO PLR
             </th>
         </tr>
         <tr>
-            <td
-                align="right"
-                style="
-                        border: 1px solid black;
-                        width: 16%;">
-                {{ dados.bases.BASE_FGTS_FOLHA }}
-            </td>
-            <td
-                align="right"
-                style="
-                        border: 1px solid black;
-                        width: 16%;">
-                {{dados.bases.FGTS_FOLHA}}
-            </td>
-            <td
-                align="right"
-                 style="
-                        border: 1px solid black;
-                        width: 16%;">
-                {{dados.bases.BASE_IRRF_FOLHA}}
-            </td>
             <td
                 align="right"
                  style="
@@ -747,18 +706,11 @@ exports.templatePayStubPlr = `
                 {{dados.bases.BASE_IRRF_PLR}}
             </td>
             <td
-            align="right"
-                style="
-                        border: 1px solid black;
-                        width: 17%;">
-                {{dados.bases.BASE_INSS_FOLHA}}
-            </td>
-            <td
                 align="right"
                 style="
                         border: 1px solid black;
                         width: 16%;">
-                {{dados.totais.LIQUIDO}}
+                {{dados.totais.LIQUIDO_PLR}}
             </td>
         </tr>
     </table>
