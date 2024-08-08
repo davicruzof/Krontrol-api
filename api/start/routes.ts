@@ -368,7 +368,7 @@ Route.group(() => {
   Route.group(() => {
     Route.post(
       "/dotCardPdfGenerator",
-      "DotCardPdf.dotCardPdfGenerator"
+      "PointRecord.pointRecordGenerator"
     ).middleware("auth");
   }).prefix("/DotCardPdf");
 

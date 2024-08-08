@@ -243,7 +243,7 @@ Route_1.default.group(() => {
         .prefix("/receipts")
         .middleware("auth");
     Route_1.default.group(() => {
-        Route_1.default.post("/dotCardPdfGenerator", "DotCardPdf.dotCardPdfGenerator").middleware("auth");
+        Route_1.default.post("/dotCardPdfGenerator", "PointRecord.pointRecordGenerator").middleware("auth");
     }).prefix("/DotCardPdf");
     Route_1.default.group(() => {
         Route_1.default.post("/version", "VersionApp.create").middleware("auth");
