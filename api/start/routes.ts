@@ -325,6 +325,8 @@ Route.group(() => {
     .prefix("/enterprises")
     .middleware("auth");
 
+  Route.post("/employee/checkByCpf", "FuncionariosController.checkByCpf");
+
   //Rotas Funcionario
   Route.group(() => {
     Route.post("/create", "FuncionariosController.create");
@@ -335,7 +337,6 @@ Route.group(() => {
     Route.post("/add-area", "FuncionariosController.addArea");
     Route.post("/remove-area", "FuncionariosController.removeArea");
     Route.post("/updateProfile", "FuncionariosController.updateProfile");
-    Route.post("/checkByCpf", "FuncionariosController.checkByCpf");
     Route.post("/dotCard", "FuncionariosController.dotCard");
     Route.post("/confirmDotCard", "FuncionariosController.confirmDotCard");
     Route.post("/inactivate", "FuncionariosController.inactivate");
