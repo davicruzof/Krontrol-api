@@ -209,6 +209,7 @@ Route_1.default.group(() => {
     })
         .prefix("/enterprises")
         .middleware("auth");
+    Route_1.default.post("/employee/checkByCpf", "FuncionariosController.checkByCpf");
     Route_1.default.group(() => {
         Route_1.default.post("/create", "FuncionariosController.create");
         Route_1.default.post("/getById", "FuncionariosController.getById");
@@ -218,7 +219,6 @@ Route_1.default.group(() => {
         Route_1.default.post("/add-area", "FuncionariosController.addArea");
         Route_1.default.post("/remove-area", "FuncionariosController.removeArea");
         Route_1.default.post("/updateProfile", "FuncionariosController.updateProfile");
-        Route_1.default.post("/checkByCpf", "FuncionariosController.checkByCpf");
         Route_1.default.post("/dotCard", "FuncionariosController.dotCard");
         Route_1.default.post("/confirmDotCard", "FuncionariosController.confirmDotCard");
         Route_1.default.post("/inactivate", "FuncionariosController.inactivate");
