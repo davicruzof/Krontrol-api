@@ -1,1 +1,0 @@
-{"version":3,"file":"CreateUserEscala.js","sourceRoot":"","sources":["../../../database/seeders/CreateUserEscala.ts"],"names":[],"mappings":";;;;;AAAA,uFAAiD;AACjD,iFAAmC;AACnC,eAAqB,SAAQ,gBAAU;IAC9B,KAAK,CAAC,GAAG;QACd,MAAM,cAAI,CAAC,MAAM,CAAC;YAChB,UAAU,EAAG,CAAC;YACd,cAAc,EAAG,EAAE;YACnB,KAAK,EAAG,YAAY;YACpB,QAAQ,EAAE,CAAC;SACZ,CAAC,CAAC;IACL,CAAC;CACF;AATD,4BASC"}
