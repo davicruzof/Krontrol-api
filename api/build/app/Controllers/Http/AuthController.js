@@ -39,6 +39,7 @@ class AuthController {
       SELECT usu.id_usuario,usu.id_status,func.id_funcionario,
       func.id_grupo,func.id_empresa,func.nome,func.cpf,
       func.id_funcionario_erp,
+      func.id_filial_erp,
       func.celular,func.email,func.dt_nascimento
       FROM ml_fol_funcionario func
         INNER JOIN ml_usu_usuario usu ON (usu.id_funcionario = func.id_funcionario)
