@@ -268,6 +268,7 @@ export default class Receipts {
                                 WHERE
                                 hol.codintfunc = ${funcionario?.id_funcionario_erp} and to_char(competficha, 'MM/YYYY') = '${competencia}'
                                 and hol.TIPOFOLHA = 1
+                                and hol.CODEVENTO NOT IN(15511)
                                 order by hol.tipoeven desc,hol.codevento asc
                                 `);
 
@@ -368,6 +369,7 @@ export default class Receipts {
                                 WHERE
                                 hol.codintfunc = ${funcionario?.id_funcionario_erp} and to_char(competficha, 'MM/YYYY') = '${competencia}'
                                 and hol.TIPOFOLHA = 4
+                                and hol.CODEVENTO NOT IN(15511)
                                 order by hol.tipoeven desc,hol.codevento asc
                                 `);
 
@@ -468,6 +470,7 @@ export default class Receipts {
                                 WHERE
                                 hol.codintfunc = ${funcionario?.id_funcionario_erp} and to_char(competficha, 'MM/YYYY') = '${competencia}'
                                 and hol.TIPOFOLHA = 7
+                                and hol.CODEVENTO NOT IN(15511)
                                 order by hol.tipoeven desc,hol.codevento asc
                                 `);
 
@@ -572,6 +575,7 @@ export default class Receipts {
                                 WHERE
                                 hol.codintfunc in ('${funcionario?.id_funcionario_erp}', '${funcionario?.id_funcionario_erp_anterior}') and to_char(competficha, 'MM/YYYY') = '${competencia}'
                                 and hol.TIPOFOLHA = 5
+                                and hol.CODEVENTO NOT IN(15511)
                                 order by hol.tipoeven desc,hol.codevento asc
                                 `);
 
