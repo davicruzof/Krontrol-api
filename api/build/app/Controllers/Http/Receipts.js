@@ -436,6 +436,7 @@ class Receipts {
             if (!appUpdate) {
                 return response.badRequest({ error: "app desatualizado" });
             }
+            const idErpAnterior = funcionario?.id_funcionario_erp_anterior ?? "";
             let payStub = await Database_1.default.connection("oracle").rawQuery(`
                                     SELECT DISTINCT
                                     to_char(competficha, 'MM-YYYY') as COMPETFICHA,
@@ -456,7 +457,7 @@ class Receipts {
                                     TIPOEVEN
                                     FROM  globus.vw_flp_fichaeventosrecibo hol
                                 WHERE
-                                hol.codintfunc in ('${funcionario?.id_funcionario_erp}', '${funcionario?.id_funcionario_erp_anterior}') and to_char(competficha, 'MM/YYYY') = '${competencia}'
+                                hol.codintfunc in ('${funcionario?.id_funcionario_erp}', '${idErpAnterior}') and to_char(competficha, 'MM/YYYY') = '${competencia}'
                                 and hol.TIPOFOLHA = 5
                                 and hol.CODEVENTO NOT IN(15511)
                                 order by hol.tipoeven desc,hol.codevento asc
