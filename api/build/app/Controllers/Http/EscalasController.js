@@ -7,6 +7,7 @@ const Validator_1 = global[Symbol.for('ioc.use')]("Adonis/Core/Validator");
 const Database_1 = __importDefault(global[Symbol.for('ioc.use')]("Adonis/Lucid/Database"));
 const Funcionario_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/Funcionario"));
 const Funcao_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/Funcao"));
+const luxon_1 = require("luxon");
 class EscalasController {
     async list({ request, response, auth }) {
         await request.validate({ schema: Validator_1.schema.create({ data: Validator_1.schema.date() }) });
@@ -76,10 +77,15 @@ class EscalasController {
         tipo = " esc.cod_cobrador  ";
         let result2 = await Database_1.default.connection("oracle").rawQuery(campos + query.replace(":tipo", tipo));
         const itens = result1.concat(result2);
-        if (itens.length === 4) {
-            return response.json(itens.pop());
+        if (itens.length == 0) {
+            const novaData = luxon_1.DateTime.fromISO(data)
+                .plus({ days: 3 })
+                .toFormat("yyyy-MM-dd");
+            const itensFilterNewData = itens.filter((item) => {
+                return item.data_escala !== novaData;
+            });
+            response.json(itensFilterNewData);
         }
-        response.json(itens);
     }
 }
 exports.default = EscalasController;
