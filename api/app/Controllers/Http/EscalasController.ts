@@ -94,6 +94,13 @@ export default class EscalasController {
     let result2 = await Database.connection("oracle").rawQuery(
       campos + query.replace(":tipo", tipo)
     );
-    response.json(result1.concat(result2));
+
+    const itens = result1.concat(result2);
+
+    if (itens.length === 4) {
+      return response.json(itens.pop());
+    }
+
+    response.json(itens);
   }
 }
