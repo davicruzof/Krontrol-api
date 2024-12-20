@@ -41,7 +41,7 @@ class EscalasController {
         let data = request.params().data;
         const novaData = luxon_1.DateTime.now().plus({ days: 3 }).toFormat("yyyy-MM-dd");
         if (data === novaData) {
-            response.json([]);
+            return response.json([]);
         }
         let funcionario = await Funcionario_1.default.findBy("id_funcionario", auth.user?.id_funcionario);
         let query;

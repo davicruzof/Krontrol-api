@@ -52,7 +52,7 @@ export default class EscalasController {
     const novaData = DateTime.now().plus({ days: 3 }).toFormat("yyyy-MM-dd");
 
     if (data === novaData) {
-      response.json([]);
+      return response.json([]);
     }
 
     let funcionario = await Funcionario.findBy(
