@@ -3,6 +3,7 @@ import { schema } from "@ioc:Adonis/Core/Validator";
 import Database from "@ioc:Adonis/Lucid/Database";
 import Funcionario from "App/Models/Funcionario";
 import Funcao from "App/Models/Funcao";
+import { DateTime } from "luxon";
 
 export default class EscalasController {
   public async list({ request, response, auth }: HttpContextContract) {
@@ -97,10 +98,26 @@ export default class EscalasController {
 
     const itens = result1.concat(result2);
 
-    if (itens.length === 4) {
-      return response.json(itens.pop());
-    }
+    if (itens.length == 0) {
+      const novaData = DateTime.fromISO(data)
+        .plus({ days: 3 })
+        .toFormat("yyyy-MM-dd");
 
-    response.json(itens);
+      interface Item {
+        prefixo: string;
+        linha: string;
+        tabela: string;
+        data_escala: string;
+        pegada: string;
+        inicio: string;
+        fim: string;
+      }
+
+      const itensFilterNewData: Item[] = itens.filter((item: Item) => {
+        return item.data_escala !== novaData;
+      });
+
+      response.json(itensFilterNewData);
+    }
   }
 }
