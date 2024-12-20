@@ -64,7 +64,7 @@ class EscalasController {
                   left  join globus.t_esc_localidade locc on esc.COD_PEG_COB = locc.COD_LOCALIDADE
                   WHERE to_char(esc.dat_escala, 'YYYY-MM-DD') = '${data}' and :tipo = '${funcionario?.id_funcionario_erp}'`;
         let result1 = await Database_1.default.connection("oracle").rawQuery(campos + query.replace(":tipo", tipo));
-        campos = `SELECT
+        campos = ` SELECT
       pre.prefixoveic AS prefixo,
       lin.CODIGOLINHA AS linha,
       esc.cod_servdiaria AS tabela,
@@ -75,8 +75,7 @@ class EscalasController {
     `;
         tipo = " esc.cod_cobrador  ";
         let result2 = await Database_1.default.connection("oracle").rawQuery(campos + query.replace(":tipo", tipo));
-        const result = result1.concat(result2);
-        response.json(result);
+        response.json(result1.concat(result2));
     }
 }
 exports.default = EscalasController;

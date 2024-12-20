@@ -80,7 +80,7 @@ export default class EscalasController {
       campos + query.replace(":tipo", tipo)
     );
 
-    campos = `SELECT
+    campos = ` SELECT
       pre.prefixoveic AS prefixo,
       lin.CODIGOLINHA AS linha,
       esc.cod_servdiaria AS tabela,
@@ -94,9 +94,6 @@ export default class EscalasController {
     let result2 = await Database.connection("oracle").rawQuery(
       campos + query.replace(":tipo", tipo)
     );
-
-    const result = result1.concat(result2);
-
-    response.json(result);
+    response.json(result1.concat(result2));
   }
 }
