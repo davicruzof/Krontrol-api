@@ -75,7 +75,7 @@ class EscalasController {
     `;
         tipo = " esc.cod_cobrador  ";
         let result2 = await Database_1.default.connection("oracle").rawQuery(campos + query.replace(":tipo", tipo));
-        const result = result1.concat(result2).pop();
+        const result = result1.concat(result2);
         response.json(result);
     }
 }

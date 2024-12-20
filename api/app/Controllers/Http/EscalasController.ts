@@ -95,7 +95,7 @@ export default class EscalasController {
       campos + query.replace(":tipo", tipo)
     );
 
-    const result = result1.concat(result2).pop();
+    const result = result1.concat(result2);
 
     response.json(result);
   }
