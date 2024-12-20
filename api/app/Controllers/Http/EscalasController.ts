@@ -48,6 +48,13 @@ export default class EscalasController {
 
   public async getList({ request, auth, response }: HttpContextContract) {
     let data = request.params().data;
+
+    const novaData = DateTime.now().plus({ days: 3 }).toFormat("yyyy-MM-dd");
+
+    if (data === novaData) {
+      response.json([]);
+    }
+
     let funcionario = await Funcionario.findBy(
       "id_funcionario",
       auth.user?.id_funcionario
@@ -95,29 +102,6 @@ export default class EscalasController {
     let result2 = await Database.connection("oracle").rawQuery(
       campos + query.replace(":tipo", tipo)
     );
-
-    const itens = result1.concat(result2);
-
-    if (itens.length == 0) {
-      const novaData = DateTime.fromISO(data)
-        .plus({ days: 3 })
-        .toFormat("yyyy-MM-dd");
-
-      interface Item {
-        prefixo: string;
-        linha: string;
-        tabela: string;
-        data_escala: string;
-        pegada: string;
-        inicio: string;
-        fim: string;
-      }
-
-      const itensFilterNewData: Item[] = itens.filter((item: Item) => {
-        return item.data_escala !== novaData;
-      });
-
-      response.json(itensFilterNewData);
-    }
+    response.json(result1.concat(result2));
   }
 }

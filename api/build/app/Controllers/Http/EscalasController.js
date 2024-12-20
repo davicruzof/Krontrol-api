@@ -39,6 +39,10 @@ class EscalasController {
     }
     async getList({ request, auth, response }) {
         let data = request.params().data;
+        const novaData = luxon_1.DateTime.now().plus({ days: 3 }).toFormat("yyyy-MM-dd");
+        if (data === novaData) {
+            response.json([]);
+        }
         let funcionario = await Funcionario_1.default.findBy("id_funcionario", auth.user?.id_funcionario);
         let query;
         let campos;
@@ -76,16 +80,7 @@ class EscalasController {
     `;
         tipo = " esc.cod_cobrador  ";
         let result2 = await Database_1.default.connection("oracle").rawQuery(campos + query.replace(":tipo", tipo));
-        const itens = result1.concat(result2);
-        if (itens.length == 0) {
-            const novaData = luxon_1.DateTime.fromISO(data)
-                .plus({ days: 3 })
-                .toFormat("yyyy-MM-dd");
-            const itensFilterNewData = itens.filter((item) => {
-                return item.data_escala !== novaData;
-            });
-            response.json(itensFilterNewData);
-        }
+        response.json(result1.concat(result2));
     }
 }
 exports.default = EscalasController;
