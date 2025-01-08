@@ -3,7 +3,7 @@ import { schema } from "@ioc:Adonis/Core/Validator";
 import Database from "@ioc:Adonis/Lucid/Database";
 import Funcionario from "App/Models/Funcionario";
 import Funcao from "App/Models/Funcao";
-import { DateTime } from "luxon";
+// import { DateTime } from "luxon";
 
 export default class EscalasController {
   public async list({ request, response, auth }: HttpContextContract) {
@@ -49,11 +49,11 @@ export default class EscalasController {
   public async getList({ request, auth, response }: HttpContextContract) {
     let data = request.params().data;
 
-    const novaData = DateTime.now().plus({ days: 3 }).toFormat("yyyy-MM-dd");
+    // const novaData = DateTime.now().plus({ days: 3 }).toFormat("yyyy-MM-dd");
 
-    if (data === novaData) {
-      return response.json([]);
-    }
+    // if (data === novaData) {
+    //   return response.json([]);
+    // }
 
     let funcionario = await Funcionario.findBy(
       "id_funcionario",
