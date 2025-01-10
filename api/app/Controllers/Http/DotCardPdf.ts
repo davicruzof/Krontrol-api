@@ -208,12 +208,14 @@ export default class DotCardPdf {
 
       let resumoFicha = [];
 
+      const idErpAnterior = funcionario?.id_funcionario_erp_anterior ?? "";
+
       try {
         resumoFicha = await Database.connection("oracle").rawQuery(`
           SELECT DISTINCT EVENTO, TRIM(HR_DIA) as HR_DIA
           FROM
             VW_ML_PON_RESUMO_HOLERITE FH
-          WHERE FH.ID_FUNCIONARIO_ERP in ('${funcionario?.id_funcionario_erp}', '${funcionario?.id_funcionario_erp_anterior}')
+          WHERE FH.ID_FUNCIONARIO_ERP in ('${funcionario?.id_funcionario_erp}', '${idErpAnterior}')
           AND FH.COMPETENCIA = '${competencia}'
         `);
       } catch (error) {
