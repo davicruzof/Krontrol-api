@@ -303,6 +303,7 @@ Route_1.default.group(() => {
     Route_1.default.group(() => {
         Route_1.default.post("/list", "EscalasController.list");
         Route_1.default.get("/list/:data", "EscalasController.getList");
+        Route_1.default.get("v2/list/:data", "EscalasController.getListV2");
     })
         .prefix("/scale")
         .middleware("auth");

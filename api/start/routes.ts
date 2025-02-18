@@ -446,6 +446,7 @@ Route.group(() => {
   Route.group(() => {
     Route.post("/list", "EscalasController.list");
     Route.get("/list/:data", "EscalasController.getList");
+    Route.get("v2/list/:data", "EscalasController.getListV2");
   })
     .prefix("/scale")
     .middleware("auth");
