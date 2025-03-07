@@ -265,6 +265,7 @@ class Receipts {
                                 and hol.CODEVENTO NOT IN(15511)
                                 and hol.CODEVENTO NOT IN(15512)
                                 and hol.CODEVENTO NOT IN(15513)
+                                and hol.TIPOEVEN NOT IN('C')
                                 order by hol.tipoeven desc,hol.codevento asc
                                 `);
             const empresa = await Empresa_1.default.findBy("id_empresa", auth.user?.id_empresa);
