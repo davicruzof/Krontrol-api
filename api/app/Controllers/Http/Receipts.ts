@@ -255,7 +255,7 @@ export default class Receipts {
         FROM GLOBUS.FLP_HISTORICOSALARIAL HS
         JOIN GLOBUS.FLP_FUNCAO FUN ON FUN.CODFUNCAO = HS.CODFUNCAO
         WHERE HS.STATUSHISTSAL = 'N'
-        AND HS.DTHISTSAL <= TO_DATE('10-2023', 'MM-YYYY')
+        AND HS.DTHISTSAL <= TO_DATE('${competencia}', 'MM-YYYY')
     )
 SELECT DISTINCT
 hol.codfunc,
