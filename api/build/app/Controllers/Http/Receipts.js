@@ -241,33 +241,45 @@ class Receipts {
                 return response.badRequest({ error: "app desatualizado" });
             }
             let payStub = await Database_1.default.connection("oracle").rawQuery(`
-                                    SELECT DISTINCT
-                                    to_char(competficha, 'MM-YYYY') as COMPETFICHA,
-                                    CODEVENTO,
-                                    CODINTFUNC,
-                                    to_char(VALORFICHA, 'FM999G999G999D90', 'nls_numeric_characters='',.''') AS VALORFICHA,
-                                    REFERENCIA,
-                                    NOMEFUNC,
-                                    DESCEVEN,
-                                    RSOCIALEMPRESA,
-                                    INSCRICAOEMPRESA,
-                                    DESCFUNCAO,
-                                    CIDADEFL,
-                                    IESTADUALFL,
-                                    ENDERECOFL,
-                                    NUMEROENDFL,
-                                    COMPLENDFL,
-                                    TIPOEVEN
-                                    FROM  globus.vw_flp_fichaeventosrecibo hol
-                                WHERE
-                                hol.codintfunc = ${funcionario?.id_funcionario_erp} and to_char(competficha, 'MM/YYYY') = '${competencia}'
-                                and hol.TIPOFOLHA = 1
-                                and hol.CODEVENTO NOT IN(15511)
-                                and hol.CODEVENTO NOT IN(15512)
-                                and hol.CODEVENTO NOT IN(15513)
-                                and hol.TIPOEVEN NOT IN('C')
-                                order by hol.tipoeven desc,hol.codevento asc
-                                `);
+                                WITH HistoricoFuncao AS (
+    SELECT
+          HS.CODINTFUNC,
+          FUN.DESCFUNCAO,
+          ROW_NUMBER() OVER (PARTITION BY HS.CODINTFUNC ORDER BY HS.DTHISTSAL DESC) AS RN
+        FROM GLOBUS.FLP_HISTORICOSALARIAL HS
+        JOIN GLOBUS.FLP_FUNCAO FUN ON FUN.CODFUNCAO = HS.CODFUNCAO
+        WHERE HS.STATUSHISTSAL = 'N'
+        AND HS.DTHISTSAL <= TO_DATE('10-2023', 'MM-YYYY')
+    )
+SELECT DISTINCT
+hol.codfunc,
+    TO_CHAR(hol.competficha, 'MM-YYYY') AS COMPETFICHA,
+    hol.CODEVENTO,
+    hol.CODINTFUNC,
+    TO_CHAR(hol.VALORFICHA, 'FM999G999G999D90', 'nls_numeric_characters=''.,''') AS VALORFICHA,
+    hol.REFERENCIA,
+    hol.NOMEFUNC,
+    hol.DESCEVEN,
+    hol.DESCFUNCAO AS FUNCAO_OLD,
+    hol.RSOCIALEMPRESA,
+    hol.INSCRICAOEMPRESA,
+    hol.CIDADEFL,
+    hol.IESTADUALFL,
+    hol.ENDERECOFL,
+    hol.NUMEROENDFL,
+    hol.COMPLENDFL,
+    hol.TIPOEVEN,
+    hf.DESCFUNCAO AS DESCFUNCAO
+FROM globus.vw_flp_fichaeventosrecibo hol
+LEFT JOIN HistoricoFuncao hf
+    ON hf.CODINTFUNC = hol.CODINTFUNC
+    AND hf.RN = 1
+WHERE
+    hol.codintfunc = ${funcionario?.id_funcionario_erp} and to_char(competficha, 'MM/YYYY') = '${competencia}'
+    AND hol.TIPOFOLHA = 1
+    AND hol.CODEVENTO NOT IN (15511, 15512, 15513)
+    AND hol.TIPOEVEN NOT IN ('C')
+ORDER BY hol.tipoeven DESC, hol.codevento ASC`);
             const empresa = await Empresa_1.default.findBy("id_empresa", auth.user?.id_empresa);
             if (!empresa) {
                 return response.badRequest({ error: "Erro ao pegar empresa!" });
