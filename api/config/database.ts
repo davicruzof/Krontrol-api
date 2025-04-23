@@ -5,8 +5,8 @@
  * file.
  */
 
-import Env from '@ioc:Adonis/Core/Env'
-import { DatabaseConfig } from '@ioc:Adonis/Lucid/Database'
+import Env from "@ioc:Adonis/Core/Env";
+import { DatabaseConfig } from "@ioc:Adonis/Lucid/Database";
 
 const databaseConfig: DatabaseConfig = {
   /*
@@ -19,7 +19,7 @@ const databaseConfig: DatabaseConfig = {
   | file.
   |
   */
-  connection: Env.get('DB_CONNECTION'),
+  connection: Env.get("DB_CONNECTION"),
 
   connections: {
     /*
@@ -34,13 +34,16 @@ const databaseConfig: DatabaseConfig = {
     |
     */
     pg: {
-      client: 'pg',
+      client: "pg",
       connection: {
-        host: Env.get('PG_HOST'),
-        port: Env.get('PG_PORT'),
-        user: Env.get('PG_USER'),
-        password: Env.get('PG_PASSWORD', ''),
-        database: Env.get('PG_DB_NAME'),
+        host: Env.get("PG_HOST"),
+        port: Env.get("PG_PORT"),
+        user: Env.get("PG_USER"),
+        password: Env.get("PG_PASSWORD", ""),
+        database: Env.get("PG_DB_NAME"),
+        ssl: {
+          rejectUnauthorized: false, // Desativa a verificação de certificado SSL
+        },
       },
       migrations: {
         naturalSort: true,
@@ -61,13 +64,13 @@ const databaseConfig: DatabaseConfig = {
     |
     */
     oracle: {
-      client: 'oracledb',
+      client: "oracledb",
       connection: {
-        user: Env.get('ORACLE_USER'),
-        password: Env.get('ORACLE_PASSWORD'),
-        host: Env.get('ORACLE_HOST'),
-        port: Env.get('ORACLE_PORT'),
-        database: Env.get('ORACLE_DB_NAME'),
+        user: Env.get("ORACLE_USER"),
+        password: Env.get("ORACLE_PASSWORD"),
+        host: Env.get("ORACLE_HOST"),
+        port: Env.get("ORACLE_PORT"),
+        database: Env.get("ORACLE_DB_NAME"),
       },
       migrations: {
         naturalSort: true,
@@ -75,8 +78,7 @@ const databaseConfig: DatabaseConfig = {
       healthCheck: true,
       debug: true,
     },
+  },
+};
 
-  }
-}
-
-export default databaseConfig
+export default databaseConfig;

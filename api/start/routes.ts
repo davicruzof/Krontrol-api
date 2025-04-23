@@ -2,7 +2,7 @@ import Route from "@ioc:Adonis/Core/Route";
 
 Route.get("api/status", async () => {
   return { status: "api is only" };
-});
+}).prefix("/v2");
 
 Route.group(() => {
   //Route.post('/teste','TestesController.criarbucket');
