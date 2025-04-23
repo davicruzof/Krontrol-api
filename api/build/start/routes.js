@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const Route_1 = __importDefault(global[Symbol.for('ioc.use')]("Adonis/Core/Route"));
 Route_1.default.get("api/status", async () => {
     return { status: "api is only" };
-});
+}).prefix("/v2");
 Route_1.default.group(() => {
     Route_1.default.group(() => {
         Route_1.default.get("/getEnterprises", "EmpresasController.getEnterprises").middleware("auth");
