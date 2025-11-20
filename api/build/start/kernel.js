@@ -31,8 +31,10 @@ const Event_1 = __importDefault(global[Symbol.for('ioc.use')]("Adonis/Core/Event
 Server_1.default.middleware.register([() => Promise.resolve().then(() => __importStar(global[Symbol.for('ioc.use')]("Adonis/Core/BodyParser")))]);
 Server_1.default.middleware.registerNamed({
     auth: "App/Middleware/Auth",
+    forceHttps: () => Promise.resolve().then(() => __importStar(global[Symbol.for('ioc.use')]("App/Middleware/ForceHttps"))),
+    securityHeaders: () => Promise.resolve().then(() => __importStar(global[Symbol.for('ioc.use')]("App/Middleware/SecurityHeaders"))),
 });
-Event_1.default.on('db:query', function ({ sql, bindings }) {
+Event_1.default.on("db:query", function ({ sql, bindings }) {
     console.log(sql, bindings);
 });
 //# sourceMappingURL=kernel.js.map

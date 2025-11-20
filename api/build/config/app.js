@@ -4,31 +4,30 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.validator = exports.profiler = exports.logger = exports.http = exports.appKey = void 0;
-const proxy_addr_1 = __importDefault(require("proxy-addr"));
 const Env_1 = __importDefault(global[Symbol.for('ioc.use')]("Adonis/Core/Env"));
-exports.appKey = Env_1.default.get('APP_KEY');
+exports.appKey = Env_1.default.get("APP_KEY");
 exports.http = {
     allowMethodSpoofing: false,
     subdomainOffset: 2,
     generateRequestId: false,
-    trustProxy: proxy_addr_1.default.compile('loopback'),
+    trustProxy: () => true,
     etag: false,
-    jsonpCallbackName: 'callback',
+    jsonpCallbackName: "callback",
     cookie: {
-        domain: '',
-        path: '/',
-        maxAge: '2h',
+        domain: "",
+        path: "/",
+        maxAge: "2h",
         httpOnly: true,
         secure: false,
         sameSite: false,
     },
-    forceContentNegotiationTo: 'application/json',
+    forceContentNegotiationTo: "application/json",
 };
 exports.logger = {
-    name: Env_1.default.get('APP_NAME'),
+    name: Env_1.default.get("APP_NAME"),
     enabled: true,
-    level: Env_1.default.get('LOG_LEVEL', 'info'),
-    prettyPrint: Env_1.default.get('NODE_ENV') === 'development',
+    level: Env_1.default.get("LOG_LEVEL", "info"),
+    prettyPrint: Env_1.default.get("NODE_ENV") === "development",
 };
 exports.profiler = {
     enabled: true,
