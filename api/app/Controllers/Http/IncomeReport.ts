@@ -154,17 +154,17 @@ export default class IncomeReport {
         id_empresa: auth.user.id_empresa,
       });
 
-      // const incomeReportRelease = await this.incomeReportRelease(
-      //   ano,
-      //   auth.user.id_empresa,
-      // );
+      const incomeReportRelease = await this.incomeReportRelease(
+        ano,
+        auth.user.id_empresa,
+      );
 
-      // if (incomeReportRelease.rows.length == 0) {
-      //   response.badRequest({
-      //     error: "Empresa não liberou para gerar o recibo",
-      //   });
-      //   return;
-      // }
+      if (incomeReportRelease.rows.length == 0) {
+        response.badRequest({
+          error: "Empresa não liberou para gerar o recibo",
+        });
+        return;
+      }
 
       const funcionario = await this.traceQuery(
         reqId,
@@ -368,16 +368,16 @@ export default class IncomeReport {
     }
   }
 
-  // private incomeReportRelease = async (ano: string, empresaId: number) => {
-  //   return await Database.connection("pg").rawQuery(
-  //     `SELECT * FROM public.vw_ml_flp_liberacao_recibos
-  //           where tipo_id = 3
-  //           AND bloqueio_liberacao = false
-  //           AND irpf = '${ano}'
-  //           AND empresa_id = ${empresaId}
-  //           `,
-  //   );
-  // };
+  private incomeReportRelease = async (ano: string, empresaId: number) => {
+    return await Database.connection("pg").rawQuery(
+      `SELECT * FROM public.vw_ml_flp_liberacao_recibos
+            where tipo_id = 3
+            AND bloqueio_liberacao = false
+            AND irpf = '${ano}'
+            AND empresa_id = ${empresaId}
+            `,
+    );
+  };
 
   private fetchIncomePrincipal = async (ano: number, cpf: string) => {
     return await Database.connection("oracle").rawQuery(`

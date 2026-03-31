@@ -13,6 +13,7 @@ const template_1 = global[Symbol.for('ioc.use')]("App/templates/pdf/template");
 const AppVersion_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Models/AppVersion"));
 const template_irpf_1 = global[Symbol.for('ioc.use')]("App/templates/pdf/template_irpf");
 const templateDecimo_1 = global[Symbol.for('ioc.use')]("App/templates/pdf/templateDecimo");
+const IncomeReport_1 = __importDefault(require("./IncomeReport"));
 class Receipts {
     constructor() {
         this.isMonthFreedom = async (id_empresa, id_pdf, mes) => {
@@ -507,6 +508,10 @@ ORDER BY hol.tipoeven DESC, hol.codevento ASC`);
             if (!ano) {
                 response.badRequest({ error: "Ano é obrigatório" });
                 return;
+            }
+            if (+ano >= 2025) {
+                const incomeReport = new IncomeReport_1.default();
+                return await incomeReport.IncomeReport(data);
             }
             if (!auth.user) {
                 response.badRequest({ error: "Usuário não encontrado" });
