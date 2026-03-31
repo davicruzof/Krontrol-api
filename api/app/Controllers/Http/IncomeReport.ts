@@ -478,38 +478,43 @@ export default class IncomeReport {
       : ano;
 
     return `<table>
-        <tr style="width: 100%;">
-        <td style="width: 50%; border: 1px solid #000; padding: 4px; font-size: 12px; text-align: center;">
-          <img src="https://i.ibb.co/Y7DtHQx8/f977b67c-106c-4272-b979-fdf48ec68a70.jpg" alt="Ministério da Fazenda" style="width: 60px; height: 60px;">
+    <tr style="width: 100%;">
+      <td
+        style="display: flex; flex-direction: row; align-items: center; justify-content: center; border: 1px solid #000; padding: 4px; font-size: 12px; text-align: center;">
+        <img src="https://i.ibb.co/G4jm9CLf/f977b67c-106c-4272-b979-fdf48ec68a70-2.jpg" alt="Ministério da Fazenda"
+          style="width: 60px; height: 60px; margin-right: 10px;">
+        <div>
           <div>
-              <b>Ministério da Fazenda</b>
+            <b>Ministério da Fazenda</b>
           </div>
           <div>
-              Secretaria da Receita Federal do Brasil
+
+            Secretaria da Receita Federal do Brasil
           </div>
           <div>
-              Imposto sobre a Renda da Pessoa Física
+            Imposto sobre a Renda da Pessoa Física
           </div>
           <div>
-              <b>Exercício de ${exercicioLabel}</b>
+            <b>Exercício de ${exercicioLabel}</b>
           </div>
-        </td>
-        <td style="border: 1px solid #000; padding: 4px; font-size: 10px; text-align: center;">
-            <div>
-                Comprovante de Rendimentos Pagos e de
-            </div>
-            <div>
-                Impostos sobre Renda Retido na Fonte
-            </div>
-            <div>
-                Imposto sobre a Renda da Pessoa Física
-            </div>
-            <div>
-                <b>Ano-calendário ${anoCalendarioLabel}</b>
-            </div>
-        </td>
-        </tr>
-    </table>
+        </div>
+      </td>
+      <td style="border: 1px solid #000; padding: 4px; font-size: 10px; text-align: center;">
+        <div>
+          Comprovante de Rendimentos Pagos e de
+        </div>
+        <div>
+          Impostos sobre Renda Retido na Fonte
+        </div>
+        <div>
+          Imposto sobre a Renda da Pessoa Física
+        </div>
+        <div>
+          <b>Ano-calendário ${anoCalendarioLabel}</b>
+        </div>
+      </td>
+    </tr>
+  </table>
 
     <table>
         <tr>
