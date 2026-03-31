@@ -513,19 +513,28 @@ class IncomeReport {
         this.medicalInfos = (medicalInfosData) => {
             let medicalInfos = "";
             if (medicalInfosData && medicalInfosData.length > 0) {
+                const byOperadora = new Map();
+                for (const item of medicalInfosData) {
+                    const key = `${item.CNPJ_OPERADORA}|${item.NOME_OPERADORA}`;
+                    const list = byOperadora.get(key);
+                    if (list) {
+                        list.push(item);
+                    }
+                    else {
+                        byOperadora.set(key, [item]);
+                    }
+                }
                 medicalInfos = medicalInfos + "<table>";
-                let operadoras = [];
-                medicalInfosData.map((item) => {
-                    if (!operadoras.includes(item.NOME_OPERADORA)) {
-                        operadoras.push(item.NOME_OPERADORA);
-                        medicalInfos =
-                            medicalInfos +
-                                `
+                for (const items of byOperadora.values()) {
+                    const head = items[0];
+                    medicalInfos =
+                        medicalInfos +
+                            `
             <tr>
-              <td style="font-size: 8px;">Operadora: ${item.CNPJ_OPERADORA} - ${item.NOME_OPERADORA}</td>
+              <td colspan="3" style="font-size: 8px;">Operadora: ${head.CNPJ_OPERADORA} - ${head.NOME_OPERADORA}</td>
             </tr>
             <tr>
-              <td style="font-size: 8px;">valor pago no ano referente aos dependentes:</td>
+              <td colspan="3" style="font-size: 8px;">valor pago no ano referente aos dependentes:</td>
             </tr>
             <tr>
               <td style="font-size: 8px;">CPF</td>
@@ -533,17 +542,18 @@ class IncomeReport {
               <td style="font-size: 8px;">VALOR</td>
             </tr>
           `;
-                    }
-                    medicalInfos =
-                        medicalInfos +
-                            `
+                    for (const item of items) {
+                        medicalInfos =
+                            medicalInfos +
+                                `
           <tr>
             <td style="font-size: 8px;">${item.CPF_DEPENDENTE}</td>
             <td style="font-size: 8px;">${item.NOME_DEPENDENTE}</td>
             <td style="font-size: 8px;">${this.formattedCurrency(+item.VALOR_SAUDE_DEPENDENTE)}</td>
           </tr>
         `;
-                });
+                    }
+                }
                 medicalInfos = medicalInfos + `</table>`;
             }
             return medicalInfos;
