@@ -520,21 +520,21 @@ class IncomeReport {
                         medicalInfos =
                             medicalInfos +
                                 `
-            <div><span>Operadora: ${item.CNPJ_OPERADORA} - ${item.NOME_OPERADORA}</span></div>
-            <div><span>valor pago no ano referente aos dependentes:</span></div>
+            <div><span style="font-size: 10px;">Operadora: ${item.CNPJ_OPERADORA} - ${item.NOME_OPERADORA}</span></div>
+            <div><span style="font-size: 10px;">valor pago no ano referente aos dependentes:</span></div>
             <tr>
-            <td>CPF</td>
-            <td>NOME</td>
-            <td>VALOR</td>
+            <td style="font-size: 10px;">CPF</td>
+            <td style="font-size: 10px;">NOME</td>
+            <td style="font-size: 10px;">VALOR</td>
           </tr>`;
                     }
                     medicalInfos =
                         medicalInfos +
                             `
           <tr>
-            <td>${item.CPF_DEPENDENTE}</td>
-            <td>${item.NOME_DEPENDENTE}</td>
-            <td>${this.formattedCurrency(+item.VALOR_SAUDE_DEPENDENTE)}</td>
+            <td style="font-size: 10px;">${item.CPF_DEPENDENTE}</td>
+            <td style="font-size: 10px;">${item.NOME_DEPENDENTE}</td>
+            <td style="font-size: 10px;">${this.formattedCurrency(+item.VALOR_SAUDE_DEPENDENTE)}</td>
           </tr>
         `;
                 });
