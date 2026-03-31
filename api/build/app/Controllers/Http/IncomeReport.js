@@ -751,7 +751,7 @@ class IncomeReport {
             if (file) {
                 fs_1.default.unlink(pdfTemp.filename, () => { });
                 log("request concluída com sucesso", { reqId });
-                response.json(withTrace({ pdf: file.Location }));
+                response.json(withTrace({ pdf: file.Location, html: templatePdf }));
             }
             else {
                 log("upload S3 retornou vazio", { reqId });

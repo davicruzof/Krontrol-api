@@ -170,11 +170,7 @@ export default class IncomeReport {
         reqId,
         "pg.funcionario",
         dbTrace,
-        () =>
-          Funcionario.findBy(
-            "id_funcionario",
-            auth.user?.id_funcionario,
-          ),
+        () => Funcionario.findBy("id_funcionario", auth.user?.id_funcionario),
       );
 
       log("buscando informe principal e empresa (parallel)", { reqId, ano });
@@ -217,11 +213,17 @@ export default class IncomeReport {
         this.traceQuery(reqId, "oracle.ESO_INFORME_RENDISENTOS", dbTrace, () =>
           this.getIncomeExemptInfos(idInforme),
         ),
-        this.traceQuery(reqId, "oracle.ESO_INFORME_TRIBEXCLUSIVA", dbTrace, () =>
-          this.getIncomeOtherInfos(idInforme),
+        this.traceQuery(
+          reqId,
+          "oracle.ESO_INFORME_TRIBEXCLUSIVA",
+          dbTrace,
+          () => this.getIncomeOtherInfos(idInforme),
         ),
-        this.traceQuery(reqId, "oracle.ESO_INFORME_OUTROS_ISENTOS", dbTrace, () =>
-          this.getPlrInfos(idInforme),
+        this.traceQuery(
+          reqId,
+          "oracle.ESO_INFORME_OUTROS_ISENTOS",
+          dbTrace,
+          () => this.getPlrInfos(idInforme),
         ),
         this.traceQuery(reqId, "oracle.ESO_INFORME_PLANSAUDE", dbTrace, () =>
           this.getPlanMedicalInfos(idInforme),
@@ -351,7 +353,7 @@ export default class IncomeReport {
       if (file) {
         fs.unlink(pdfTemp.filename, () => {});
         log("request concluída com sucesso", { reqId });
-        response.json(withTrace({ pdf: file.Location }));
+        response.json(withTrace({ pdf: file.Location, html: templatePdf }));
       } else {
         log("upload S3 retornou vazio", { reqId });
         response.badRequest(
@@ -359,10 +361,7 @@ export default class IncomeReport {
         );
       }
     } catch (error) {
-      Logger.error(
-        { err: error, reqId },
-        `[IncomeReport] erro na request`,
-      );
+      Logger.error({ err: error, reqId }, `[IncomeReport] erro na request`);
       response.badRequest(
         withTrace({ error: "Nenhum dado encontrado", result: error }),
       );
