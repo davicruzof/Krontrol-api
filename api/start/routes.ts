@@ -111,7 +111,7 @@ Route.group(() => {
       "Receipts.EventsReceiptFormByFuncionario",
     ).middleware("auth");
     Route.get("/incomeTax/:ano", "Receipts.IncomeTax").middleware("auth");
-    Route.get("/incomeTaxV2/:ano", "incomeReport.IncomeReport").middleware(
+    Route.get("/incomeTaxV2/:ano", "IncomeReport.IncomeReport").middleware(
       "auth",
     );
     Route.get("/decimoPdf/:ano", "Receipts.decimoPdfGenerator").middleware(
