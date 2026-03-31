@@ -853,18 +853,21 @@ export default class IncomeReport {
       let operadoras: string[] = [];
 
       medicalInfosData.map((item) => {
-        if (!operadoras.includes(item.CNPJ_OPERADORA)) {
-          operadoras.push(item.CNPJ_OPERADORA);
+        if (!operadoras.includes(item.NOME_OPERADORA)) {
+          operadoras.push(item.NOME_OPERADORA);
           medicalInfos =
             medicalInfos +
             `
-            <div><span style="font-size: 8px;">Operadora: ${item.CNPJ_OPERADORA} - ${item.NOME_OPERADORA}</span></div>
-            <div><span style="font-size: 8px;">valor pago no ano referente aos dependentes:</span></div>
             <tr>
-            <td style="font-size: 8px;">CPF</td>
-            <td style="font-size: 8px;">NOME</td>
-            <td style="font-size: 8px;">VALOR</td>
-          </tr>`;
+              <td style="font-size: 8px;">Operadora: ${item.CNPJ_OPERADORA} - ${item.NOME_OPERADORA}</td>
+              <td style="font-size: 8px;">valor pago no ano referente aos dependentes:</td>
+            </tr>
+            <tr>
+              <td style="font-size: 8px;">CPF</td>
+              <td style="font-size: 8px;">NOME</td>
+              <td style="font-size: 8px;">VALOR</td>
+            </tr>
+          `;
         }
         medicalInfos =
           medicalInfos +
