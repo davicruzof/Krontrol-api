@@ -523,6 +523,8 @@ class IncomeReport {
                                 `
             <tr>
               <td style="font-size: 8px;">Operadora: ${item.CNPJ_OPERADORA} - ${item.NOME_OPERADORA}</td>
+            </tr>
+            <tr>
               <td style="font-size: 8px;">valor pago no ano referente aos dependentes:</td>
             </tr>
             <tr>
