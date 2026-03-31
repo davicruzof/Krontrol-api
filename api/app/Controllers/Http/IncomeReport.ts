@@ -319,7 +319,7 @@ export default class IncomeReport {
         this.templateIncomeOtherInfos(incomeOtherInfosData) +
         this.templateIncomeReceivedAccumulatedInfos() +
         this.InformationComplementariesInfos(
-          this.formattedCurrency(plrInfos[0].PLR),
+          this.formattedCurrency(plrInfos[0].VALOR),
           planMedicalInfos,
           pensInfos,
         ) +
@@ -412,6 +412,7 @@ export default class IncomeReport {
     return await Database.connection("oracle").rawQuery(`
         SELECT * FROM GLOBUS.ESO_INFORME_OUTROS_ISENTOS eiplr
         WHERE eiplr.ID_INFORME_PRINCIPAL = ${idInformePrincipal}
+        and eiplr.DESCRICAO = 'PLR'
       `);
   };
 

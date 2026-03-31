@@ -97,6 +97,7 @@ class IncomeReport {
             return await Database_1.default.connection("oracle").rawQuery(`
         SELECT * FROM GLOBUS.ESO_INFORME_OUTROS_ISENTOS eiplr
         WHERE eiplr.ID_INFORME_PRINCIPAL = ${idInformePrincipal}
+        and eiplr.DESCRICAO = 'PLR'
       `);
         };
         this.getPlanMedicalInfos = async (idInformePrincipal) => {
@@ -732,7 +733,7 @@ class IncomeReport {
                 this.templateIncomeExemptInfos(incomeReceivedExemptInfosData) +
                 this.templateIncomeOtherInfos(incomeOtherInfosData) +
                 this.templateIncomeReceivedAccumulatedInfos() +
-                this.InformationComplementariesInfos(this.formattedCurrency(plrInfos[0].PLR), planMedicalInfos, pensInfos) +
+                this.InformationComplementariesInfos(this.formattedCurrency(plrInfos[0].VALOR), planMedicalInfos, pensInfos) +
                 this.responsibleForTheInformation(enterprise?.responsavel_irpf ?? "");
             log("HTML do PDF montado", {
                 reqId,
