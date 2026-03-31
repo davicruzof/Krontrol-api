@@ -56,6 +56,7 @@ Route_1.default.group(() => {
         Route_1.default.post("/payStubAuxPdfGenerator", "Receipts.payStubAuxPdfGenerator").middleware("auth");
         Route_1.default.post("/EventsReceiptFormByFuncionario", "Receipts.EventsReceiptFormByFuncionario").middleware("auth");
         Route_1.default.get("/incomeTax/:ano", "Receipts.IncomeTax").middleware("auth");
+        Route_1.default.get("/incomeTaxV2/:ano", "incomeReport.IncomeReport").middleware("auth");
         Route_1.default.get("/decimoPdf/:ano", "Receipts.decimoPdfGenerator").middleware("auth");
     }).prefix("/receipts");
     Route_1.default.group(() => {

@@ -10,7 +10,7 @@ Route.group(() => {
   Route.group(() => {
     Route.get(
       "/getEnterprises",
-      "EmpresasController.getEnterprises"
+      "EmpresasController.getEnterprises",
     ).middleware("auth");
     Route.post("/login", "AuthController.login");
     Route.post("/signIn", "SignInController.login");
@@ -46,48 +46,48 @@ Route.group(() => {
     Route.get("/getAll", "FuncionariosController.getAll").middleware("auth");
     Route.get(
       "/irpf-avaiables",
-      "FuncionariosController.irpfAvaiables"
+      "FuncionariosController.irpfAvaiables",
     ).middleware("auth");
     Route.get(
       "/vacation-pdf/:competencia",
-      "FuncionariosController.vacation"
+      "FuncionariosController.vacation",
     ).middleware("auth");
     Route.post("/add-area", "FuncionariosController.addArea").middleware(
-      "auth"
+      "auth",
     );
     Route.post("/remove-area", "FuncionariosController.removeArea").middleware(
-      "auth"
+      "auth",
     );
     Route.post(
       "/updateProfile",
-      "FuncionariosController.updateProfile"
+      "FuncionariosController.updateProfile",
     ).middleware("auth");
     Route.post("/checkByCpf", "FuncionariosController.checkByCpf");
     Route.post("/dotCard", "FuncionariosController.dotCard").middleware("auth");
     Route.post(
       "/confirmDotCard",
-      "FuncionariosController.confirmDotCard"
+      "FuncionariosController.confirmDotCard",
     ).middleware("auth");
     Route.post("/inactivate", "FuncionariosController.inactivate").middleware(
-      "auth"
+      "auth",
     );
     Route.post(
       "/deleteAccount",
-      "FuncionariosController.deleteAccount"
+      "FuncionariosController.deleteAccount",
     ).middleware("auth");
     Route.post("/confirmPdf", "FuncionariosController.confirmPdf").middleware(
-      "auth"
+      "auth",
     );
     Route.get("/getVideos", "FuncionariosController.getVideos").middleware(
-      "auth"
+      "auth",
     );
     Route.post(
       "/confirmVideo",
-      "FuncionariosController.confirmarVideo"
+      "FuncionariosController.confirmarVideo",
     ).middleware("auth");
     Route.get(
       "/vacationNotice",
-      "FuncionariosController.avisoFerias"
+      "FuncionariosController.avisoFerias",
     ).middleware("auth");
     Route.get("/params", "FuncionariosController.getParams").middleware("auth");
   }).prefix("/employee");
@@ -96,30 +96,33 @@ Route.group(() => {
   Route.group(() => {
     Route.post(
       "/dotCardPdfGenerator",
-      "Receipts.dotCardPdfGenerator"
+      "Receipts.dotCardPdfGenerator",
     ).middleware("auth");
     Route.post(
       "/payStubPdfGenerator",
-      "Receipts.payStubPdfGenerator"
+      "Receipts.payStubPdfGenerator",
     ).middleware("auth");
     Route.post(
       "/payStubAuxPdfGenerator",
-      "Receipts.payStubAuxPdfGenerator"
+      "Receipts.payStubAuxPdfGenerator",
     ).middleware("auth");
     Route.post(
       "/EventsReceiptFormByFuncionario",
-      "Receipts.EventsReceiptFormByFuncionario"
+      "Receipts.EventsReceiptFormByFuncionario",
     ).middleware("auth");
     Route.get("/incomeTax/:ano", "Receipts.IncomeTax").middleware("auth");
+    Route.get("/incomeTaxV2/:ano", "incomeReport.IncomeReport").middleware(
+      "auth",
+    );
     Route.get("/decimoPdf/:ano", "Receipts.decimoPdfGenerator").middleware(
-      "auth"
+      "auth",
     );
   }).prefix("/receipts");
 
   Route.group(() => {
     Route.post(
       "/dotCardPdfGenerator",
-      "DotCardPdf.dotCardPdfGenerator"
+      "DotCardPdf.dotCardPdfGenerator",
     ).middleware("auth");
   }).prefix("/DotCardPdf");
 
@@ -131,10 +134,10 @@ Route.group(() => {
     Route.get("/", "InformativosController.getInformativos").middleware("auth");
     Route.get(
       "/notify",
-      "InformativosController.getInformativosNotify"
+      "InformativosController.getInformativosNotify",
     ).middleware("auth");
     Route.put("/", "InformativosController.updateInformativo").middleware(
-      "auth"
+      "auth",
     );
   }).prefix("/informativos");
 
@@ -208,7 +211,7 @@ Route.group(() => {
     Route.get("/list", "DepartamentosController.list");
     Route.post(
       "/list_area_departamento",
-      "DepartamentosController.list_area_departamento"
+      "DepartamentosController.list_area_departamento",
     );
   })
     .prefix("/departaments")
@@ -241,7 +244,7 @@ Route.group(() => {
     Route.put("/update", "NotificationsController.updateReadNotifications");
     Route.get(
       "/getNotificationsByUser",
-      "NotificationsController.getNotificationsByUser"
+      "NotificationsController.getNotificationsByUser",
     );
   })
     .prefix("/notifications")
@@ -296,7 +299,7 @@ Route.group(() => {
   Route.group(() => {
     Route.get(
       "/getEnterprises",
-      "EmpresasController.getEnterprises"
+      "EmpresasController.getEnterprises",
     ).middleware("auth");
     Route.post("/login", "AuthController.login");
     Route.post("/signIn", "SignInController.login");
@@ -356,7 +359,7 @@ Route.group(() => {
     Route.post("/payStubAuxPdfGenerator", "Receipts.payStubAuxPdfGenerator");
     Route.post(
       "/EventsReceiptFormByFuncionario",
-      "Receipts.EventsReceiptFormByFuncionario"
+      "Receipts.EventsReceiptFormByFuncionario",
     );
     Route.get("/incomeTax/:ano", "Receipts.IncomeTax");
     Route.get("/decimoPdf/:ano", "Receipts.decimoPdfGenerator");
@@ -369,7 +372,7 @@ Route.group(() => {
   Route.group(() => {
     Route.post(
       "/dotCardPdfGenerator",
-      "PointRecord.pointRecordGenerator"
+      "PointRecord.pointRecordGenerator",
     ).middleware("auth");
   }).prefix("/DotCardPdf");
 
@@ -456,7 +459,7 @@ Route.group(() => {
     Route.get("/list", "DepartamentosController.list");
     Route.post(
       "/list_area_departamento",
-      "DepartamentosController.list_area_departamento"
+      "DepartamentosController.list_area_departamento",
     );
   })
     .prefix("/departaments")
@@ -489,7 +492,7 @@ Route.group(() => {
     Route.put("/update", "NotificationsController.updateReadNotifications");
     Route.get(
       "/getNotificationsByUser",
-      "NotificationsController.getNotificationsByUser"
+      "NotificationsController.getNotificationsByUser",
     );
   })
     .prefix("/notifications")

@@ -67,27 +67,33 @@ export default class IncomeReport {
         return;
       }
 
-      const incomeReportRelease = await this.incomeReportRelease(
-        ano,
-        auth.user.id_empresa,
-      );
+      // const incomeReportRelease = await this.incomeReportRelease(
+      //   ano,
+      //   auth.user.id_empresa,
+      // );
 
-      if (incomeReportRelease.rows.length == 0) {
-        response.badRequest({
-          error: "Empresa não liberou para gerar o recibo",
-        });
-        return;
-      }
+      // if (incomeReportRelease.rows.length == 0) {
+      //   response.badRequest({
+      //     error: "Empresa não liberou para gerar o recibo",
+      //   });
+      //   return;
+      // }
 
       const funcionario = await Funcionario.findBy(
         "id_funcionario",
         auth.user?.id_funcionario,
       );
 
+      console.log("funcionario", funcionario);
+
       const [incomeGetData, enterprise] = await Promise.all([
         this.incomeGetData(ano, funcionario?.cpf ?? ""),
         Empresa.findBy("id_empresa", auth.user?.id_empresa),
       ]);
+
+      console.log("incomeGetData", incomeGetData);
+
+      console.log("enterprise", enterprise);
 
       const [
         incomes,
@@ -177,32 +183,39 @@ export default class IncomeReport {
         ) +
         this.responsibleForTheInformation(enterprise?.responsavel_irpf ?? "");
 
+      console.log(templatePdf);
+
       const pdfTemp = await this.generatePdf(templatePdf);
+
+      console.log("pdfTemp", pdfTemp);
 
       const file = await uploadPdfEmpresa(
         pdfTemp.filename,
         auth.user?.id_empresa,
       );
 
+      console.log("file", file);
+
       if (file) {
         fs.unlink(pdfTemp.filename, () => {});
         response.json({ pdf: file.Location });
       }
     } catch (error) {
+      console.log("error", error);
       response.badRequest({ error: "Nenhum dado encontrado", result: error });
     }
   }
 
-  private incomeReportRelease = async (ano: string, empresaId: number) => {
-    return await Database.connection("pg").rawQuery(
-      `SELECT * FROM public.vw_ml_flp_liberacao_recibos
-            where tipo_id = 3
-            AND bloqueio_liberacao = false
-            AND irpf = '${ano}'
-            AND empresa_id = ${empresaId}
-            `,
-    );
-  };
+  // private incomeReportRelease = async (ano: string, empresaId: number) => {
+  //   return await Database.connection("pg").rawQuery(
+  //     `SELECT * FROM public.vw_ml_flp_liberacao_recibos
+  //           where tipo_id = 3
+  //           AND bloqueio_liberacao = false
+  //           AND irpf = '${ano}'
+  //           AND empresa_id = ${empresaId}
+  //           `,
+  //   );
+  // };
 
   private incomeGetData = async (ano: number, cpf: string) => {
     return await Database.connection("oracle").rawQuery(`
@@ -213,6 +226,7 @@ export default class IncomeReport {
   };
 
   private getIncomeInfos = async (idInformePrincipal: number) => {
+    console.log(idInformePrincipal);
     return await Database.connection("oracle").rawQuery(`
         SELECT * FROM GLOBUS.ESO_INFORME_RENDTRIB eir
         WHERE eir.ID_INFORME_PRINCIPAL = ${idInformePrincipal}

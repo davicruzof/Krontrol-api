@@ -11,14 +11,6 @@ const Funcionario_1 = __importDefault(require("../../Models/Funcionario"));
 const S3_1 = global[Symbol.for('ioc.use')]("App/Controllers/Http/S3");
 class IncomeReport {
     constructor() {
-        this.incomeReportRelease = async (ano, empresaId) => {
-            return await Database_1.default.connection("pg").rawQuery(`SELECT * FROM public.vw_ml_flp_liberacao_recibos
-            where tipo_id = 3
-            AND bloqueio_liberacao = false
-            AND irpf = '${ano}'
-            AND empresa_id = ${empresaId}
-            `);
-        };
         this.incomeGetData = async (ano, cpf) => {
             return await Database_1.default.connection("oracle").rawQuery(`
         SELECT * FROM GLOBUS.ESO_INFORME_PRINCIPAL eip
@@ -27,6 +19,7 @@ class IncomeReport {
       `);
         };
         this.getIncomeInfos = async (idInformePrincipal) => {
+            console.log(idInformePrincipal);
             return await Database_1.default.connection("oracle").rawQuery(`
         SELECT * FROM GLOBUS.ESO_INFORME_RENDTRIB eir
         WHERE eir.ID_INFORME_PRINCIPAL = ${idInformePrincipal}
@@ -586,18 +579,14 @@ class IncomeReport {
                 response.badRequest({ error: "Usuário não encontrado" });
                 return;
             }
-            const incomeReportRelease = await this.incomeReportRelease(ano, auth.user.id_empresa);
-            if (incomeReportRelease.rows.length == 0) {
-                response.badRequest({
-                    error: "Empresa não liberou para gerar o recibo",
-                });
-                return;
-            }
             const funcionario = await Funcionario_1.default.findBy("id_funcionario", auth.user?.id_funcionario);
+            console.log("funcionario", funcionario);
             const [incomeGetData, enterprise] = await Promise.all([
                 this.incomeGetData(ano, funcionario?.cpf ?? ""),
                 Empresa_1.default.findBy("id_empresa", auth.user?.id_empresa),
             ]);
+            console.log("incomeGetData", incomeGetData);
+            console.log("enterprise", enterprise);
             const [incomes, incomeReceivedExemptInfos, incomeOtherInfos, plrInfos, planMedicalInfos, pensInfos,] = await Promise.all([
                 this.getIncomeInfos(incomeGetData[0].ID),
                 this.getIncomeExemptInfos(incomeGetData[0].ID),
@@ -637,14 +626,18 @@ class IncomeReport {
                 this.templateIncomeReceivedAccumulatedInfos() +
                 this.InformationComplementariesInfos(this.formattedCurrency(plrInfos[0].PLR), planMedicalInfos, pensInfos) +
                 this.responsibleForTheInformation(enterprise?.responsavel_irpf ?? "");
+            console.log(templatePdf);
             const pdfTemp = await this.generatePdf(templatePdf);
+            console.log("pdfTemp", pdfTemp);
             const file = await (0, S3_1.uploadPdfEmpresa)(pdfTemp.filename, auth.user?.id_empresa);
+            console.log("file", file);
             if (file) {
                 fs_1.default.unlink(pdfTemp.filename, () => { });
                 response.json({ pdf: file.Location });
             }
         }
         catch (error) {
+            console.log("error", error);
             response.badRequest({ error: "Nenhum dado encontrado", result: error });
         }
     }
