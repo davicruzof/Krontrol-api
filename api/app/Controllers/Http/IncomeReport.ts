@@ -479,11 +479,11 @@ export default class IncomeReport {
 
     return `<table>
     <tr style="width: 100%;">
+    <th style="border: 1px solid #000; border-right: none;"><img src="https://i.ibb.co/G4jm9CLf/f977b67c-106c-4272-b979-fdf48ec68a70-2.jpg" alt="Ministério da Fazenda"
+            style="width: 60px; height: 60px; margin-right: 10px;"></th>
       <td
         style="border: 1px solid #000; padding: 4px; font-size: 12px; text-align: center;">
         <div style="display: flex; flex-direction: row; align-items: center; justify-content: center;">
-        <img src="https://i.ibb.co/G4jm9CLf/f977b67c-106c-4272-b979-fdf48ec68a70-2.jpg" alt="Ministério da Fazenda"
-          style="width: 60px; height: 60px; margin-right: 10px;">
           <div>
             <b>Ministério da Fazenda</b>
           </div>
