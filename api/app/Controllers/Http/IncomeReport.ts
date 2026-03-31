@@ -798,13 +798,13 @@ export default class IncomeReport {
     <tr style="width: 100%; max-width: 80%;">
       <td style="border: 1px solid #000;">
         <div style="font-size: 10px; display: flex; flex-direction: row; justify-content: space-between;">
-          <span style="padding-right: 4px;">6.1 Número do processo</span>
-          <span style="font-size: 10px;">
+          <span style="padding-right: 4px; font-size: 10px;">6.1 Número do processo</span>
+          <span>
             <span
-              style="border-left: 1px solid #000; border-right: 1px solid #000;">
+              style="font-size: 10px; border-left: 1px solid #000; border-right: 1px solid #000;">
               Quantidade de meses
             </span>
-            <span style="padding: 0 4px;">0</span>
+            <span style="padding: 0 4px; font-size: 10px;">0</span>
           </span>
         </div>
       </td>
