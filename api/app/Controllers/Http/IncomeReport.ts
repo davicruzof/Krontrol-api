@@ -726,7 +726,7 @@ export default class IncomeReport {
         <tr style="width: 100%;">
         <td style="width: 80%; border: 1px solid #000; padding: 4px;">
             <div style="font-size: 10px;">
-            7. Outros: (CLÁUSULA 3ª DA CCT)
+            7. Outros:
             </div>
         </td>
         <td style="border: 1px solid #000; padding: 4px;">
