@@ -441,7 +441,7 @@ export default class IncomeReport {
     <style>
         body {
         margin: 0;
-        padding: 30px;
+        padding: 20px;
         font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
         }
 
@@ -493,7 +493,7 @@ export default class IncomeReport {
                 <b>Exercício de ${exercicioLabel}</b>
             </div>
         </td>
-        <td style="border: 1px solid #000; padding: 4px; font-size: 12px; text-align: center;">
+        <td style="border: 1px solid #000; padding: 4px; font-size: 10px; text-align: center;">
             <div>
                 Comprovante de Rendimentos Pagos e de
             </div>
