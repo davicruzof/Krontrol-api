@@ -12,6 +12,7 @@ import {
 import AppVersion from "App/Models/AppVersion";
 import { templateIRPF } from "App/templates/pdf/template_irpf";
 import { templateDECIMO } from "App/templates/pdf/templateDecimo";
+import IncomeReport from "./IncomeTax";
 
 export default class Receipts {
   private async generatePdf(dados, template) {
@@ -50,7 +51,7 @@ export default class Receipts {
             AND bloqueio_liberacao = false
             AND mes_liberado = '${mes}'
             AND empresa_id = ${id_empresa}
-            `
+            `,
     );
 
     return liberacaoPdf?.rows.length > 0 ? true : false;
@@ -219,7 +220,7 @@ export default class Receipts {
       const liberacaoPdf = await this.isMonthFreedom(
         auth.user?.id_empresa,
         2,
-        competencia
+        competencia,
       );
 
       if (!liberacaoPdf) {
@@ -230,7 +231,7 @@ export default class Receipts {
 
       const funcionario = await Funcionario.findBy(
         "id_funcionario",
-        auth.user?.id_funcionario
+        auth.user?.id_funcionario,
       );
 
       if (!funcionario) {
@@ -239,7 +240,7 @@ export default class Receipts {
 
       const appUpdate = await AppVersion.findBy(
         "id_funcionario",
-        auth.user?.id_funcionario
+        auth.user?.id_funcionario,
       );
 
       if (!appUpdate) {
@@ -297,12 +298,12 @@ ORDER BY hol.tipoeven DESC, hol.codevento ASC`);
 
       const pdfTemp = await this.generatePdf(
         this.tratarDadosEvents(payStub, empresa),
-        templateDotCard
+        templateDotCard,
       );
 
       const file = await uploadPdfEmpresa(
         pdfTemp.filename,
-        auth.user?.id_empresa
+        auth.user?.id_empresa,
       );
 
       if (!file || !file.Location) {
@@ -335,7 +336,7 @@ ORDER BY hol.tipoeven DESC, hol.codevento ASC`);
       const liberacaoPdf = await this.isMonthFreedom(
         auth.user?.id_empresa,
         5,
-        competencia
+        competencia,
       );
 
       if (!liberacaoPdf) {
@@ -346,7 +347,7 @@ ORDER BY hol.tipoeven DESC, hol.codevento ASC`);
 
       const funcionario = await Funcionario.findBy(
         "id_funcionario",
-        auth.user?.id_funcionario
+        auth.user?.id_funcionario,
       );
 
       if (!funcionario) {
@@ -355,7 +356,7 @@ ORDER BY hol.tipoeven DESC, hol.codevento ASC`);
 
       const appUpdate = await AppVersion.findBy(
         "id_funcionario",
-        auth.user?.id_funcionario
+        auth.user?.id_funcionario,
       );
 
       if (!appUpdate) {
@@ -400,12 +401,12 @@ ORDER BY hol.tipoeven DESC, hol.codevento ASC`);
 
       const pdfTemp = await this.generatePdf(
         this.tratarDadosEvents(payStub, empresa),
-        templateDotCard
+        templateDotCard,
       );
 
       const file = await uploadPdfEmpresa(
         pdfTemp.filename,
-        auth.user?.id_empresa
+        auth.user?.id_empresa,
       );
 
       if (!file || !file.Location) {
@@ -438,7 +439,7 @@ ORDER BY hol.tipoeven DESC, hol.codevento ASC`);
       const liberacaoPdf = await this.isMonthFreedom(
         auth.user?.id_empresa,
         6,
-        competencia
+        competencia,
       );
 
       if (!liberacaoPdf) {
@@ -449,7 +450,7 @@ ORDER BY hol.tipoeven DESC, hol.codevento ASC`);
 
       const funcionario = await Funcionario.findBy(
         "id_funcionario",
-        auth.user?.id_funcionario
+        auth.user?.id_funcionario,
       );
 
       if (!funcionario) {
@@ -458,7 +459,7 @@ ORDER BY hol.tipoeven DESC, hol.codevento ASC`);
 
       const appUpdate = await AppVersion.findBy(
         "id_funcionario",
-        auth.user?.id_funcionario
+        auth.user?.id_funcionario,
       );
 
       if (!appUpdate) {
@@ -503,12 +504,12 @@ ORDER BY hol.tipoeven DESC, hol.codevento ASC`);
 
       const pdfTemp = await this.generatePdf(
         this.tratarDadosEvents(payStub, empresa),
-        templatePayStubPlr
+        templatePayStubPlr,
       );
 
       const file = await uploadPdfEmpresa(
         pdfTemp.filename,
-        auth.user?.id_empresa
+        auth.user?.id_empresa,
       );
 
       if (!file || !file.Location) {
@@ -545,7 +546,7 @@ ORDER BY hol.tipoeven DESC, hol.codevento ASC`);
       const liberacaoPdf = await this.isMonthFreedom(
         auth.user?.id_empresa,
         4,
-        competencia
+        competencia,
       );
 
       if (!liberacaoPdf) {
@@ -556,7 +557,7 @@ ORDER BY hol.tipoeven DESC, hol.codevento ASC`);
 
       const funcionario = await Funcionario.findBy(
         "id_funcionario",
-        auth.user?.id_funcionario
+        auth.user?.id_funcionario,
       );
 
       if (!funcionario) {
@@ -565,7 +566,7 @@ ORDER BY hol.tipoeven DESC, hol.codevento ASC`);
 
       const appUpdate = await AppVersion.findBy(
         "id_funcionario",
-        auth.user?.id_funcionario
+        auth.user?.id_funcionario,
       );
 
       if (!appUpdate) {
@@ -612,12 +613,12 @@ ORDER BY hol.tipoeven DESC, hol.codevento ASC`);
 
       const pdfTemp = await this.generatePdf(
         this.tratarDadosEventsDecimo(payStub, empresa),
-        templateDECIMO
+        templateDECIMO,
       );
 
       const file = await uploadPdfEmpresa(
         pdfTemp.filename,
-        auth.user?.id_empresa
+        auth.user?.id_empresa,
       );
 
       if (!file || !file.Location) {
@@ -643,13 +644,19 @@ ORDER BY hol.tipoeven DESC, hol.codevento ASC`);
     return valorFormatado;
   };
 
-  public async IncomeTax({ request, response, auth }: HttpContextContract) {
+  public async IncomeTax(data: HttpContextContract) {
     try {
+      const { request, response, auth } = data;
       let ano = request.params().ano;
 
       if (!ano) {
         response.badRequest({ error: "Ano é obrigatório" });
         return;
+      }
+
+      if (ano >= 2025) {
+        const incomeReport = new IncomeReport();
+        return await incomeReport.IncomeReport(data);
       }
 
       if (!auth.user) {
@@ -663,7 +670,7 @@ ORDER BY hol.tipoeven DESC, hol.codevento ASC`);
             AND bloqueio_liberacao = false
             AND irpf = '${ano}'
             AND empresa_id = ${auth.user.id_empresa}
-            `
+            `,
       );
 
       if (liberacaoPdf.rows.length == 0) {
@@ -675,7 +682,7 @@ ORDER BY hol.tipoeven DESC, hol.codevento ASC`);
 
       const funcionario = await Funcionario.findBy(
         "id_funcionario",
-        auth.user?.id_funcionario
+        auth.user?.id_funcionario,
       );
 
       const idErpAnterior = funcionario?.id_funcionario_erp_anterior ?? "";
@@ -705,7 +712,7 @@ ORDER BY hol.tipoeven DESC, hol.codevento ASC`);
 
       if (dadosIRPFDecimo.length > 0) {
         dadosIRPF[0].VLR_DECIMO = this.formattedCurrency(
-          dadosIRPFDecimo?.[0].VALOR
+          dadosIRPFDecimo?.[0].VALOR,
         );
       } else {
         dadosIRPF[0].VLR_DECIMO = this.formattedCurrency(0);
@@ -713,21 +720,21 @@ ORDER BY hol.tipoeven DESC, hol.codevento ASC`);
 
       dadosIRPF[0].VLR_DEC13 = this.formattedCurrency(dadosIRPF[0].VLR_DEC13);
       dadosIRPF[0].VLR_RENDIMENTO = this.formattedCurrency(
-        dadosIRPF[0].VLR_RENDIMENTO
+        dadosIRPF[0].VLR_RENDIMENTO,
       );
       dadosIRPF[0].VLR_CPO = this.formattedCurrency(dadosIRPF[0].VLR_CPO);
       dadosIRPF[0].VLR_PENSAO_ALIM = this.formattedCurrency(
-        dadosIRPF[0].VLR_PENSAO_ALIM
+        dadosIRPF[0].VLR_PENSAO_ALIM,
       );
       dadosIRPF[0].VLR_IMP_RETIDO = this.formattedCurrency(
-        dadosIRPF[0].VLR_IMP_RETIDO
+        dadosIRPF[0].VLR_IMP_RETIDO,
       );
       dadosIRPF[0].VLR_INDENIZACAO = this.formattedCurrency(
-        dadosIRPF[0].VLR_INDENIZACAO
+        dadosIRPF[0].VLR_INDENIZACAO,
       );
       dadosIRPF[0].VLR_OUTROS = this.formattedCurrency(dadosIRPF[0].VLR_OUTROS);
       dadosIRPF[0].VLR_ASSMEDICA = this.formattedCurrency(
-        dadosIRPF[0].VLR_ASSMEDICA
+        dadosIRPF[0].VLR_ASSMEDICA,
       );
       dadosIRPF[0].VLR_ODONTO = this.formattedCurrency(dadosIRPF[0].VLR_ODONTO);
 
@@ -742,7 +749,7 @@ ORDER BY hol.tipoeven DESC, hol.codevento ASC`);
 
       if (dadosIRPFPrecuniario && dadosIRPFPrecuniario.length > 0) {
         dadosIRPF[0].PECUNIARIO = this.formattedCurrency(
-          dadosIRPFPrecuniario?.[0].VLR_PECUNIARIO
+          dadosIRPFPrecuniario?.[0].VLR_PECUNIARIO,
         );
       } else {
         dadosIRPF[0].PECUNIARIO = this.formattedCurrency(0);
@@ -877,12 +884,12 @@ ORDER BY hol.tipoeven DESC, hol.codevento ASC`);
         {
           iprf: dadosIRPF[0],
         },
-        templateIRPF + templateMont
+        templateIRPF + templateMont,
       );
 
       const file = await uploadPdfEmpresa(
         pdfTemp.filename,
-        auth.user?.id_empresa
+        auth.user?.id_empresa,
       );
 
       if (file) {
@@ -890,7 +897,10 @@ ORDER BY hol.tipoeven DESC, hol.codevento ASC`);
         response.json({ pdf: file.Location });
       }
     } catch (error) {
-      response.badRequest({ error: "Nenhum dado encontrado", result: error });
+      data.response.badRequest({
+        error: "Nenhum dado encontrado",
+        result: error,
+      });
     }
   }
 }

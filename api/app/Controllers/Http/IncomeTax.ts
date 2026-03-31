@@ -1,0 +1,821 @@
+import fs from "fs";
+import pdf from "pdf-creator-node";
+import Empresa from "App/Models/Empresa";
+import Database from "@ioc:Adonis/Lucid/Database";
+import Funcionario from "../../Models/Funcionario";
+import { uploadPdfEmpresa } from "App/Controllers/Http/S3";
+import type { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
+
+interface IncomeInfos {
+  totalRendimentos: string;
+  contribuiçãoProvidenciariaOficial: string;
+  contribuiçãoEntidadesPrevComplementar: string;
+  pensaoAlimenticia: string;
+  impostoRendaRetidoNaFonte: string;
+}
+
+interface IncomeExemptInfos {
+  parcelaIsenta65: string;
+  diariasAjudaCusto: string;
+  pensaoProventosMoleGrave: string;
+  lucrosDividendos: string;
+  valoresPagosTitularMei: string;
+  indenizacao: string;
+  outros: string;
+}
+
+interface IncomeOtherInfos {
+  decimoTerceiroSalario: string;
+  impostoRendaRetidoNaFonteSobre13oSalario: string;
+  outros: string;
+}
+
+interface PlanMedicalInfos {
+  ID: number;
+  ID_INFORME_PRINCIPAL: number;
+  tipoPlano: number;
+  CNPJ_OPERADORA: string;
+  REGISTRO_ANS: string;
+  VALOR_SAUDE_TITULAR: number;
+  CPF_DEPENDENTE: string;
+  NOME_DEPENDENTE: string;
+  VALOR_SAUDE_DEPENDENTE: number;
+  NOME_OPERADORA: string;
+}
+
+interface PensInfos {
+  ID: number;
+  ID_INFORME_PRINCIPAL: number;
+  CPF_ALIMENTANDO: string;
+  NOME_ALIMENTANDO: string;
+  VALOR_PENSAO: number;
+  DT_NASC: string;
+}
+
+export default class IncomeReport {
+  public async IncomeReport({ request, response, auth }: HttpContextContract) {
+    try {
+      const ano = request.params().ano;
+
+      if (!ano) {
+        response.badRequest({ error: "Ano é obrigatório" });
+        return;
+      }
+
+      if (!auth.user) {
+        response.badRequest({ error: "Usuário não encontrado" });
+        return;
+      }
+
+      const incomeReportRelease = await this.incomeReportRelease(
+        ano,
+        auth.user.id_empresa,
+      );
+
+      if (incomeReportRelease.rows.length == 0) {
+        response.badRequest({
+          error: "Empresa não liberou para gerar o recibo",
+        });
+        return;
+      }
+
+      const funcionario = await Funcionario.findBy(
+        "id_funcionario",
+        auth.user?.id_funcionario,
+      );
+
+      const [incomeGetData, enterprise] = await Promise.all([
+        this.incomeGetData(ano, funcionario?.cpf ?? ""),
+        Empresa.findBy("id_empresa", auth.user?.id_empresa),
+      ]);
+
+      const [
+        incomes,
+        incomeReceivedExemptInfos,
+        incomeOtherInfos,
+        plrInfos,
+        planMedicalInfos,
+        pensInfos,
+      ] = await Promise.all([
+        this.getIncomeInfos(incomeGetData[0].ID),
+        this.getIncomeExemptInfos(incomeGetData[0].ID),
+        this.getIncomeOtherInfos(incomeGetData[0].ID),
+        this.getPlrInfos(incomeGetData[0].ID),
+        this.getPlanMedicalInfos(incomeGetData[0].ID),
+        this.getPensInfos(incomeGetData[0].ID),
+      ]);
+
+      const incomesData: IncomeInfos = {
+        totalRendimentos: this.formattedCurrency(incomes[0].TOTAL_RENDIMENTOS),
+        contribuiçãoProvidenciariaOficial: this.formattedCurrency(
+          incomes[0].CONTRIB_PREV,
+        ),
+        contribuiçãoEntidadesPrevComplementar: this.formattedCurrency(
+          incomes[0].CONTRIB_PREVID_COMPL_FAPI,
+        ),
+        pensaoAlimenticia: this.formattedCurrency(
+          incomes[0].PENSAO_ALIMENTICIA,
+        ),
+        impostoRendaRetidoNaFonte: this.formattedCurrency(
+          incomes[0].IRRF_RETIDO,
+        ),
+      };
+
+      const incomeReceivedExemptInfosData: IncomeExemptInfos = {
+        parcelaIsenta65: this.formattedCurrency(
+          incomeReceivedExemptInfos[0].PARCELA_ISENTA_65,
+        ),
+        diariasAjudaCusto: this.formattedCurrency(
+          incomeReceivedExemptInfos[0].DIARIAS_AJUDA_CUSTO,
+        ),
+        pensaoProventosMoleGrave: this.formattedCurrency(
+          incomeReceivedExemptInfos[0].PENSAO_PROVENTOS_MOLE_GRAVE,
+        ),
+        lucrosDividendos: this.formattedCurrency(
+          incomeReceivedExemptInfos[0].LUCROS_DIVIDENDOS,
+        ),
+        valoresPagosTitularMei: this.formattedCurrency(
+          incomeReceivedExemptInfos[0].VALORES_PAGOS_TITULAR_MEI,
+        ),
+        indenizacao: this.formattedCurrency(
+          incomeReceivedExemptInfos[0].INDENIZACAO,
+        ),
+        outros: this.formattedCurrency(
+          incomeReceivedExemptInfos[0].OUTROS_ISENTOS,
+        ),
+      };
+
+      const incomeOtherInfosData: IncomeOtherInfos = {
+        decimoTerceiroSalario: this.formattedCurrency(
+          incomeOtherInfos[0].DECIMO_TERCEIRO,
+        ),
+        impostoRendaRetidoNaFonteSobre13oSalario: this.formattedCurrency(
+          incomeOtherInfos[0].IRRF_RETIDO_13,
+        ),
+        outros: this.formattedCurrency(incomeOtherInfos[0].OUTROS_EXCLUSIVOS),
+      };
+
+      const templatePdf =
+        this.InitPdf() +
+        this.templateHeaderInfos(ano) +
+        this.templateEnterpriseInfos(
+          enterprise?.cnpj ?? "",
+          enterprise?.nomeempresarial ?? "",
+        ) +
+        this.templatePeopleInfos(
+          funcionario?.cpf ?? "",
+          funcionario?.nome ?? "",
+        ) +
+        this.templateIncomeInfos(incomesData) +
+        this.templateIncomeExemptInfos(incomeReceivedExemptInfosData) +
+        this.templateIncomeOtherInfos(incomeOtherInfosData) +
+        this.templateIncomeReceivedAccumulatedInfos() +
+        this.InformationComplementariesInfos(
+          this.formattedCurrency(plrInfos[0].PLR),
+          planMedicalInfos,
+          pensInfos,
+        ) +
+        this.responsibleForTheInformation(enterprise?.responsavel_irpf ?? "");
+
+      const pdfTemp = await this.generatePdf(templatePdf);
+
+      const file = await uploadPdfEmpresa(
+        pdfTemp.filename,
+        auth.user?.id_empresa,
+      );
+
+      if (file) {
+        fs.unlink(pdfTemp.filename, () => {});
+        response.json({ pdf: file.Location });
+      }
+    } catch (error) {
+      response.badRequest({ error: "Nenhum dado encontrado", result: error });
+    }
+  }
+
+  private incomeReportRelease = async (ano: string, empresaId: number) => {
+    return await Database.connection("pg").rawQuery(
+      `SELECT * FROM public.vw_ml_flp_liberacao_recibos
+            where tipo_id = 3
+            AND bloqueio_liberacao = false
+            AND irpf = '${ano}'
+            AND empresa_id = ${empresaId}
+            `,
+    );
+  };
+
+  private incomeGetData = async (ano: number, cpf: string) => {
+    return await Database.connection("oracle").rawQuery(`
+        SELECT * FROM GLOBUS.ESO_INFORME_PRINCIPAL eip
+        WHERE eip.CPF_BENEFICIARIO = '${cpf}'
+        and eip.ANO_BASE = '${ano}'
+      `);
+  };
+
+  private getIncomeInfos = async (idInformePrincipal: number) => {
+    return await Database.connection("oracle").rawQuery(`
+        SELECT * FROM GLOBUS.ESO_INFORME_RENDTRIB eir
+        WHERE eir.ID_INFORME_PRINCIPAL = ${idInformePrincipal}
+      `);
+  };
+
+  private getIncomeExemptInfos = async (idInformePrincipal: number) => {
+    return await Database.connection("oracle").rawQuery(`
+        SELECT * FROM GLOBUS.ESO_INFORME_RENDISENTOS eire
+        WHERE eire.ID_INFORME_PRINCIPAL = ${idInformePrincipal}
+      `);
+  };
+
+  private getIncomeOtherInfos = async (idInformePrincipal: number) => {
+    return await Database.connection("oracle").rawQuery(`
+        SELECT * FROM GLOBUS.ESO_INFORME_TRIBEXCLUSIVA eior
+        WHERE eior.ID_INFORME_PRINCIPAL = ${idInformePrincipal}
+      `);
+  };
+
+  private getPlrInfos = async (idInformePrincipal: number) => {
+    return await Database.connection("oracle").rawQuery(`
+        SELECT * FROM GLOBUS.ESO_INFORME_OUTROS_ISENTOS eiplr
+        WHERE eiplr.ID_INFORME_PRINCIPAL = ${idInformePrincipal}
+      `);
+  };
+
+  private getPlanMedicalInfos = async (idInformePrincipal: number) => {
+    return await Database.connection("oracle").rawQuery(`
+        SELECT * FROM GLOBUS.ESO_INFORME_PLANSAUDE eipm
+        WHERE eipm.ID_INFORME_PRINCIPAL = ${idInformePrincipal}
+      `);
+  };
+
+  private getPensInfos = async (idInformePrincipal: number) => {
+    return await Database.connection("oracle").rawQuery(`
+        SELECT * FROM GLOBUS.ESO_INFORME_PENSAOALIM eipm
+        WHERE eipm.ID_INFORME_PRINCIPAL = ${idInformePrincipal}
+      `);
+  };
+
+  private InitPdf = () => {
+    return `<!DOCTYPE html>
+    <html lang="en">
+
+    <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informe de Rendimentos</title>
+    <style>
+        body {
+        padding: 0;
+        margin: 0;
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        padding: 30px;
+        }
+
+        table {
+        width: 100%;
+        }
+
+        span {
+        font-weight: 500;
+        font-size: 14px;
+        padding: 1em;
+        padding-right: 0.5em;
+        padding-left: 0;
+        }
+
+        tr {
+        width: 100%;
+        }
+
+        hr {
+        border: 1px solid #000;
+        }
+    </style>
+    </head>
+
+    <body>`;
+  };
+
+  private templateHeaderInfos = (ano: string) => {
+    return `<table>
+        <tr style="width: 100%;">
+        <td style="width: 50%; border: 1px solid #000; padding: 4px; font-size: 12px;">
+            <center>
+            <div>
+                <b>Ministério da Fazenda</b>
+            </div>
+            <div>
+                Secretaria da Receita Federal do Brasil
+            </div>
+            <div>
+                Imposto sobre a Renda da Pessoa Física
+            </div>
+            <div>
+                <b>Exercício de ${ano + 1}</b>
+            </div>
+            </center>
+        </td>
+        <td style="border: 1px solid #000; padding: 4px; font-size: 12px;">
+            <center>
+            <div>
+                Comprovante de Rendimentos Pagos e de
+            </div>
+            <div>
+                Impostos sobre Renda Retido na Fonte
+            </div>
+            <div>
+                Imposto sobre a Renda da Pessoa Física
+            </div>
+            <div>
+                <b>Ano-calendário ${ano}</b>
+            </div>
+            </center>
+        </td>
+        </tr>
+    </table>
+
+    <table>
+        <tr>
+        <td style="border: 1px solid #000; padding: 8px; font-size: 12px;">
+            <center>
+            Verifique as condições e o prazo para aprensentação da Declaração do Imposto sobre a Renda da Pessoa Física
+            para
+            </center>
+            <center>
+            este ano-calendário no sítio daSecretaria da da Receita Federal do Brasil na Internet, no endereço
+            <www.receita.fazenda.gov.br>
+            </center>
+        </td>
+        </tr>
+    </table>`;
+  };
+
+  private templateEnterpriseInfos = (cnpj: string, enterpriseName: string) => {
+    return `<b style="font-size: 10px;">1. Fonte Pagadora Pessoa Jurídica ou Pessoa Física</b>
+
+    <table>
+        <tr style="width: 100%;">
+        <td style="width: 40%; border: 1px solid #000; padding: 8px;">
+            <div style="font-size: 10px;">
+            CNPJ: ${cnpj}
+            </div>
+        </td>
+        <td style="border: 1px solid #000; padding: 8px;">
+            <div style="font-size: 10px;">
+            Empresa: ${enterpriseName}
+            </div>
+        </td>
+        </tr>
+    </table>`;
+  };
+
+  private templatePeopleInfos = (cpf: string, name: string) => {
+    return `<b style="font-size: 10px;">2. Pessoa Física Beneficiária dos Rendimentos</b>
+
+    <table>
+        <tr style="width: 100%;">
+        <td style="width: 30%; border: 1px solid #000; padding: 8px;">
+            <div style="font-size: 10px;">
+            CPF: ${cpf}
+            </div>
+        </td>
+        <td style="border: 1px solid #000; padding: 8px;">
+            <div style="font-size: 10px;">
+            Nome Completo: ${name}
+            </div>
+        </td>
+        </tr>
+    </table>
+    <table>
+        <tr style="width: 100%;">
+        <td style="width: 100%; border: 1px solid #000; padding: 8px;">
+            <div style="font-size: 10px;">
+            Natureza do rendimento
+            </div>
+        </td>
+        <td />
+        </tr>
+    </table>`;
+  };
+
+  private templateIncomeInfos = (incomeInfos: IncomeInfos) => {
+    return `<b style="font-size: 10px;">3. Rendimentos Tributáveis, Deduções e Imposto de renda Retido na Fonte</b>
+
+    <table>
+        <tr style="width: 100%;">
+        <td style="width: 80%; border: 1px solid #000; padding: 8px;">
+            <div style="font-size: 10px;">
+            1.Total dos rendimentos(Inclusive férias)
+            </div>
+        </td>
+        <td style="border: 1px solid #000; padding: 8px;">
+            <div style="text-align: end; font-size:10px;">
+            ${incomeInfos.totalRendimentos}
+            </div>
+        </td>
+        </tr>
+        <tr style="width: 100%;">
+        <td style="width: 80%; border: 1px solid #000; padding: 8px;">
+            <div style="font-size: 10px;">
+            2. Contribuição previdenciária oficial
+            </div>
+        </td>
+        <td style="border: 1px solid #000; padding: 8px;">
+            <div style="text-align: end; font-size:10px;">
+            ${incomeInfos.contribuiçãoProvidenciariaOficial}
+            </div>
+        </td>
+        </tr>
+        <tr style="width: 100%;">
+        <td style="width: 80%; border: 1px solid #000; padding: 8px;">
+            <div style="font-size: 10px;">
+            3. Contribuição a entidades de prev. complementar e a fundos de aposentadoria prog. individual - Fapi (quadro
+            7)
+            </div>
+        </td>
+        <td style="border: 1px solid #000; padding: 8px;">
+            <div style="text-align: end; font-size:10px;">
+            R$: 0,00
+            </div>
+        </td>
+        </tr>
+        <tr style="width: 100%;">
+        <td style="width: 80%; border: 1px solid #000; padding: 8px;">
+            <div style="font-size: 10px;">
+            4. Pensão Alimentícia(Informar beneficiário no quadro 7)
+            </div>
+        </td>
+        <td style="border: 1px solid #000; padding: 8px;">
+            <div style="text-align: end; font-size:10px;">
+            ${incomeInfos.pensaoAlimenticia}
+            </div>
+        </td>
+        </tr>
+        <tr style="width: 100%;">
+        <td style="width: 80%; border: 1px solid #000; padding: 8px;">
+            <div style="font-size: 10px;">
+            5. Imposto sobre a renda retido na fonte
+            </div>
+        </td>
+        <td style="border: 1px solid #000; padding: 8px;">
+            <div style="text-align: end; font-size:10px;">
+            ${incomeInfos.impostoRendaRetidoNaFonte}
+            </div>
+        </td>
+        </tr>
+    </table>`;
+  };
+
+  private templateIncomeExemptInfos = (
+    incomeExemptInfos: IncomeExemptInfos,
+  ) => {
+    return `<table>
+        <tr>
+        <td style="width: 80%;padding: 4px;">
+            <b style="font-size: 10px;">4. Rendimentos Isentos e Não Tributáveis</b>
+        </td>
+        <td style="padding: 4px; text-align: center; font-size: 12px;">
+            Valores em reais
+        </td>
+        </tr>
+    </table>
+
+    <table>
+        <tr style="width: 100%;">
+        <td style="width: 80%; border: 1px solid #000; padding: 4px;">
+            <div style="font-size: 10px;">
+            1. Parcela Isenta dos proventos de aposentadoria, reserva, reforma e pensão (65 anos ou mais)
+            </div>
+        </td>
+        <td style="border: 1px solid #000; padding: 4px;">
+            <div style="text-align: end; font-size: 10px;">
+            ${incomeExemptInfos.parcelaIsenta65}
+            </div>
+        </td>
+        </tr>
+        <tr style="width: 100%;">
+        <td style="width: 80%; border: 1px solid #000; padding: 4px;">
+            <div style="font-size: 10px;">
+            2. Diárias e ajuda de custo
+            </div>
+        </td>
+        <td style="border: 1px solid #000; padding: 4px;">
+            <div style="text-align: end; font-size: 10px;">
+            ${incomeExemptInfos.diariasAjudaCusto}
+            </div>
+        </td>
+        </tr>
+        <tr style="width: 100%;">
+        <td style="width: 80%; border: 1px solid #000; padding: 4px;">
+            <div style="font-size: 10px;">
+            3. Pensão e proventos de aposentadoria ou reforma por moléstia grave proventos de aposentadoria ou reforma por
+            acidente
+            em serviço
+            </div>
+        </td>
+        <td style="border: 1px solid #000; padding: 4px;">
+            <div style="text-align: end; font-size: 10px;">
+            ${incomeExemptInfos.pensaoProventosMoleGrave}
+            </div>
+        </td>
+        </tr>
+        <tr style="width: 100%;">
+        <td style="width: 80%; border: 1px solid #000; padding: 4px;">
+            <div style="font-size: 10px;">
+            4. Lucros e dividendos, apurados a partir de 1996, pago por pessoa jurídica(lucro real, presumido ou
+            arbitrado)
+            </div>
+        </td>
+        <td style="border: 1px solid #000; padding: 4px;">
+            <div style="text-align: end; font-size: 10px;">
+            ${incomeExemptInfos.lucrosDividendos}
+            </div>
+        </td>
+        </tr>
+        <tr style="width: 100%;">
+        <td style="width: 80%; border: 1px solid #000; padding: 4px;">
+            <div style="font-size: 10px;">
+            5. Valores pagos ao titular ou sócio da microempresa ou empresa de pequeno porte, exceto pro labore, aluguéis
+            ou
+            serviços prestados
+            </div>
+        </td>
+        <td style="border: 1px solid #000; padding: 4px;">
+            <div style="text-align: end; font-size: 10px;">
+            ${incomeExemptInfos.valoresPagosTitularMei}
+            </div>
+        </td>
+        </tr>
+        <tr style="width: 100%;">
+        <td style="width: 80%; border: 1px solid #000; padding: 4px;">
+            <div style="font-size: 10px;">
+            6. Indenização por rescisão de contrato de trabalho, inclusive a título de PDV, e por acidente de trabalho
+            </div>
+        </td>
+        <td style="border: 1px solid #000; padding: 4px;">
+            <div style="text-align: end; font-size: 10px;">
+            ${incomeExemptInfos.indenizacao}
+            </div>
+        </td>
+        </tr>
+        <tr style="width: 100%;">
+        <td style="width: 80%; border: 1px solid #000; padding: 4px;">
+            <div style="font-size: 10px;">
+            7. Outros:(CLÁUSULA 3ª DA CCT;)
+            </div>
+        </td>
+        <td style="border: 1px solid #000; padding: 4px;">
+            <div style="text-align: end; font-size: 10px;">
+            ${incomeExemptInfos.outros}
+            </div>
+        </td>
+        </tr>
+    </table>`;
+  };
+
+  private templateIncomeOtherInfos = (incomeOtherInfos: IncomeOtherInfos) => {
+    return `<table>
+        <tr>
+        <td style="width: 80%;padding: 4px;">
+            <b style="font-size: 10px;">5. Rendimentos sujeitos a Tributação Exclusiva(rendimento líquido)</b>
+        </td>
+        <td style="padding: 4px; text-align: center; font-size: 12px;">
+            Valores em reais
+        </td>
+        </tr>
+    </table>
+
+    <table>
+        <tr style="width: 100%;">
+          <td style="width: 80%; border: 1px solid #000; padding: 4px;">
+              <div style="font-size: 10px;">
+              1. Décimo terceiro salário
+              </div>
+          </td>
+          <td style="border: 1px solid #000; padding: 8px;">
+              <div style="text-align: end; font-size: 10px;">
+              ${incomeOtherInfos.decimoTerceiroSalario}
+              </div>
+          </td>
+        </tr>
+        <tr style="width: 100%;">
+        <td style="width: 80%; border: 1px solid #000; padding: 8px;">
+            <div style="font-size: 10px;">
+            2. Imposto sobre a renda retida na fonte sobre 13º salário
+            </div>
+        </td>
+        <td style="border: 1px solid #000; padding: 8px;">
+            <div style="text-align: end; font-size: 10px;">
+            ${incomeOtherInfos.impostoRendaRetidoNaFonteSobre13oSalario}
+            </div>
+        </td>
+        </tr>
+        <tr style="width: 100%;">
+        <td style="width: 80%; border: 1px solid #000; padding: 8px;">
+            <div style="font-size: 10px;">
+            3. Outros
+            </div>
+        </td>
+        <td style="border: 1px solid #000; padding: 8px;">
+            <div style="text-align: end; font-size: 10px;">
+            ${incomeOtherInfos.outros}
+            </div>
+        </td>
+        </tr>
+    </table>`;
+  };
+
+  private templateIncomeReceivedAccumulatedInfos = () => {
+    return `<div>
+    <b style="font-size: 10px;">6. Rendimentos recebidos acumuladamente - art.12-a da lei no.7.713, de 1988 (sujeito a
+      tributacão exclusiva)</b>
+  </div>
+
+  <table style="width: 80%; max-width: 80%;">
+    <tr style="width: 100%; max-width: 80%;">
+      <td style="width: 40%; border: 1px solid #000; padding: 4px;">
+        <div style="font-size: 12px; display: flex; flex-direction: row; justify-content: space-between;">
+          6.1 Numero do processo
+          <div style="font-size: 12px;">
+            <span
+              style="border-left: 1px solid #000; border-right: 1px solid #000; padding: 4px; padding-right: 24px; padding-left: 8px;">
+              Quantidade de meses
+            </span>
+            <span style="padding-left: 100px; text-align: end;">0</span>
+          </div>
+        </div>
+      </td>
+    </tr>
+    <tr style="width: 100%;">
+      <td style="width: 100%; border: 1px solid #000; padding: 4px;">
+        <div style="font-size: 12px;">
+          Natureza do Processo:
+        </div>
+      </td>
+    </tr>
+  </table>`;
+  };
+
+  private InformationComplementariesInfos = (
+    plr: string,
+    planMedicalInfosData: PlanMedicalInfos[],
+    pensInfosData: PensInfos[],
+  ) => {
+    let medicalInfos = this.medicalInfos(planMedicalInfosData);
+
+    let pensInfos = this.informationPensInfos(pensInfosData);
+
+    return `<div>
+        <b style="font-size: 10px;">7. Informações complementares</b>
+    </div>
+
+    <div style="min-height: 100px; border: 1px solid #000; margin: 2px;">
+      <div style="font-size: 10px; margin-left: 4px; margin-top: 4px;">
+        Rendimentos isentos outros:
+      </div>
+      <div style="font-size: 10px; margin-left: 4px; margin-bottom: 4px;">
+        Participação nos lucros ou resultados (PLR): ${plr}
+      </div>
+
+      <div>${medicalInfos}</div>
+      <div>${pensInfos}</div>
+      `;
+  };
+
+  private medicalInfos = (medicalInfosData: PlanMedicalInfos[]) => {
+    let medicalInfos = "";
+    if (medicalInfosData && medicalInfosData.length > 0) {
+      medicalInfos = medicalInfos + "<table>";
+      let operadoras: string[] = [];
+
+      medicalInfosData.map((item) => {
+        if (!operadoras.includes(item.CNPJ_OPERADORA)) {
+          operadoras.push(item.CNPJ_OPERADORA);
+          medicalInfos =
+            medicalInfos +
+            `
+            <div><span>Operadora: ${item.CNPJ_OPERADORA} - ${item.NOME_OPERADORA}</span></div>
+            <div><span>valor pago no ano referente aos dependentes:</span></div>
+            <tr>
+            <td>CPF</td>
+            <td>NOME</td>
+            <td>VALOR</td>
+          </tr>`;
+        }
+        medicalInfos =
+          medicalInfos +
+          `
+          <tr>
+            <td>${item.CPF_DEPENDENTE}</td>
+            <td>${item.NOME_DEPENDENTE}</td>
+            <td>${this.formattedCurrency(+item.VALOR_SAUDE_DEPENDENTE)}</td>
+          </tr>
+        `;
+      });
+
+      medicalInfos = medicalInfos + `</table>`;
+    }
+
+    return medicalInfos;
+  };
+
+  private informationPensInfos = (pensInfosData: PensInfos[]) => {
+    let complementar = "";
+
+    if (pensInfosData.length > 0) {
+      complementar = complementar + "<table>";
+      pensInfosData.map((item) => {
+        if (item) {
+          complementar =
+            complementar +
+            `
+              <tr style="width: 100%;">
+                <div><span>Dados dos alimentandos:</span></div>
+                <table>
+                  <tr>
+                    <td>CPF</td>
+                    <td>NOME</td>
+                    <td>VALOR</td>
+                  </tr>
+                  <tr>
+                    <td>${item.CPF_ALIMENTANDO}</td>
+                    <td>${item.NOME_ALIMENTANDO}</td>
+                    <td>${this.formattedCurrency(+item.VALOR_PENSAO)}</td>
+                  </tr>
+                </table>
+              </tr>
+            </table>
+          `;
+        }
+      });
+      complementar = complementar + `</table>`;
+    }
+
+    return complementar;
+  };
+
+  private responsibleForTheInformation = (responsible: string) => {
+    return `<b style="font-size: 14px; margin-top: 16px;">8. RESPONSAVEL PELAS INFORMACOES</b>
+
+        <table>
+            <tr style="width: 100%;">
+            <td style="width: 40%; border: 1px solid #000; padding: 8px;">
+                <div style="font-size: 10px;">
+                Nome: ${responsible}
+                </div>
+            </td>
+            <td style="width: 20%; border: 1px solid #000; padding: 8px;">
+                <div style="font-size: 10px;">
+                Data: / /
+                </div>
+            </td>
+            <td style="border: 1px solid #000; padding: 8px;">
+                <div style="font-size: 10px;">
+                Assinatura:
+                </div>
+            </td>
+            </tr>
+        </table>
+
+        </body>
+
+        </html>`;
+  };
+
+  private async generatePdf(template: string) {
+    try {
+      var options = {
+        format: "A3",
+        orientation: "portrait",
+        border: "10mm",
+        type: "pdf",
+      };
+      const filename = "informe_rendimentos_" + new Date().getTime() + ".pdf";
+      var document = {
+        html: template,
+        path: "./pdfsTemp/" + filename,
+      };
+
+      let file = pdf
+        .create(document, options)
+        .then((res) => {
+          return res;
+        })
+        .catch((error) => {
+          return error;
+        });
+      return await file;
+    } catch (error) {}
+  }
+
+  private formattedCurrency = (value) => {
+    if (value == null) {
+      return "0,00";
+    }
+
+    let valorFormatado = value.toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    });
+    return valorFormatado;
+  };
+}
