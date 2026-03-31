@@ -12,7 +12,7 @@ import {
 import AppVersion from "App/Models/AppVersion";
 import { templateIRPF } from "App/templates/pdf/template_irpf";
 import { templateDECIMO } from "App/templates/pdf/templateDecimo";
-import IncomeReport from "./IncomeReport";
+// import IncomeReport from "./IncomeReport";
 
 export default class Receipts {
   private async generatePdf(dados, template) {
@@ -654,10 +654,10 @@ ORDER BY hol.tipoeven DESC, hol.codevento ASC`);
         return;
       }
 
-      if (+ano >= 2025) {
-        const incomeReport = new IncomeReport();
-        return await incomeReport.IncomeReport(data);
-      }
+      // if (+ano >= 2025) {
+      //   const incomeReport = new IncomeReport();
+      //   return await incomeReport.IncomeReport(data);
+      // }
 
       if (!auth.user) {
         response.badRequest({ error: "Usuário não encontrado" });

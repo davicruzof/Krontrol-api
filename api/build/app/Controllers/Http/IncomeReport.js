@@ -60,14 +60,6 @@ class IncomeReport {
                 throw err;
             }
         };
-        this.incomeReportRelease = async (ano, empresaId) => {
-            return await Database_1.default.connection("pg").rawQuery(`SELECT * FROM public.vw_ml_flp_liberacao_recibos
-            where tipo_id = 3
-            AND bloqueio_liberacao = false
-            AND irpf = '${ano}'
-            AND empresa_id = ${empresaId}
-            `);
-        };
         this.fetchIncomePrincipal = async (ano, cpf) => {
             return await Database_1.default.connection("oracle").rawQuery(`
         SELECT * FROM GLOBUS.ESO_INFORME_PRINCIPAL eip
@@ -160,10 +152,10 @@ class IncomeReport {
             return `<table>
     <tr style="width: 100%;">
       <td
-        style="display: flex; flex-direction: row; align-items: center; justify-content: center; border: 1px solid #000; padding: 4px; font-size: 12px; text-align: center;">
+        style="border: 1px solid #000; padding: 4px; font-size: 12px; text-align: center;">
+        <div style="display: flex; flex-direction: row; align-items: center; justify-content: center;">
         <img src="https://i.ibb.co/G4jm9CLf/f977b67c-106c-4272-b979-fdf48ec68a70-2.jpg" alt="Ministério da Fazenda"
           style="width: 60px; height: 60px; margin-right: 10px;">
-        <div>
           <div>
             <b>Ministério da Fazenda</b>
           </div>
@@ -680,13 +672,6 @@ class IncomeReport {
                 id_funcionario: auth.user.id_funcionario,
                 id_empresa: auth.user.id_empresa,
             });
-            const incomeReportRelease = await this.incomeReportRelease(ano, auth.user.id_empresa);
-            if (incomeReportRelease.rows.length == 0) {
-                response.badRequest({
-                    error: "Empresa não liberou para gerar o recibo",
-                });
-                return;
-            }
             const funcionario = await this.traceQuery(reqId, "pg.funcionario", dbTrace, () => Funcionario_1.default.findBy("id_funcionario", auth.user?.id_funcionario));
             log("buscando informe principal e empresa (parallel)", { reqId, ano });
             const [incomeGetData, enterprise] = await Promise.all([
