@@ -5,6 +5,32 @@ import Database from "@ioc:Adonis/Lucid/Database";
 import Funcionario from "../../Models/Funcionario";
 import { uploadPdfEmpresa } from "App/Controllers/Http/S3";
 import type { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
+import Logger from "@ioc:Adonis/Core/Logger";
+
+const log = (step: string, data?: Record<string, unknown>) => {
+  if (data) {
+    Logger.info(data, `[IncomeReport] ${step}`);
+  } else {
+    Logger.info(`[IncomeReport] ${step}`);
+  }
+};
+
+interface IncomeReportDbTraceEntry {
+  op: string;
+  ok: boolean;
+  rows?: number;
+  ms?: number;
+  error?: string;
+}
+
+function wantsIncomeReportDbTrace(request: HttpContextContract["request"]) {
+  const q = request.qs();
+  return (
+    request.input("debug") === "1" ||
+    request.input("debug") === true ||
+    String(q.debug) === "1"
+  );
+}
 
 interface IncomeInfos {
   totalRendimentos: string;
@@ -53,19 +79,80 @@ interface PensInfos {
 }
 
 export default class IncomeReport {
+  private traceQuery = async <T>(
+    reqId: string,
+    op: string,
+    dbTrace: IncomeReportDbTraceEntry[],
+    executor: () => Promise<T>,
+  ): Promise<T> => {
+    const t0 = Date.now();
+    try {
+      const result = await executor();
+      const ms = Date.now() - t0;
+      let rows: number | undefined;
+      if (Array.isArray(result)) {
+        rows = result.length;
+      } else if (result == null) {
+        rows = 0;
+      } else {
+        rows = 1;
+      }
+      const entry: IncomeReportDbTraceEntry = { op, ok: true, rows, ms };
+      dbTrace.push(entry);
+      log("db ok", { reqId, ...entry });
+      return result;
+    } catch (err) {
+      const ms = Date.now() - t0;
+      const message = err instanceof Error ? err.message : String(err);
+      const entry: IncomeReportDbTraceEntry = {
+        op,
+        ok: false,
+        ms,
+        error: message,
+      };
+      dbTrace.push(entry);
+      Logger.error(
+        { err, reqId, op, ms },
+        `[IncomeReport] falha na operação de banco`,
+      );
+      throw err;
+    }
+  };
+
   public async IncomeReport({ request, response, auth }: HttpContextContract) {
+    const reqId = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+    const dbTrace: IncomeReportDbTraceEntry[] = [];
+    const withTrace = <T extends Record<string, unknown>>(body: T) =>
+      wantsIncomeReportDbTrace(request)
+        ? { ...body, reqId, db: dbTrace }
+        : body;
+
     try {
       const ano = request.params().ano;
+      log("request iniciada", {
+        reqId,
+        ano,
+        method: request.method(),
+        url: request.url(),
+      });
 
       if (!ano) {
-        response.badRequest({ error: "Ano é obrigatório" });
+        log("validação falhou: ano ausente", { reqId });
+        response.badRequest(withTrace({ error: "Ano é obrigatório" }));
         return;
       }
 
       if (!auth.user) {
-        response.badRequest({ error: "Usuário não encontrado" });
+        log("validação falhou: usuário não autenticado", { reqId });
+        response.badRequest(withTrace({ error: "Usuário não encontrado" }));
         return;
       }
+
+      log("contexto usuário", {
+        reqId,
+        id_funcionario: auth.user.id_funcionario,
+        id_empresa: auth.user.id_empresa,
+      });
 
       // const incomeReportRelease = await this.incomeReportRelease(
       //   ano,
@@ -79,21 +166,42 @@ export default class IncomeReport {
       //   return;
       // }
 
-      const funcionario = await Funcionario.findBy(
-        "id_funcionario",
-        auth.user?.id_funcionario,
+      const funcionario = await this.traceQuery(
+        reqId,
+        "pg.funcionario",
+        dbTrace,
+        () =>
+          Funcionario.findBy(
+            "id_funcionario",
+            auth.user?.id_funcionario,
+          ),
       );
 
-      console.log("funcionario", funcionario);
-
+      log("buscando informe principal e empresa (parallel)", { reqId, ano });
       const [incomeGetData, enterprise] = await Promise.all([
-        this.incomeGetData(ano, funcionario?.cpf ?? ""),
-        Empresa.findBy("id_empresa", auth.user?.id_empresa),
+        this.traceQuery(reqId, "oracle.ESO_INFORME_PRINCIPAL", dbTrace, () =>
+          this.fetchIncomePrincipal(ano, funcionario?.cpf ?? ""),
+        ),
+        this.traceQuery(reqId, "pg.empresa", dbTrace, () =>
+          Empresa.findBy("id_empresa", auth.user?.id_empresa),
+        ),
       ]);
 
-      console.log("incomeGetData", incomeGetData);
+      if (!incomeGetData?.length) {
+        log("informe principal sem linhas", {
+          reqId,
+          cpfPreenchido: Boolean(funcionario?.cpf?.length),
+        });
+        response.badRequest(
+          withTrace({
+            error:
+              "Nenhum informe principal encontrado no Oracle para este CPF/ano",
+          }),
+        );
+        return;
+      }
 
-      console.log("enterprise", enterprise);
+      const idInforme = incomeGetData[0].ID;
 
       const [
         incomes,
@@ -103,13 +211,45 @@ export default class IncomeReport {
         planMedicalInfos,
         pensInfos,
       ] = await Promise.all([
-        this.getIncomeInfos(incomeGetData[0].ID),
-        this.getIncomeExemptInfos(incomeGetData[0].ID),
-        this.getIncomeOtherInfos(incomeGetData[0].ID),
-        this.getPlrInfos(incomeGetData[0].ID),
-        this.getPlanMedicalInfos(incomeGetData[0].ID),
-        this.getPensInfos(incomeGetData[0].ID),
+        this.traceQuery(reqId, "oracle.ESO_INFORME_RENDTRIB", dbTrace, () =>
+          this.getIncomeInfos(idInforme),
+        ),
+        this.traceQuery(reqId, "oracle.ESO_INFORME_RENDISENTOS", dbTrace, () =>
+          this.getIncomeExemptInfos(idInforme),
+        ),
+        this.traceQuery(reqId, "oracle.ESO_INFORME_TRIBEXCLUSIVA", dbTrace, () =>
+          this.getIncomeOtherInfos(idInforme),
+        ),
+        this.traceQuery(reqId, "oracle.ESO_INFORME_OUTROS_ISENTOS", dbTrace, () =>
+          this.getPlrInfos(idInforme),
+        ),
+        this.traceQuery(reqId, "oracle.ESO_INFORME_PLANSAUDE", dbTrace, () =>
+          this.getPlanMedicalInfos(idInforme),
+        ),
+        this.traceQuery(reqId, "oracle.ESO_INFORME_PENSAOALIM", dbTrace, () =>
+          this.getPensInfos(idInforme),
+        ),
       ]);
+
+      const requiredRows: { name: string; rows: unknown[] }[] = [
+        { name: "ESO_INFORME_RENDTRIB", rows: incomes },
+        { name: "ESO_INFORME_RENDISENTOS", rows: incomeReceivedExemptInfos },
+        { name: "ESO_INFORME_TRIBEXCLUSIVA", rows: incomeOtherInfos },
+        { name: "ESO_INFORME_OUTROS_ISENTOS (PLR)", rows: plrInfos },
+      ];
+      const missing = requiredRows.find((r) => !r.rows?.length);
+      if (missing) {
+        log("consulta obrigatória retornou vazio", {
+          reqId,
+          tabela: missing.name,
+        });
+        response.badRequest(
+          withTrace({
+            error: `Sem dados em ${missing.name} para o informe ${idInforme}`,
+          }),
+        );
+        return;
+      }
 
       const incomesData: IncomeInfos = {
         totalRendimentos: this.formattedCurrency(incomes[0].TOTAL_RENDIMENTOS),
@@ -183,26 +323,49 @@ export default class IncomeReport {
         ) +
         this.responsibleForTheInformation(enterprise?.responsavel_irpf ?? "");
 
-      console.log(templatePdf);
+      log("HTML do PDF montado", {
+        reqId,
+        templateLengthChars: templatePdf.length,
+      });
 
+      log("gerando PDF", { reqId });
       const pdfTemp = await this.generatePdf(templatePdf);
 
-      console.log("pdfTemp", pdfTemp);
+      log("PDF gerado em disco", {
+        reqId,
+        filename: pdfTemp.filename,
+      });
 
+      log("enviando PDF para S3", { reqId, id_empresa: auth.user?.id_empresa });
       const file = await uploadPdfEmpresa(
         pdfTemp.filename,
         auth.user?.id_empresa,
       );
 
-      console.log("file", file);
+      log("upload S3 concluído", {
+        reqId,
+        ok: !!file,
+        location: file?.Location,
+      });
 
       if (file) {
         fs.unlink(pdfTemp.filename, () => {});
-        response.json({ pdf: file.Location });
+        log("request concluída com sucesso", { reqId });
+        response.json(withTrace({ pdf: file.Location }));
+      } else {
+        log("upload S3 retornou vazio", { reqId });
+        response.badRequest(
+          withTrace({ error: "Falha ao enviar PDF (S3 não retornou arquivo)" }),
+        );
       }
     } catch (error) {
-      console.log("error", error);
-      response.badRequest({ error: "Nenhum dado encontrado", result: error });
+      Logger.error(
+        { err: error, reqId },
+        `[IncomeReport] erro na request`,
+      );
+      response.badRequest(
+        withTrace({ error: "Nenhum dado encontrado", result: error }),
+      );
     }
   }
 
@@ -217,7 +380,7 @@ export default class IncomeReport {
   //   );
   // };
 
-  private incomeGetData = async (ano: number, cpf: string) => {
+  private fetchIncomePrincipal = async (ano: number, cpf: string) => {
     return await Database.connection("oracle").rawQuery(`
         SELECT * FROM GLOBUS.ESO_INFORME_PRINCIPAL eip
         WHERE eip.CPF_BENEFICIARIO = '${cpf}'
@@ -226,7 +389,6 @@ export default class IncomeReport {
   };
 
   private getIncomeInfos = async (idInformePrincipal: number) => {
-    console.log(idInformePrincipal);
     return await Database.connection("oracle").rawQuery(`
         SELECT * FROM GLOBUS.ESO_INFORME_RENDTRIB eir
         WHERE eir.ID_INFORME_PRINCIPAL = ${idInformePrincipal}
