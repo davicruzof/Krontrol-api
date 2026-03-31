@@ -256,7 +256,7 @@ export default class IncomeReport {
       const incomesData: IncomeInfos = {
         totalRendimentos: this.formattedCurrency(incomes[0].TOTAL_RENDIMENTOS),
         contribuiçãoProvidenciariaOficial: this.formattedCurrency(
-          incomes[0].CONTRIB_PREV,
+          incomes[0].CONTRIB_PREVID_OFICIAL,
         ),
         contribuiçãoEntidadesPrevComplementar: this.formattedCurrency(
           incomes[0].CONTRIB_PREVID_COMPL_FAPI,

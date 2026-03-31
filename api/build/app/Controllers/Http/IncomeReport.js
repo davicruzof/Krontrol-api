@@ -705,7 +705,7 @@ class IncomeReport {
             }
             const incomesData = {
                 totalRendimentos: this.formattedCurrency(incomes[0].TOTAL_RENDIMENTOS),
-                contribuiçãoProvidenciariaOficial: this.formattedCurrency(incomes[0].CONTRIB_PREV),
+                contribuiçãoProvidenciariaOficial: this.formattedCurrency(incomes[0].CONTRIB_PREVID_OFICIAL),
                 contribuiçãoEntidadesPrevComplementar: this.formattedCurrency(incomes[0].CONTRIB_PREVID_COMPL_FAPI),
                 pensaoAlimenticia: this.formattedCurrency(incomes[0].PENSAO_ALIMENTICIA),
                 impostoRendaRetidoNaFonte: this.formattedCurrency(incomes[0].IRRF_RETIDO),
