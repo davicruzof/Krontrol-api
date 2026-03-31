@@ -561,28 +561,28 @@ class IncomeReport {
         this.informationPensInfos = (pensInfosData) => {
             let complementar = "";
             if (pensInfosData.length > 0) {
-                complementar = complementar + "<table>";
+                complementar =
+                    complementar +
+                        `<table>
+      <tr>
+        <td style="font-size: 8px;">Dados dos alimentandos:</td>
+      </tr>
+      <tr>
+        <td style="font-size: 8px;">CPF</td>
+        <td style="font-size: 8px;">NOME</td>
+        <td style="font-size: 8px;">VALOR</td>
+      </tr>
+      `;
                 pensInfosData.map((item) => {
                     if (item) {
                         complementar =
                             complementar +
                                 `
               <tr style="width: 100%;">
-                <div><span style="font-size: 8px;">Dados dos alimentandos:</span></div>
-                <table>
-                  <tr>
-                    <td style="font-size: 8px;">CPF</td>
-                    <td style="font-size: 8px;">NOME</td>
-                    <td style="font-size: 8px;">VALOR</td>
-                  </tr>
-                  <tr>
-                    <td style="font-size: 8px;">${item.CPF_ALIMENTANDO}</td>
-                    <td style="font-size: 8px;">${item.NOME_ALIMENTANDO}</td>
-                    <td style="font-size: 8px;">${this.formattedCurrency(+item.VALOR_PENSAO)}</td>
-                  </tr>
-                </table>
+                <td style="font-size: 8px;">${item.CPF_ALIMENTANDO}</td>
+                <td style="font-size: 8px;">${item.NOME_ALIMENTANDO}</td>
+                <td style="font-size: 8px;">${this.formattedCurrency(+item.VALOR_PENSAO)}</td>
               </tr>
-            </table>
           `;
                     }
                 });
