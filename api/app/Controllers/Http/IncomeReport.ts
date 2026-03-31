@@ -801,10 +801,10 @@ export default class IncomeReport {
           <span>6.1 Número do processo</span>
           <div style="font-size: 10px;">
             <span
-              style="border-left: 1px solid #000; border-right: 1px solid #000; padding: 4px 24px 4px 8px;">
+              style="border-left: 1px solid #000; border-right: 1px solid #000;">
               Quantidade de meses
             </span>
-            <span style="padding: 0 0 0 24px;">0</span>
+            <span style="">0</span>
           </div>
         </div>
       </td>
