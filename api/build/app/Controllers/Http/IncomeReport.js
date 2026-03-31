@@ -462,13 +462,13 @@ class IncomeReport {
     <tr style="width: 100%; max-width: 80%;">
       <td style="border: 1px solid #000; padding: 4px;">
         <div style="font-size: 10px; display: flex; flex-direction: row; justify-content: space-between;">
-          <span style="width: 40%;">6.1 Número do processo</span>
-          <span style="width: 60%; font-size: 10px;">
+          <span style="padding-right: 4px;">6.1 Número do processo</span>
+          <span style="font-size: 10px;">
             <span
-              style="border-left: 1px solid #000; border-right: 1px solid #000; padding: 4px 24px 4px 8px;">
+              style="border-left: 1px solid #000; border-right: 1px solid #000; padding: 4px;">
               Quantidade de meses
             </span>
-            <span style="padding: 0 0 0 24px;">0</span>
+            <span style="padding: 0 4px;">0</span>
           </span>
         </div>
       </td>
