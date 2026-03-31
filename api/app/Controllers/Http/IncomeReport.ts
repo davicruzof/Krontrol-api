@@ -353,7 +353,7 @@ export default class IncomeReport {
       if (file) {
         fs.unlink(pdfTemp.filename, () => {});
         log("request concluída com sucesso", { reqId });
-        response.json(withTrace({ pdf: file.Location, html: templatePdf }));
+        response.json(withTrace({ pdf: file.Location }));
       } else {
         log("upload S3 retornou vazio", { reqId });
         response.badRequest(
@@ -796,7 +796,7 @@ export default class IncomeReport {
 
   <table style="width: 80%; max-width: 80%;">
     <tr style="width: 100%; max-width: 80%;">
-      <td style="border: 1px solid #000; padding: 4px;">
+      <td style="border: 1px solid #000;">
         <div style="font-size: 10px; display: flex; flex-direction: row; justify-content: space-between;">
           <span style="padding-right: 4px;">6.1 Número do processo</span>
           <span style="font-size: 10px;">
