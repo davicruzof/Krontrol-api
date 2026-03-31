@@ -857,21 +857,21 @@ export default class IncomeReport {
           medicalInfos =
             medicalInfos +
             `
-            <div><span style="font-size: 10px;">Operadora: ${item.CNPJ_OPERADORA} - ${item.NOME_OPERADORA}</span></div>
-            <div><span style="font-size: 10px;">valor pago no ano referente aos dependentes:</span></div>
+            <div><span style="font-size: 8px;">Operadora: ${item.CNPJ_OPERADORA} - ${item.NOME_OPERADORA}</span></div>
+            <div><span style="font-size: 8px;">valor pago no ano referente aos dependentes:</span></div>
             <tr>
-            <td style="font-size: 10px;">CPF</td>
-            <td style="font-size: 10px;">NOME</td>
-            <td style="font-size: 10px;">VALOR</td>
+            <td style="font-size: 8px;">CPF</td>
+            <td style="font-size: 8px;">NOME</td>
+            <td style="font-size: 8px;">VALOR</td>
           </tr>`;
         }
         medicalInfos =
           medicalInfos +
           `
           <tr>
-            <td style="font-size: 10px;">${item.CPF_DEPENDENTE}</td>
-            <td style="font-size: 10px;">${item.NOME_DEPENDENTE}</td>
-            <td style="font-size: 10px;">${this.formattedCurrency(+item.VALOR_SAUDE_DEPENDENTE)}</td>
+            <td style="font-size: 8px;">${item.CPF_DEPENDENTE}</td>
+            <td style="font-size: 8px;">${item.NOME_DEPENDENTE}</td>
+            <td style="font-size: 8px;">${this.formattedCurrency(+item.VALOR_SAUDE_DEPENDENTE)}</td>
           </tr>
         `;
       });
