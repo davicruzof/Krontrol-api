@@ -568,17 +568,17 @@ class IncomeReport {
                             complementar +
                                 `
               <tr style="width: 100%;">
-                <div><span>Dados dos alimentandos:</span></div>
+                <div><span style="font-size: 8px;">Dados dos alimentandos:</span></div>
                 <table>
                   <tr>
-                    <td>CPF</td>
-                    <td>NOME</td>
-                    <td>VALOR</td>
+                    <td style="font-size: 8px;">CPF</td>
+                    <td style="font-size: 8px;">NOME</td>
+                    <td style="font-size: 8px;">VALOR</td>
                   </tr>
                   <tr>
-                    <td>${item.CPF_ALIMENTANDO}</td>
-                    <td>${item.NOME_ALIMENTANDO}</td>
-                    <td>${this.formattedCurrency(+item.VALOR_PENSAO)}</td>
+                    <td style="font-size: 8px;">${item.CPF_ALIMENTANDO}</td>
+                    <td style="font-size: 8px;">${item.NOME_ALIMENTANDO}</td>
+                    <td style="font-size: 8px;">${this.formattedCurrency(+item.VALOR_PENSAO)}</td>
                   </tr>
                 </table>
               </tr>
