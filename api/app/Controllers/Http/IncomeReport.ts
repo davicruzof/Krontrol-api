@@ -958,40 +958,48 @@ export default class IncomeReport {
   };
 
   private async generatePdf(template: string) {
-    try {
-      var options = {
-        format: "A3",
-        orientation: "portrait",
-        border: "10mm",
-        type: "pdf",
-      };
-      const filename = "informe_rendimentos_" + new Date().getTime() + ".pdf";
-      var document = {
-        html: template,
-        path: "./pdfsTemp/" + filename,
-      };
+    const options = {
+      format: "A3",
+      orientation: "portrait",
+      border: "10mm",
+      type: "pdf",
+    };
+    const filename = `informe_rendimentos_${Date.now()}.pdf`;
+    const dir = "./pdfsTemp";
+    await fs.promises.mkdir(dir, { recursive: true });
+    const filepath = `${dir}/${filename}`;
 
-      let file = pdf
-        .create(document, options)
-        .then((res) => {
-          return res;
-        })
-        .catch((error) => {
-          return error;
-        });
-      return await file;
-    } catch (error) {}
+    // pdf-creator-node exige `data` (Handlebars); sem isso a promise rejeita e,
+    // se o erro for engolido, fs.createReadStream(undefined) gera ERR_INVALID_ARG_TYPE.
+    const document = {
+      html: template,
+      data: {},
+      path: filepath,
+    };
+
+    return await pdf.create(document, options);
   }
 
-  private formattedCurrency = (value) => {
-    if (value == null) {
+  private formattedCurrency = (value: unknown) => {
+    if (value == null || value === "") {
       return "0,00";
     }
-
-    let valorFormatado = value.toLocaleString("pt-BR", {
+    let n: number;
+    if (typeof value === "number") {
+      n = value;
+    } else {
+      const s = String(value).trim();
+      n = Number(s);
+      if (Number.isNaN(n) && /,/.test(s)) {
+        n = Number(s.replace(/\./g, "").replace(",", "."));
+      }
+    }
+    if (Number.isNaN(n)) {
+      return "0,00";
+    }
+    return n.toLocaleString("pt-BR", {
       style: "currency",
       currency: "BRL",
     });
-    return valorFormatado;
   };
 }

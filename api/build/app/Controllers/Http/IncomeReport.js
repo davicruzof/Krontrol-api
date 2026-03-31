@@ -606,14 +606,27 @@ class IncomeReport {
         </html>`;
         };
         this.formattedCurrency = (value) => {
-            if (value == null) {
+            if (value == null || value === "") {
                 return "0,00";
             }
-            let valorFormatado = value.toLocaleString("pt-BR", {
+            let n;
+            if (typeof value === "number") {
+                n = value;
+            }
+            else {
+                const s = String(value).trim();
+                n = Number(s);
+                if (Number.isNaN(n) && /,/.test(s)) {
+                    n = Number(s.replace(/\./g, "").replace(",", "."));
+                }
+            }
+            if (Number.isNaN(n)) {
+                return "0,00";
+            }
+            return n.toLocaleString("pt-BR", {
                 style: "currency",
                 currency: "BRL",
             });
-            return valorFormatado;
         };
     }
     async IncomeReport({ request, response, auth }) {
@@ -751,29 +764,22 @@ class IncomeReport {
         }
     }
     async generatePdf(template) {
-        try {
-            var options = {
-                format: "A3",
-                orientation: "portrait",
-                border: "10mm",
-                type: "pdf",
-            };
-            const filename = "informe_rendimentos_" + new Date().getTime() + ".pdf";
-            var document = {
-                html: template,
-                path: "./pdfsTemp/" + filename,
-            };
-            let file = pdf_creator_node_1.default
-                .create(document, options)
-                .then((res) => {
-                return res;
-            })
-                .catch((error) => {
-                return error;
-            });
-            return await file;
-        }
-        catch (error) { }
+        const options = {
+            format: "A3",
+            orientation: "portrait",
+            border: "10mm",
+            type: "pdf",
+        };
+        const filename = `informe_rendimentos_${Date.now()}.pdf`;
+        const dir = "./pdfsTemp";
+        await fs_1.default.promises.mkdir(dir, { recursive: true });
+        const filepath = `${dir}/${filename}`;
+        const document = {
+            html: template,
+            data: {},
+            path: filepath,
+        };
+        return await pdf_creator_node_1.default.create(document, options);
     }
 }
 exports.default = IncomeReport;
