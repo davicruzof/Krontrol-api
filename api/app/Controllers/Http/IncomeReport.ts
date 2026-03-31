@@ -353,7 +353,7 @@ export default class IncomeReport {
       if (file) {
         fs.unlink(pdfTemp.filename, () => {});
         log("request concluída com sucesso", { reqId });
-        response.json(withTrace({ pdf: file.Location, html: templatePdf }));
+        response.json(withTrace({ pdf: file.Location }));
       } else {
         log("upload S3 retornou vazio", { reqId });
         response.badRequest(
@@ -452,7 +452,6 @@ export default class IncomeReport {
         span {
         font-weight: 500;
         font-size: 14px;
-        padding: 1em 0.5em 1em 0;
         }
 
         tr {
@@ -556,16 +555,12 @@ export default class IncomeReport {
             </div>
         </td>
         </tr>
-    </table>
-    <table>
         <tr style="width: 100%;">
         <td style="width: 100%; border: 1px solid #000; padding: 8px;">
             <div style="font-size: 10px;">
             Natureza do rendimento
             </div>
         </td>
-        <td style="border: 1px solid #000; padding: 8px;"></td>
-        </tr>
     </table>`;
   };
 
