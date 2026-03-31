@@ -154,17 +154,17 @@ export default class IncomeReport {
         id_empresa: auth.user.id_empresa,
       });
 
-      // const incomeReportRelease = await this.incomeReportRelease(
-      //   ano,
-      //   auth.user.id_empresa,
-      // );
+      const incomeReportRelease = await this.incomeReportRelease(
+        ano,
+        auth.user.id_empresa,
+      );
 
-      // if (incomeReportRelease.rows.length == 0) {
-      //   response.badRequest({
-      //     error: "Empresa não liberou para gerar o recibo",
-      //   });
-      //   return;
-      // }
+      if (incomeReportRelease.rows.length == 0) {
+        response.badRequest({
+          error: "Empresa não liberou para gerar o recibo",
+        });
+        return;
+      }
 
       const funcionario = await this.traceQuery(
         reqId,
@@ -368,16 +368,16 @@ export default class IncomeReport {
     }
   }
 
-  // private incomeReportRelease = async (ano: string, empresaId: number) => {
-  //   return await Database.connection("pg").rawQuery(
-  //     `SELECT * FROM public.vw_ml_flp_liberacao_recibos
-  //           where tipo_id = 3
-  //           AND bloqueio_liberacao = false
-  //           AND irpf = '${ano}'
-  //           AND empresa_id = ${empresaId}
-  //           `,
-  //   );
-  // };
+  private incomeReportRelease = async (ano: string, empresaId: number) => {
+    return await Database.connection("pg").rawQuery(
+      `SELECT * FROM public.vw_ml_flp_liberacao_recibos
+            where tipo_id = 3
+            AND bloqueio_liberacao = false
+            AND irpf = '${ano}'
+            AND empresa_id = ${empresaId}
+            `,
+    );
+  };
 
   private fetchIncomePrincipal = async (ano: number, cpf: string) => {
     return await Database.connection("oracle").rawQuery(`
@@ -801,7 +801,7 @@ export default class IncomeReport {
           <span style="padding-right: 4px;">6.1 Número do processo</span>
           <span style="font-size: 10px;">
             <span
-              style="border-left: 1px solid #000; border-right: 1px solid #000; padding: 4px;">
+              style="border-left: 1px solid #000; border-right: 1px solid #000;">
               Quantidade de meses
             </span>
             <span style="padding: 0 4px;">0</span>
@@ -810,7 +810,7 @@ export default class IncomeReport {
       </td>
     </tr>
     <tr style="width: 100%;">
-      <td style="width: 100%; border: 1px solid #000; padding: 4px;">
+      <td style="width: 100%; border: 1px solid #000;">
         <div style="font-size: 10px;">
           Natureza do processo:
         </div>
