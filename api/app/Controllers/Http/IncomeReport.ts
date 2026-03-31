@@ -323,7 +323,7 @@ export default class IncomeReport {
           planMedicalInfos,
           pensInfos,
         ) +
-        this.responsibleForTheInformation(enterprise?.responsavel_irpf ?? "");
+        this.responsibleForTheInformation("Edna Maria da Silva", "27/02/2026");
 
       log("HTML do PDF montado", {
         reqId,
@@ -932,7 +932,10 @@ export default class IncomeReport {
     return complementar;
   };
 
-  private responsibleForTheInformation = (responsible: string) => {
+  private responsibleForTheInformation = (
+    responsible: string,
+    date: string,
+  ) => {
     return `<b style="font-size: 14px; display: block; margin-top: 16px;">8. Responsável pelas informações</b>
 
         <table>
@@ -944,7 +947,7 @@ export default class IncomeReport {
             </td>
             <td style="width: 20%; border: 1px solid #000; padding: 8px;">
                 <div style="font-size: 10px;">
-                Data: &nbsp;/&nbsp;/
+                Data: ${date}
                 </div>
             </td>
             <td style="border: 1px solid #000; padding: 8px;">
@@ -954,6 +957,10 @@ export default class IncomeReport {
             </td>
             </tr>
         </table>
+
+        <div style="font-size: 10px;">
+          Aprovado pela instituição normativa RFB nº 2060 de 13 de dezembro de 2021
+        </div>
 
         </body>
 
