@@ -160,10 +160,8 @@ class IncomeReport {
             return `<table>
         <tr style="width: 100%;">
         <td style="width: 50%; border: 1px solid #000; padding: 4px; font-size: 12px; text-align: center;">
-            <td>
-              <img src="https://i.ibb.co/Y7DtHQx8/f977b67c-106c-4272-b979-fdf48ec68a70.jpg" alt="Ministério da Fazenda" style="width: 60px; height: 60px;">
-            </td>
             <td style="border: 1px solid #000; padding: 4px; font-size: 12px; text-align: center;">
+              <img src="https://i.ibb.co/Y7DtHQx8/f977b67c-106c-4272-b979-fdf48ec68a70.jpg" alt="Ministério da Fazenda" style="width: 60px; height: 60px;">
               <div>
                   <b>Ministério da Fazenda</b>
               </div>
