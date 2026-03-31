@@ -105,7 +105,7 @@ class IncomeReport {
         };
         this.InitPdf = () => {
             return `<!DOCTYPE html>
-    <html lang="en">
+    <html lang="pt-BR">
 
     <head>
     <meta charset="UTF-8">
@@ -113,22 +113,20 @@ class IncomeReport {
     <title>Informe de Rendimentos</title>
     <style>
         body {
-        padding: 0;
         margin: 0;
-        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
         padding: 30px;
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
         }
 
         table {
         width: 100%;
+        border-collapse: collapse;
         }
 
         span {
         font-weight: 500;
         font-size: 14px;
-        padding: 1em;
-        padding-right: 0.5em;
-        padding-left: 0;
+        padding: 1em 0.5em 1em 0;
         }
 
         tr {
@@ -144,10 +142,16 @@ class IncomeReport {
     <body>`;
         };
         this.templateHeaderInfos = (ano) => {
+            const anoCalendario = parseInt(ano, 10);
+            const anoCalendarioLabel = Number.isFinite(anoCalendario)
+                ? String(anoCalendario)
+                : ano;
+            const exercicioLabel = Number.isFinite(anoCalendario)
+                ? String(anoCalendario + 1)
+                : ano;
             return `<table>
         <tr style="width: 100%;">
-        <td style="width: 50%; border: 1px solid #000; padding: 4px; font-size: 12px;">
-            <center>
+        <td style="width: 50%; border: 1px solid #000; padding: 4px; font-size: 12px; text-align: center;">
             <div>
                 <b>Ministério da Fazenda</b>
             </div>
@@ -158,12 +162,10 @@ class IncomeReport {
                 Imposto sobre a Renda da Pessoa Física
             </div>
             <div>
-                <b>Exercício de ${ano + 1}</b>
+                <b>Exercício de ${exercicioLabel}</b>
             </div>
-            </center>
         </td>
-        <td style="border: 1px solid #000; padding: 4px; font-size: 12px;">
-            <center>
+        <td style="border: 1px solid #000; padding: 4px; font-size: 12px; text-align: center;">
             <div>
                 Comprovante de Rendimentos Pagos e de
             </div>
@@ -174,24 +176,18 @@ class IncomeReport {
                 Imposto sobre a Renda da Pessoa Física
             </div>
             <div>
-                <b>Ano-calendário ${ano}</b>
+                <b>Ano-calendário ${anoCalendarioLabel}</b>
             </div>
-            </center>
         </td>
         </tr>
     </table>
 
     <table>
         <tr>
-        <td style="border: 1px solid #000; padding: 8px; font-size: 12px;">
-            <center>
-            Verifique as condições e o prazo para aprensentação da Declaração do Imposto sobre a Renda da Pessoa Física
-            para
-            </center>
-            <center>
-            este ano-calendário no sítio daSecretaria da da Receita Federal do Brasil na Internet, no endereço
-            <www.receita.fazenda.gov.br>
-            </center>
+        <td style="border: 1px solid #000; padding: 8px; font-size: 12px; text-align: center;">
+            Verifique as condições e o prazo para apresentação da Declaração do Imposto sobre a Renda da Pessoa Física
+            para este ano-calendário no sítio da Secretaria da Receita Federal do Brasil na Internet, no endereço
+            <a href="https://www.gov.br/receitafederal/pt-br">www.gov.br/receitafederal</a>
         </td>
         </tr>
     </table>`;
@@ -238,22 +234,22 @@ class IncomeReport {
             Natureza do rendimento
             </div>
         </td>
-        <td />
+        <td style="border: 1px solid #000; padding: 8px;"></td>
         </tr>
     </table>`;
         };
         this.templateIncomeInfos = (incomeInfos) => {
-            return `<b style="font-size: 10px;">3. Rendimentos Tributáveis, Deduções e Imposto de renda Retido na Fonte</b>
+            return `<b style="font-size: 10px;">3. Rendimentos Tributáveis, Deduções e Imposto de Renda Retido na Fonte</b>
 
     <table>
         <tr style="width: 100%;">
         <td style="width: 80%; border: 1px solid #000; padding: 8px;">
             <div style="font-size: 10px;">
-            1.Total dos rendimentos(Inclusive férias)
+            1. Total dos rendimentos (inclusive férias)
             </div>
         </td>
         <td style="border: 1px solid #000; padding: 8px;">
-            <div style="text-align: end; font-size:10px;">
+            <div style="text-align: right; font-size:10px;">
             ${incomeInfos.totalRendimentos}
             </div>
         </td>
@@ -265,7 +261,7 @@ class IncomeReport {
             </div>
         </td>
         <td style="border: 1px solid #000; padding: 8px;">
-            <div style="text-align: end; font-size:10px;">
+            <div style="text-align: right; font-size:10px;">
             ${incomeInfos.contribuiçãoProvidenciariaOficial}
             </div>
         </td>
@@ -273,24 +269,23 @@ class IncomeReport {
         <tr style="width: 100%;">
         <td style="width: 80%; border: 1px solid #000; padding: 8px;">
             <div style="font-size: 10px;">
-            3. Contribuição a entidades de prev. complementar e a fundos de aposentadoria prog. individual - Fapi (quadro
-            7)
+            3. Contribuição a entidades de prev. complementar e a fundos de aposentadoria prog. individual — Fapi (quadro 7)
             </div>
         </td>
         <td style="border: 1px solid #000; padding: 8px;">
-            <div style="text-align: end; font-size:10px;">
-            R$: 0,00
+            <div style="text-align: right; font-size:10px;">
+            ${incomeInfos.contribuiçãoEntidadesPrevComplementar}
             </div>
         </td>
         </tr>
         <tr style="width: 100%;">
         <td style="width: 80%; border: 1px solid #000; padding: 8px;">
             <div style="font-size: 10px;">
-            4. Pensão Alimentícia(Informar beneficiário no quadro 7)
+            4. Pensão alimentícia (informar beneficiário no quadro 7)
             </div>
         </td>
         <td style="border: 1px solid #000; padding: 8px;">
-            <div style="text-align: end; font-size:10px;">
+            <div style="text-align: right; font-size:10px;">
             ${incomeInfos.pensaoAlimenticia}
             </div>
         </td>
@@ -302,7 +297,7 @@ class IncomeReport {
             </div>
         </td>
         <td style="border: 1px solid #000; padding: 8px;">
-            <div style="text-align: end; font-size:10px;">
+            <div style="text-align: right; font-size:10px;">
             ${incomeInfos.impostoRendaRetidoNaFonte}
             </div>
         </td>
@@ -325,11 +320,11 @@ class IncomeReport {
         <tr style="width: 100%;">
         <td style="width: 80%; border: 1px solid #000; padding: 4px;">
             <div style="font-size: 10px;">
-            1. Parcela Isenta dos proventos de aposentadoria, reserva, reforma e pensão (65 anos ou mais)
+            1. Parcela isenta dos proventos de aposentadoria, reserva, reforma e pensão (65 anos ou mais)
             </div>
         </td>
         <td style="border: 1px solid #000; padding: 4px;">
-            <div style="text-align: end; font-size: 10px;">
+            <div style="text-align: right; font-size: 10px;">
             ${incomeExemptInfos.parcelaIsenta65}
             </div>
         </td>
@@ -341,7 +336,7 @@ class IncomeReport {
             </div>
         </td>
         <td style="border: 1px solid #000; padding: 4px;">
-            <div style="text-align: end; font-size: 10px;">
+            <div style="text-align: right; font-size: 10px;">
             ${incomeExemptInfos.diariasAjudaCusto}
             </div>
         </td>
@@ -349,13 +344,11 @@ class IncomeReport {
         <tr style="width: 100%;">
         <td style="width: 80%; border: 1px solid #000; padding: 4px;">
             <div style="font-size: 10px;">
-            3. Pensão e proventos de aposentadoria ou reforma por moléstia grave proventos de aposentadoria ou reforma por
-            acidente
-            em serviço
+            3. Pensão e proventos de aposentadoria ou reforma por moléstia grave ou por acidente em serviço
             </div>
         </td>
         <td style="border: 1px solid #000; padding: 4px;">
-            <div style="text-align: end; font-size: 10px;">
+            <div style="text-align: right; font-size: 10px;">
             ${incomeExemptInfos.pensaoProventosMoleGrave}
             </div>
         </td>
@@ -363,12 +356,11 @@ class IncomeReport {
         <tr style="width: 100%;">
         <td style="width: 80%; border: 1px solid #000; padding: 4px;">
             <div style="font-size: 10px;">
-            4. Lucros e dividendos, apurados a partir de 1996, pago por pessoa jurídica(lucro real, presumido ou
-            arbitrado)
+            4. Lucros e dividendos, apurados a partir de 1996, pagos por pessoa jurídica (lucro real, presumido ou arbitrado)
             </div>
         </td>
         <td style="border: 1px solid #000; padding: 4px;">
-            <div style="text-align: end; font-size: 10px;">
+            <div style="text-align: right; font-size: 10px;">
             ${incomeExemptInfos.lucrosDividendos}
             </div>
         </td>
@@ -376,13 +368,11 @@ class IncomeReport {
         <tr style="width: 100%;">
         <td style="width: 80%; border: 1px solid #000; padding: 4px;">
             <div style="font-size: 10px;">
-            5. Valores pagos ao titular ou sócio da microempresa ou empresa de pequeno porte, exceto pro labore, aluguéis
-            ou
-            serviços prestados
+            5. Valores pagos ao titular ou sócio da microempresa ou empresa de pequeno porte, exceto pró-labore, aluguéis ou serviços prestados
             </div>
         </td>
         <td style="border: 1px solid #000; padding: 4px;">
-            <div style="text-align: end; font-size: 10px;">
+            <div style="text-align: right; font-size: 10px;">
             ${incomeExemptInfos.valoresPagosTitularMei}
             </div>
         </td>
@@ -394,7 +384,7 @@ class IncomeReport {
             </div>
         </td>
         <td style="border: 1px solid #000; padding: 4px;">
-            <div style="text-align: end; font-size: 10px;">
+            <div style="text-align: right; font-size: 10px;">
             ${incomeExemptInfos.indenizacao}
             </div>
         </td>
@@ -402,11 +392,11 @@ class IncomeReport {
         <tr style="width: 100%;">
         <td style="width: 80%; border: 1px solid #000; padding: 4px;">
             <div style="font-size: 10px;">
-            7. Outros:(CLÁUSULA 3ª DA CCT;)
+            7. Outros: (CLÁUSULA 3ª DA CCT)
             </div>
         </td>
         <td style="border: 1px solid #000; padding: 4px;">
-            <div style="text-align: end; font-size: 10px;">
+            <div style="text-align: right; font-size: 10px;">
             ${incomeExemptInfos.outros}
             </div>
         </td>
@@ -417,7 +407,7 @@ class IncomeReport {
             return `<table>
         <tr>
         <td style="width: 80%;padding: 4px;">
-            <b style="font-size: 10px;">5. Rendimentos sujeitos a Tributação Exclusiva(rendimento líquido)</b>
+            <b style="font-size: 10px;">5. Rendimentos sujeitos a tributação exclusiva (rendimento líquido)</b>
         </td>
         <td style="padding: 4px; text-align: center; font-size: 12px;">
             Valores em reais
@@ -433,7 +423,7 @@ class IncomeReport {
               </div>
           </td>
           <td style="border: 1px solid #000; padding: 8px;">
-              <div style="text-align: end; font-size: 10px;">
+              <div style="text-align: right; font-size: 10px;">
               ${incomeOtherInfos.decimoTerceiroSalario}
               </div>
           </td>
@@ -445,7 +435,7 @@ class IncomeReport {
             </div>
         </td>
         <td style="border: 1px solid #000; padding: 8px;">
-            <div style="text-align: end; font-size: 10px;">
+            <div style="text-align: right; font-size: 10px;">
             ${incomeOtherInfos.impostoRendaRetidoNaFonteSobre13oSalario}
             </div>
         </td>
@@ -457,7 +447,7 @@ class IncomeReport {
             </div>
         </td>
         <td style="border: 1px solid #000; padding: 8px;">
-            <div style="text-align: end; font-size: 10px;">
+            <div style="text-align: right; font-size: 10px;">
             ${incomeOtherInfos.outros}
             </div>
         </td>
@@ -466,21 +456,20 @@ class IncomeReport {
         };
         this.templateIncomeReceivedAccumulatedInfos = () => {
             return `<div>
-    <b style="font-size: 10px;">6. Rendimentos recebidos acumuladamente - art.12-a da lei no.7.713, de 1988 (sujeito a
-      tributacão exclusiva)</b>
+    <b style="font-size: 10px;">6. Rendimentos recebidos acumuladamente — art. 12-A da Lei nº 7.713, de 1988 (sujeito a tributação exclusiva)</b>
   </div>
 
   <table style="width: 80%; max-width: 80%;">
     <tr style="width: 100%; max-width: 80%;">
       <td style="width: 40%; border: 1px solid #000; padding: 4px;">
         <div style="font-size: 12px; display: flex; flex-direction: row; justify-content: space-between;">
-          6.1 Numero do processo
+          <span>6.1 Número do processo</span>
           <div style="font-size: 12px;">
             <span
-              style="border-left: 1px solid #000; border-right: 1px solid #000; padding: 4px; padding-right: 24px; padding-left: 8px;">
+              style="border-left: 1px solid #000; border-right: 1px solid #000; padding: 4px 24px 4px 8px;">
               Quantidade de meses
             </span>
-            <span style="padding-left: 100px; text-align: end;">0</span>
+            <span style="padding-left: 100px; text-align: right;">0</span>
           </div>
         </div>
       </td>
@@ -488,7 +477,7 @@ class IncomeReport {
     <tr style="width: 100%;">
       <td style="width: 100%; border: 1px solid #000; padding: 4px;">
         <div style="font-size: 12px;">
-          Natureza do Processo:
+          Natureza do processo:
         </div>
       </td>
     </tr>
@@ -502,16 +491,16 @@ class IncomeReport {
     </div>
 
     <div style="min-height: 100px; border: 1px solid #000; margin: 2px;">
-      <div style="font-size: 10px; margin-left: 4px; margin-top: 4px;">
+      <div style="font-size: 10px; margin: 4px 4px 0 4px;">
         Rendimentos isentos outros:
       </div>
-      <div style="font-size: 10px; margin-left: 4px; margin-bottom: 4px;">
+      <div style="font-size: 10px; margin: 0 4px 4px 4px;">
         Participação nos lucros ou resultados (PLR): ${plr}
       </div>
 
       <div>${medicalInfos}</div>
       <div>${pensInfos}</div>
-      `;
+    </div>`;
         };
         this.medicalInfos = (medicalInfosData) => {
             let medicalInfos = "";
@@ -579,7 +568,7 @@ class IncomeReport {
             return complementar;
         };
         this.responsibleForTheInformation = (responsible) => {
-            return `<b style="font-size: 14px; margin-top: 16px;">8. RESPONSAVEL PELAS INFORMACOES</b>
+            return `<b style="font-size: 14px; display: block; margin-top: 16px;">8. Responsável pelas informações</b>
 
         <table>
             <tr style="width: 100%;">
@@ -590,7 +579,7 @@ class IncomeReport {
             </td>
             <td style="width: 20%; border: 1px solid #000; padding: 8px;">
                 <div style="font-size: 10px;">
-                Data: / /
+                Data: &nbsp;/&nbsp;/
                 </div>
             </td>
             <td style="border: 1px solid #000; padding: 8px;">
