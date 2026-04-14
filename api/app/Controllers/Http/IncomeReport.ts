@@ -322,6 +322,7 @@ export default class IncomeReport {
           this.formattedCurrency(plrInfos[0].VALOR),
           planMedicalInfos,
           pensInfos,
+          funcionario!,
         ) +
         this.responsibleForTheInformation("Edna Maria da Silva", "27/02/2026");
 
@@ -830,8 +831,9 @@ export default class IncomeReport {
     plr: string,
     planMedicalInfosData: PlanMedicalInfos[],
     pensInfosData: PensInfos[],
+    funcionario: Funcionario,
   ) => {
-    let medicalInfos = this.medicalInfos(planMedicalInfosData);
+    let medicalInfos = this.medicalInfos(planMedicalInfosData, funcionario);
 
     let pensInfos = this.informationPensInfos(pensInfosData);
 
@@ -852,7 +854,10 @@ export default class IncomeReport {
     </div>`;
   };
 
-  private medicalInfos = (medicalInfosData: PlanMedicalInfos[]) => {
+  private medicalInfos = (
+    medicalInfosData: PlanMedicalInfos[],
+    funcionario: Funcionario,
+  ) => {
     let medicalInfos = "";
     if (medicalInfosData && medicalInfosData.length > 0) {
       const byOperadora = new Map<string, PlanMedicalInfos[]>();
@@ -885,13 +890,26 @@ export default class IncomeReport {
             </tr>
           `;
         for (const item of items) {
+          const nome =
+            item.NOME_DEPENDENTE === null
+              ? funcionario?.nome
+              : item.NOME_DEPENDENTE;
+          const cpf =
+            item.CPF_DEPENDENTE === null
+              ? funcionario?.cpf
+              : item.CPF_DEPENDENTE;
+          const valor =
+            item.VALOR_SAUDE_DEPENDENTE === null
+              ? this.formattedCurrency(+item.VALOR_SAUDE_TITULAR)
+              : this.formattedCurrency(+item.VALOR_SAUDE_DEPENDENTE);
+
           medicalInfos =
             medicalInfos +
             `
           <tr>
-            <td style="font-size: 8px;">${item.CPF_DEPENDENTE}</td>
-            <td style="font-size: 8px;">${item.NOME_DEPENDENTE}</td>
-            <td style="font-size: 8px;">${this.formattedCurrency(+item.VALOR_SAUDE_DEPENDENTE)}</td>
+            <td style="font-size: 8px;">${cpf}</td>
+            <td style="font-size: 8px;">${nome}</td>
+            <td style="font-size: 8px;">${valor}</td>
           </tr>
         `;
         }

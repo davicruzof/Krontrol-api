@@ -497,8 +497,8 @@ class IncomeReport {
     </tr>
   </table>`;
         };
-        this.InformationComplementariesInfos = (plr, planMedicalInfosData, pensInfosData) => {
-            let medicalInfos = this.medicalInfos(planMedicalInfosData);
+        this.InformationComplementariesInfos = (plr, planMedicalInfosData, pensInfosData, funcionario) => {
+            let medicalInfos = this.medicalInfos(planMedicalInfosData, funcionario);
             let pensInfos = this.informationPensInfos(pensInfosData);
             return `<div>
         <b style="font-size: 10px;">7. Informações complementares</b>
@@ -516,7 +516,7 @@ class IncomeReport {
       <div>${pensInfos}</div>
     </div>`;
         };
-        this.medicalInfos = (medicalInfosData) => {
+        this.medicalInfos = (medicalInfosData, funcionario) => {
             let medicalInfos = "";
             if (medicalInfosData && medicalInfosData.length > 0) {
                 const byOperadora = new Map();
@@ -549,13 +549,22 @@ class IncomeReport {
             </tr>
           `;
                     for (const item of items) {
+                        const nome = item.NOME_DEPENDENTE === null
+                            ? funcionario?.nome
+                            : item.NOME_DEPENDENTE;
+                        const cpf = item.CPF_DEPENDENTE === null
+                            ? funcionario?.cpf
+                            : item.CPF_DEPENDENTE;
+                        const valor = item.VALOR_SAUDE_DEPENDENTE === null
+                            ? this.formattedCurrency(+item.VALOR_SAUDE_TITULAR)
+                            : this.formattedCurrency(+item.VALOR_SAUDE_DEPENDENTE);
                         medicalInfos =
                             medicalInfos +
                                 `
           <tr>
-            <td style="font-size: 8px;">${item.CPF_DEPENDENTE}</td>
-            <td style="font-size: 8px;">${item.NOME_DEPENDENTE}</td>
-            <td style="font-size: 8px;">${this.formattedCurrency(+item.VALOR_SAUDE_DEPENDENTE)}</td>
+            <td style="font-size: 8px;">${cpf}</td>
+            <td style="font-size: 8px;">${nome}</td>
+            <td style="font-size: 8px;">${valor}</td>
           </tr>
         `;
                     }
@@ -758,7 +767,7 @@ class IncomeReport {
                 this.templateIncomeExemptInfos(incomeReceivedExemptInfosData) +
                 this.templateIncomeOtherInfos(incomeOtherInfosData) +
                 this.templateIncomeReceivedAccumulatedInfos() +
-                this.InformationComplementariesInfos(this.formattedCurrency(plrInfos[0].VALOR), planMedicalInfos, pensInfos) +
+                this.InformationComplementariesInfos(this.formattedCurrency(plrInfos[0].VALOR), planMedicalInfos, pensInfos, funcionario) +
                 this.responsibleForTheInformation("Edna Maria da Silva", "27/02/2026");
             log("HTML do PDF montado", {
                 reqId,
