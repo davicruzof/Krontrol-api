@@ -498,6 +498,11 @@ class IncomeReport {
   </table>`;
         };
         this.InformationComplementariesInfos = (plr, planMedicalInfosData, pensInfosData, funcionario) => {
+            const prlInfos = plr
+                ? `<div style="font-size: 10px; margin: 0 4px 4px 4px;">
+        Participação nos lucros ou resultados (PLR): ${plr}
+      </div>`
+                : "";
             let medicalInfos = this.medicalInfos(planMedicalInfosData, funcionario);
             let pensInfos = this.informationPensInfos(pensInfosData);
             return `<div>
@@ -508,9 +513,8 @@ class IncomeReport {
       <div style="font-size: 10px; margin: 4px 4px 0 4px;">
         Rendimentos isentos outros:
       </div>
-      <div style="font-size: 10px; margin: 0 4px 4px 4px;">
-        Participação nos lucros ou resultados (PLR): ${plr}
-      </div>
+
+      <div>${prlInfos}</div>
 
       <div>${medicalInfos}</div>
       <div>${pensInfos}</div>
@@ -725,7 +729,6 @@ class IncomeReport {
                 { name: "ESO_INFORME_RENDTRIB", rows: incomes },
                 { name: "ESO_INFORME_RENDISENTOS", rows: incomeReceivedExemptInfos },
                 { name: "ESO_INFORME_TRIBEXCLUSIVA", rows: incomeOtherInfos },
-                { name: "ESO_INFORME_OUTROS_ISENTOS (PLR)", rows: plrInfos },
             ];
             const missing = requiredRows.find((r) => !r.rows?.length);
             if (missing) {
@@ -740,24 +743,24 @@ class IncomeReport {
             }
             const incomesData = {
                 totalRendimentos: this.formattedCurrency(incomes[0].TOTAL_RENDIMENTOS),
-                contribuiçãoProvidenciariaOficial: this.formattedCurrency(incomes[0].CONTRIB_PREVID_OFICIAL),
-                contribuiçãoEntidadesPrevComplementar: this.formattedCurrency(incomes[0].CONTRIB_PREVID_COMPL_FAPI),
-                pensaoAlimenticia: this.formattedCurrency(incomes[0].PENSAO_ALIMENTICIA),
-                impostoRendaRetidoNaFonte: this.formattedCurrency(incomes[0].IRRF_RETIDO),
+                contribuiçãoProvidenciariaOficial: this.formattedCurrency(incomes[0].CONTRIB_PREVID_OFICIAL ?? 0),
+                contribuiçãoEntidadesPrevComplementar: this.formattedCurrency(incomes[0].CONTRIB_PREVID_COMPL_FAPI ?? 0),
+                pensaoAlimenticia: this.formattedCurrency(incomes[0].PENSAO_ALIMENTICIA ?? 0),
+                impostoRendaRetidoNaFonte: this.formattedCurrency(incomes[0].IRRF_RETIDO ?? 0),
             };
             const incomeReceivedExemptInfosData = {
-                parcelaIsenta65: this.formattedCurrency(incomeReceivedExemptInfos[0].PARCELA_ISENTA_65),
-                diariasAjudaCusto: this.formattedCurrency(incomeReceivedExemptInfos[0].DIARIAS_AJUDA_CUSTO),
-                pensaoProventosMoleGrave: this.formattedCurrency(incomeReceivedExemptInfos[0].PENSAO_PROVENTOS_MOLE_GRAVE),
-                lucrosDividendos: this.formattedCurrency(incomeReceivedExemptInfos[0].LUCROS_DIVIDENDOS),
-                valoresPagosTitularMei: this.formattedCurrency(incomeReceivedExemptInfos[0].VALORES_PAGOS_TITULAR_MEI),
-                indenizacao: this.formattedCurrency(incomeReceivedExemptInfos[0].INDENIZACAO),
-                outros: this.formattedCurrency(incomeReceivedExemptInfos[0].OUTROS_ISENTOS),
+                parcelaIsenta65: this.formattedCurrency(incomeReceivedExemptInfos[0].PARCELA_ISENTA_65 ?? 0),
+                diariasAjudaCusto: this.formattedCurrency(incomeReceivedExemptInfos[0].DIARIAS_AJUDA_CUSTO ?? 0),
+                pensaoProventosMoleGrave: this.formattedCurrency(incomeReceivedExemptInfos[0].PENSAO_PROVENTOS_MOLE_GRAVE ?? 0),
+                lucrosDividendos: this.formattedCurrency(incomeReceivedExemptInfos[0].LUCROS_DIVIDENDOS ?? 0),
+                valoresPagosTitularMei: this.formattedCurrency(incomeReceivedExemptInfos[0].VALORES_PAGOS_TITULAR_MEI ?? 0),
+                indenizacao: this.formattedCurrency(incomeReceivedExemptInfos[0].INDENIZACAO ?? 0),
+                outros: this.formattedCurrency(incomeReceivedExemptInfos[0].OUTROS_ISENTOS ?? 0),
             };
             const incomeOtherInfosData = {
-                decimoTerceiroSalario: this.formattedCurrency(incomeOtherInfos[0].DECIMO_TERCEIRO),
-                impostoRendaRetidoNaFonteSobre13oSalario: this.formattedCurrency(incomeOtherInfos[0].IRRF_RETIDO_13),
-                outros: this.formattedCurrency(incomeOtherInfos[0].OUTROS_EXCLUSIVOS),
+                decimoTerceiroSalario: this.formattedCurrency(incomeOtherInfos[0].DECIMO_TERCEIRO ?? 0),
+                impostoRendaRetidoNaFonteSobre13oSalario: this.formattedCurrency(incomeOtherInfos[0].IRRF_RETIDO_13 ?? 0),
+                outros: this.formattedCurrency(incomeOtherInfos[0].OUTROS_EXCLUSIVOS ?? 0),
             };
             const templatePdf = this.InitPdf() +
                 this.templateHeaderInfos(ano) +

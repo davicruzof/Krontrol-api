@@ -237,7 +237,6 @@ export default class IncomeReport {
         { name: "ESO_INFORME_RENDTRIB", rows: incomes },
         { name: "ESO_INFORME_RENDISENTOS", rows: incomeReceivedExemptInfos },
         { name: "ESO_INFORME_TRIBEXCLUSIVA", rows: incomeOtherInfos },
-        { name: "ESO_INFORME_OUTROS_ISENTOS (PLR)", rows: plrInfos },
       ];
       const missing = requiredRows.find((r) => !r.rows?.length);
       if (missing) {
@@ -256,51 +255,53 @@ export default class IncomeReport {
       const incomesData: IncomeInfos = {
         totalRendimentos: this.formattedCurrency(incomes[0].TOTAL_RENDIMENTOS),
         contribuiçãoProvidenciariaOficial: this.formattedCurrency(
-          incomes[0].CONTRIB_PREVID_OFICIAL,
+          incomes[0].CONTRIB_PREVID_OFICIAL ?? 0,
         ),
         contribuiçãoEntidadesPrevComplementar: this.formattedCurrency(
-          incomes[0].CONTRIB_PREVID_COMPL_FAPI,
+          incomes[0].CONTRIB_PREVID_COMPL_FAPI ?? 0,
         ),
         pensaoAlimenticia: this.formattedCurrency(
-          incomes[0].PENSAO_ALIMENTICIA,
+          incomes[0].PENSAO_ALIMENTICIA ?? 0,
         ),
         impostoRendaRetidoNaFonte: this.formattedCurrency(
-          incomes[0].IRRF_RETIDO,
+          incomes[0].IRRF_RETIDO ?? 0,
         ),
       };
 
       const incomeReceivedExemptInfosData: IncomeExemptInfos = {
         parcelaIsenta65: this.formattedCurrency(
-          incomeReceivedExemptInfos[0].PARCELA_ISENTA_65,
+          incomeReceivedExemptInfos[0].PARCELA_ISENTA_65 ?? 0,
         ),
         diariasAjudaCusto: this.formattedCurrency(
-          incomeReceivedExemptInfos[0].DIARIAS_AJUDA_CUSTO,
+          incomeReceivedExemptInfos[0].DIARIAS_AJUDA_CUSTO ?? 0,
         ),
         pensaoProventosMoleGrave: this.formattedCurrency(
-          incomeReceivedExemptInfos[0].PENSAO_PROVENTOS_MOLE_GRAVE,
+          incomeReceivedExemptInfos[0].PENSAO_PROVENTOS_MOLE_GRAVE ?? 0,
         ),
         lucrosDividendos: this.formattedCurrency(
-          incomeReceivedExemptInfos[0].LUCROS_DIVIDENDOS,
+          incomeReceivedExemptInfos[0].LUCROS_DIVIDENDOS ?? 0,
         ),
         valoresPagosTitularMei: this.formattedCurrency(
-          incomeReceivedExemptInfos[0].VALORES_PAGOS_TITULAR_MEI,
+          incomeReceivedExemptInfos[0].VALORES_PAGOS_TITULAR_MEI ?? 0,
         ),
         indenizacao: this.formattedCurrency(
-          incomeReceivedExemptInfos[0].INDENIZACAO,
+          incomeReceivedExemptInfos[0].INDENIZACAO ?? 0,
         ),
         outros: this.formattedCurrency(
-          incomeReceivedExemptInfos[0].OUTROS_ISENTOS,
+          incomeReceivedExemptInfos[0].OUTROS_ISENTOS ?? 0,
         ),
       };
 
       const incomeOtherInfosData: IncomeOtherInfos = {
         decimoTerceiroSalario: this.formattedCurrency(
-          incomeOtherInfos[0].DECIMO_TERCEIRO,
+          incomeOtherInfos[0].DECIMO_TERCEIRO ?? 0,
         ),
         impostoRendaRetidoNaFonteSobre13oSalario: this.formattedCurrency(
-          incomeOtherInfos[0].IRRF_RETIDO_13,
+          incomeOtherInfos[0].IRRF_RETIDO_13 ?? 0,
         ),
-        outros: this.formattedCurrency(incomeOtherInfos[0].OUTROS_EXCLUSIVOS),
+        outros: this.formattedCurrency(
+          incomeOtherInfos[0].OUTROS_EXCLUSIVOS ?? 0,
+        ),
       };
 
       const templatePdf =
@@ -833,6 +834,12 @@ export default class IncomeReport {
     pensInfosData: PensInfos[],
     funcionario: Funcionario,
   ) => {
+    const prlInfos = plr
+      ? `<div style="font-size: 10px; margin: 0 4px 4px 4px;">
+        Participação nos lucros ou resultados (PLR): ${plr}
+      </div>`
+      : "";
+
     let medicalInfos = this.medicalInfos(planMedicalInfosData, funcionario);
 
     let pensInfos = this.informationPensInfos(pensInfosData);
@@ -845,9 +852,8 @@ export default class IncomeReport {
       <div style="font-size: 10px; margin: 4px 4px 0 4px;">
         Rendimentos isentos outros:
       </div>
-      <div style="font-size: 10px; margin: 0 4px 4px 4px;">
-        Participação nos lucros ou resultados (PLR): ${plr}
-      </div>
+
+      <div>${prlInfos}</div>
 
       <div>${medicalInfos}</div>
       <div>${pensInfos}</div>
