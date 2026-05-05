@@ -801,7 +801,7 @@ class IncomeReport {
                 this.templateIncomeExemptInfos(incomeReceivedExemptInfosData) +
                 this.templateIncomeOtherInfos(incomeOtherInfosData) +
                 this.templateIncomeReceivedAccumulatedInfos() +
-                this.InformationComplementariesInfos(this.formattedCurrency(plrInfos[0].VALOR), planMedicalInfos, pensInfos, funcionario) +
+                this.InformationComplementariesInfos(this.formattedCurrency(plrInfos[0]?.VALOR ?? 0), planMedicalInfos, pensInfos, funcionario) +
                 this.responsibleForTheInformation("Edna Maria da Silva", "27/02/2026");
             log("HTML do PDF montado", {
                 reqId,

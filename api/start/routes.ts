@@ -295,6 +295,8 @@ Route.group(() => {
   }).prefix("/video");
 }).prefix("/api");
 
+// Rotas V2
+
 Route.group(() => {
   Route.group(() => {
     Route.get(

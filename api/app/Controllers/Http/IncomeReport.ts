@@ -357,7 +357,7 @@ export default class IncomeReport {
         this.templateIncomeOtherInfos(incomeOtherInfosData) +
         this.templateIncomeReceivedAccumulatedInfos() +
         this.InformationComplementariesInfos(
-          this.formattedCurrency(plrInfos[0].VALOR),
+          this.formattedCurrency(plrInfos[0]?.VALOR ?? 0),
           planMedicalInfos,
           pensInfos,
           funcionario!,
