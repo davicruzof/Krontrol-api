@@ -159,7 +159,7 @@ export default class IncomeReport {
         auth.user.id_empresa,
       );
 
-      if (incomeReportRelease.rows.length == 0) {
+      if (!incomeReportRelease || incomeReportRelease.rows.length == 0) {
         response.badRequest({
           error: "Empresa não liberou para gerar o recibo",
         });
@@ -173,7 +173,15 @@ export default class IncomeReport {
         () => Funcionario.findBy("id_funcionario", auth.user?.id_funcionario),
       );
 
+      if (!funcionario) {
+        response.badRequest({
+          error: "Funcionário não encontrado",
+        });
+        return;
+      }
+
       log("buscando informe principal e empresa (parallel)", { reqId, ano });
+
       const [incomeGetData, enterprise] = await Promise.all([
         this.traceQuery(reqId, "oracle.ESO_INFORME_PRINCIPAL", dbTrace, () =>
           this.fetchIncomePrincipal(ano, funcionario?.cpf ?? ""),
@@ -194,6 +202,13 @@ export default class IncomeReport {
               "Nenhum informe principal encontrado no Oracle para este CPF/ano",
           }),
         );
+        return;
+      }
+
+      if (!enterprise) {
+        response.badRequest({
+          error: "Empresa não encontrada",
+        });
         return;
       }
 
@@ -232,6 +247,28 @@ export default class IncomeReport {
           this.getPensInfos(idInforme),
         ),
       ]);
+
+      if (
+        !incomes ||
+        !incomeReceivedExemptInfos ||
+        !incomeOtherInfos ||
+        !plrInfos ||
+        !planMedicalInfos ||
+        !pensInfos
+      ) {
+        response.badRequest({
+          error: "Dados não encontrados",
+          data: {
+            incomes,
+            incomeReceivedExemptInfos,
+            incomeOtherInfos,
+            plrInfos,
+            planMedicalInfos,
+            pensInfos,
+          },
+        });
+        return;
+      }
 
       const requiredRows: { name: string; rows: unknown[] }[] = [
         { name: "ESO_INFORME_RENDTRIB", rows: incomes },
