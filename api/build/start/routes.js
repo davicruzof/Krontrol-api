@@ -196,6 +196,11 @@ Route_1.default.group(() => {
         Route_1.default.get("/me", "AuthController.me").middleware("auth");
     }).prefix("/auth");
     Route_1.default.group(() => {
+        Route_1.default.post("/getComunications", "MessagesController.getComunications");
+        Route_1.default.post("/viewMessage", "MessagesController.viewMessage");
+        Route_1.default.post("/confirmMessage", "MessagesController.confirmMessage");
+    }).prefix("/messages");
+    Route_1.default.group(() => {
         Route_1.default.post("/create", "UsersController.create");
     }).prefix("/user");
     Route_1.default.group(() => {

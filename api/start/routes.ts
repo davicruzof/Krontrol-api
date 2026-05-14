@@ -309,6 +309,13 @@ Route.group(() => {
     Route.get("/me", "AuthController.me").middleware("auth");
   }).prefix("/auth");
 
+
+  Route.group(() => {
+    Route.post("/getComunications", "MessagesController.getComunications");
+    Route.post("/viewMessage", "MessagesController.viewMessage");
+    Route.post("/confirmMessage", "MessagesController.confirmMessage");
+  }).prefix("/messages");
+
   //Rotas Usuario
   Route.group(() => {
     Route.post("/create", "UsersController.create");
