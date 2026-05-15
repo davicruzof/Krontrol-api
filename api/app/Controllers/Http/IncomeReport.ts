@@ -270,25 +270,6 @@ export default class IncomeReport {
         return;
       }
 
-      const requiredRows: { name: string; rows: unknown[] }[] = [
-        { name: "ESO_INFORME_RENDTRIB", rows: incomes },
-        { name: "ESO_INFORME_RENDISENTOS", rows: incomeReceivedExemptInfos },
-        { name: "ESO_INFORME_TRIBEXCLUSIVA", rows: incomeOtherInfos },
-      ];
-      const missing = requiredRows.find((r) => !r.rows?.length);
-      if (missing) {
-        log("consulta obrigatória retornou vazio", {
-          reqId,
-          tabela: missing.name,
-        });
-        response.badRequest(
-          withTrace({
-            error: `Sem dados em ${missing.name} para o informe ${idInforme}`,
-          }),
-        );
-        return;
-      }
-
       const incomesData: IncomeInfos = {
         totalRendimentos: this.formattedCurrency(incomes[0].TOTAL_RENDIMENTOS),
         contribuiçãoProvidenciariaOficial: this.formattedCurrency(
@@ -390,7 +371,7 @@ export default class IncomeReport {
       });
 
       if (file) {
-        fs.unlink(pdfTemp.filename, () => {});
+        fs.unlink(pdfTemp.filename, () => { });
         log("request concluída com sucesso", { reqId });
         response.json(withTrace({ pdf: file.Location }));
       } else {
@@ -614,7 +595,12 @@ export default class IncomeReport {
     </table>`;
   };
 
-  private templateIncomeInfos = (incomeInfos: IncomeInfos) => {
+  private templateIncomeInfos = (incomeInfos?: IncomeInfos) => {
+
+    if (!incomeInfos) {
+      return '';
+    }
+
     return `<b style="font-size: 10px;">3. Rendimentos Tributáveis, Deduções e Imposto de Renda Retido na Fonte</b>
 
     <table>
@@ -682,8 +668,13 @@ export default class IncomeReport {
   };
 
   private templateIncomeExemptInfos = (
-    incomeExemptInfos: IncomeExemptInfos,
+    incomeExemptInfos?: IncomeExemptInfos,
   ) => {
+
+    if (!incomeExemptInfos) {
+      return '';
+    }
+
     return `<table>
         <tr>
         <td style="width: 80%;padding: 4px;">
@@ -783,7 +774,12 @@ export default class IncomeReport {
     </table>`;
   };
 
-  private templateIncomeOtherInfos = (incomeOtherInfos: IncomeOtherInfos) => {
+  private templateIncomeOtherInfos = (incomeOtherInfos?: IncomeOtherInfos) => {
+
+    if (!incomeOtherInfos) {
+      return '';
+    }
+
     return `<table>
         <tr>
         <td style="width: 80%;padding: 4px;">
