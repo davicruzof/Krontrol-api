@@ -1,66 +1,31 @@
 import Database from "@ioc:Adonis/Lucid/Database";
 import type { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
 
-export interface AviMensagem {
-    id: number;
-    empresa_id: number;
-    funcionario_erp_id: number;
-    dt_cadastro: string;
-    funcionario_cad_id: number;
-    dt_alteracao: string;
-    funcionario_alt_id: number;
-    dt_visualizacao: string;
-    dt_leitura_confirmacao: string;
-    acao_id: number;
-    conteudo_id: number;
-}
-
-export interface ContentMessage {
-    id: number;
-    empresa_id: number;
-    conteudo: string;
-    dt_cadastro: string;
-    link_texto: string;
-    link: string;
-    titulo: string;
-    competencia: string;
-    holerite: boolean;
-    inativo: boolean;
-}
-
-export interface AviAcao {
-    id: number;
-    empresa_id: number;
-    botao_texto: string;
-    botao_acao: string;
-    dt_cadastro: string;
-    funcionario_cad_id: number;
-    dt_alteracao: string;
-    funcionario_alt_id: number;
-}
-
 export default class MessagesController {
+  public getComunications = async ({
+    response,
+    request,
+  }: HttpContextContract) => {
+    try {
+      const { funcionario_erp_id, id_empresa } = request.body();
 
-    public getComunications = async ({ response, request }: HttpContextContract) => {
-        try {
+      if (!funcionario_erp_id || !id_empresa) {
+        return response.badRequest({
+          message: "Dados do funcionário ou empresa não informados",
+        });
+      }
 
-            const { funcionario_erp_id, id_empresa } = request.body();
-
-            if (!funcionario_erp_id || !id_empresa) {
-                return response.badRequest({ message: "Dados do funcionário ou empresa não informados" });
-            }
-
-            const query = `
-                SELECT 
+      const query = `
+                SELECT
                 m.*,
                 (
-                    SELECT row_to_json(c) 
-                    FROM public.ml_avi_conteudo c 
+                    SELECT row_to_json(c)
+                    FROM public.ml_avi_conteudo c
                     WHERE c.id = m.conteudo_id AND c.inativo = false
                 ) as conteudo,
                 (
-                    SELECT row_to_json(a) 
-                    FROM public.ml_avi_acao a 
+                    SELECT row_to_json(a)
+                    FROM public.ml_avi_acao a
                     WHERE a.id = m.acao_id
                 ) as acao
                 FROM public.ml_avi_mensagem m
@@ -70,70 +35,76 @@ export default class MessagesController {
                 ORDER BY m.dt_cadastro DESC
             `;
 
-            const result = await Database.connection("pg").rawQuery(query, [
-                funcionario_erp_id,
-                id_empresa,
-            ]);
+      const result = await Database.connection("pg").rawQuery(query, [
+        funcionario_erp_id,
+        id_empresa,
+      ]);
 
-            return response.ok({ messages: result.rows });
-        } catch (error) {
-            console.error("Error on getComunications:", error);
-            return response.internalServerError({
-                message: "Ocorreu um erro ao buscar as comunicações",
-                error: process.env.NODE_ENV === "development" ? error.message : undefined,
-            });
-        }
-    };
+      return response.ok({ messages: result.rows });
+    } catch (error) {
+      console.error("Error on getComunications:", error);
+      return response.internalServerError({
+        message: "Ocorreu um erro ao buscar as comunicações",
+        error:
+          process.env.NODE_ENV === "development" ? error.message : undefined,
+      });
+    }
+  };
 
-    public viewMessage = async ({ response, request }: HttpContextContract) => {
-        try {
-            const { id } = request.body();
+  public viewMessage = async ({ response, request }: HttpContextContract) => {
+    try {
+      const { id } = request.body();
 
-            if (!id) {
-                return response.badRequest({ message: "ID da mensagem não informado" });
-            }
+      if (!id) {
+        return response.badRequest({ message: "ID da mensagem não informado" });
+      }
 
-            const query = `
+      const query = `
                 UPDATE public.ml_avi_mensagem
                 SET dt_visualizacao = now()
                 WHERE id = ?
             `;
 
-            await Database.connection("pg").rawQuery(query, [id]);
+      await Database.connection("pg").rawQuery(query, [id]);
 
-            return response.ok({ message: "Mensagem visualizada" });
-        } catch (error) {
-            console.error("Error on viewMessage:", error);
-            return response.internalServerError({
-                message: "Ocorreu um erro ao visualizar a mensagem",
-                error: process.env.NODE_ENV === "development" ? error.message : undefined,
-            });
-        }
-    };
+      return response.ok({ message: "Mensagem visualizada" });
+    } catch (error) {
+      console.error("Error on viewMessage:", error);
+      return response.internalServerError({
+        message: "Ocorreu um erro ao visualizar a mensagem",
+        error:
+          process.env.NODE_ENV === "development" ? error.message : undefined,
+      });
+    }
+  };
 
-    public confirmMessage = async ({ response, request }: HttpContextContract) => {
-        try {
-            const { id } = request.body();
+  public confirmMessage = async ({
+    response,
+    request,
+  }: HttpContextContract) => {
+    try {
+      const { id } = request.body();
 
-            if (!id) {
-                return response.badRequest({ message: "ID da mensagem não informado" });
-            }
+      if (!id) {
+        return response.badRequest({ message: "ID da mensagem não informado" });
+      }
 
-            const query = `
+      const query = `
                 UPDATE public.ml_avi_mensagem
                 SET dt_leitura_confirmacao = now()
                 WHERE id = ?
             `;
 
-            await Database.connection("pg").rawQuery(query, [id]);
+      await Database.connection("pg").rawQuery(query, [id]);
 
-            return response.ok({ message: "Mensagem confirmada" });
-        } catch (error) {
-            console.error("Error on confirmMessage:", error);
-            return response.internalServerError({
-                message: "Ocorreu um erro ao confirmar a mensagem",
-                error: process.env.NODE_ENV === "development" ? error.message : undefined,
-            });
-        }
-    };
+      return response.ok({ message: "Mensagem confirmada" });
+    } catch (error) {
+      console.error("Error on confirmMessage:", error);
+      return response.internalServerError({
+        message: "Ocorreu um erro ao confirmar a mensagem",
+        error:
+          process.env.NODE_ENV === "development" ? error.message : undefined,
+      });
+    }
+  };
 }

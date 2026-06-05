@@ -305,6 +305,21 @@ exports.templateDotCard = `
         </tr>
     </table>
 
+    <table style="width: 100%; margin-top: 5%;">
+        <tr>
+            <th style="
+                        border: 1px solid black;
+                        width: 20%;">
+                <span>{{dados.comunications.conteudo.titulo}}</span>
+            </th>
+        </tr>
+        <tr>
+            <td>
+                <span>{{dados.comunications.conteudo.conteudo}}</span>
+            </td>
+        </tr>
+    </table>
+
 </body>
 
 </html>

@@ -25,6 +25,43 @@ class Receipts {
             `);
             return liberacaoPdf?.rows.length > 0 ? true : false;
         };
+        this.getComunications = async (funcionario_erp_id, id_empresa, competencia) => {
+            try {
+                if (!funcionario_erp_id || !id_empresa || !competencia) {
+                    return;
+                }
+                const query = `
+                SELECT
+                m.*,
+                (
+                    SELECT row_to_json(c)
+                    FROM public.ml_avi_conteudo c
+                    WHERE c.id = m.conteudo_id
+                ) as conteudo,
+                (
+                    SELECT row_to_json(a)
+                    FROM public.ml_avi_acao a
+                    WHERE a.id = m.acao_id
+                ) as acao
+                FROM public.ml_avi_mensagem m
+                WHERE m.funcionario_erp_id = ?
+                AND m.empresa_id = ?
+                AND m.holerite_competencia = ?
+                AND m.holerite = true
+                AND m.holerite_dt_visualizacao IS NULL
+                ORDER BY m.dt_cadastro DESC
+            `;
+                const result = await Database_1.default.connection("pg").rawQuery(query, [
+                    funcionario_erp_id,
+                    id_empresa,
+                    competencia,
+                ]);
+                return result.rows[0];
+            }
+            catch (error) {
+                return;
+            }
+        };
         this.formattedCurrency = (value) => {
             if (value == null) {
                 return "0,00";
@@ -98,6 +135,7 @@ class Receipts {
                 BASE_IRRF_PLR: 0,
             },
             descricao: new Array(),
+            footer: dados[0].comunications,
         };
         dados.forEach((element) => {
             if (element.DESCEVEN == "LIQUIDO DE PLR") {
@@ -242,50 +280,54 @@ class Receipts {
                 return response.badRequest({ error: "app desatualizado" });
             }
             let payStub = await Database_1.default.connection("oracle").rawQuery(`
-                                WITH HistoricoFuncao AS (
-    SELECT
-          HS.CODINTFUNC,
-          FUN.DESCFUNCAO,
-          ROW_NUMBER() OVER (PARTITION BY HS.CODINTFUNC ORDER BY HS.DTHISTSAL DESC) AS RN
-        FROM GLOBUS.FLP_HISTORICOSALARIAL HS
-        JOIN GLOBUS.FLP_FUNCAO FUN ON FUN.CODFUNCAO = HS.CODFUNCAO
-        WHERE HS.STATUSHISTSAL = 'N'
-        AND HS.DTHISTSAL <= TO_DATE('${competencia}', 'MM-YYYY')
-    )
-SELECT DISTINCT
-hol.codfunc,
-    TO_CHAR(hol.competficha, 'MM-YYYY') AS COMPETFICHA,
-    hol.CODEVENTO,
-    hol.CODINTFUNC,
-    TO_CHAR(hol.VALORFICHA, 'FM999G999G999D90', 'nls_numeric_characters=''.,''') AS VALORFICHA,
-    hol.REFERENCIA,
-    hol.NOMEFUNC,
-    hol.DESCEVEN,
-    hol.DESCFUNCAO AS FUNCAO_OLD,
-    hol.RSOCIALEMPRESA,
-    hol.INSCRICAOEMPRESA,
-    hol.CIDADEFL,
-    hol.IESTADUALFL,
-    hol.ENDERECOFL,
-    hol.NUMEROENDFL,
-    hol.COMPLENDFL,
-    hol.TIPOEVEN,
-    hf.DESCFUNCAO AS DESCFUNCAO
-FROM globus.vw_flp_fichaeventosrecibo hol
-LEFT JOIN HistoricoFuncao hf
-    ON hf.CODINTFUNC = hol.CODINTFUNC
-    AND hf.RN = 1
-WHERE
-    hol.codintfunc = ${funcionario?.id_funcionario_erp} and to_char(competficha, 'MM/YYYY') = '${competencia}'
-    AND hol.TIPOFOLHA = 1
-    AND hol.CODEVENTO NOT IN (15511, 15512, 15513)
-    AND hol.TIPOEVEN NOT IN ('C')
-ORDER BY hol.tipoeven DESC, hol.codevento ASC`);
+        WITH HistoricoFuncao AS (
+          SELECT
+            HS.CODINTFUNC,
+            FUN.DESCFUNCAO,
+            ROW_NUMBER() OVER (PARTITION BY HS.CODINTFUNC ORDER BY HS.DTHISTSAL DESC) AS RN
+            FROM GLOBUS.FLP_HISTORICOSALARIAL HS
+            JOIN GLOBUS.FLP_FUNCAO FUN ON FUN.CODFUNCAO = HS.CODFUNCAO
+            WHERE HS.STATUSHISTSAL = 'N'
+            AND HS.DTHISTSAL <= TO_DATE('${competencia}', 'MM-YYYY')
+        )
+        SELECT DISTINCT
+          hol.codfunc,
+            TO_CHAR(hol.competficha, 'MM-YYYY') AS COMPETFICHA,
+            hol.CODEVENTO,
+            hol.CODINTFUNC,
+            TO_CHAR(hol.VALORFICHA, 'FM999G999G999D90', 'nls_numeric_characters=''.,''') AS VALORFICHA,
+            hol.REFERENCIA,
+            hol.NOMEFUNC,
+            hol.DESCEVEN,
+            hol.DESCFUNCAO AS FUNCAO_OLD,
+            hol.RSOCIALEMPRESA,
+            hol.INSCRICAOEMPRESA,
+            hol.CIDADEFL,
+            hol.IESTADUALFL,
+            hol.ENDERECOFL,
+            hol.NUMEROENDFL,
+            hol.COMPLENDFL,
+            hol.TIPOEVEN,
+            hf.DESCFUNCAO AS DESCFUNCAO
+          FROM globus.vw_flp_fichaeventosrecibo hol
+          LEFT JOIN HistoricoFuncao hf
+            ON hf.CODINTFUNC = hol.CODINTFUNC
+            AND hf.RN = 1
+          WHERE
+            hol.codintfunc = ${funcionario?.id_funcionario_erp} and to_char(competficha, 'MM/YYYY') = '${competencia}'
+            AND hol.TIPOFOLHA = 1
+            AND hol.CODEVENTO NOT IN (15511, 15512, 15513)
+            AND hol.TIPOEVEN NOT IN ('C')
+          ORDER BY hol.tipoeven DESC, hol.codevento ASC`);
             const empresa = await Empresa_1.default.findBy("id_empresa", auth.user?.id_empresa);
             if (!empresa) {
                 return response.badRequest({ error: "Erro ao pegar empresa!" });
             }
             payStub[0].registro = funcionario?.registro;
+            const comunications = await this.getComunications(funcionario?.id_funcionario_erp?.toString(), empresa?.id_empresa.toString(), `${year}/${month}`);
+            if (comunications) {
+                payStub[0].comunications = comunications;
+            }
             const pdfTemp = await this.generatePdf(this.tratarDadosEvents(payStub, empresa), template_1.templateDotCard);
             const file = await (0, S3_1.uploadPdfEmpresa)(pdfTemp.filename, auth.user?.id_empresa);
             if (!file || !file.Location) {

@@ -6,23 +6,25 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const Database_1 = __importDefault(global[Symbol.for('ioc.use')]("Adonis/Lucid/Database"));
 class MessagesController {
     constructor() {
-        this.getComunications = async ({ response, request }) => {
+        this.getComunications = async ({ response, request, }) => {
             try {
                 const { funcionario_erp_id, id_empresa } = request.body();
                 if (!funcionario_erp_id || !id_empresa) {
-                    return response.badRequest({ message: "Dados do funcionário ou empresa não informados" });
+                    return response.badRequest({
+                        message: "Dados do funcionário ou empresa não informados",
+                    });
                 }
                 const query = `
-                SELECT 
+                SELECT
                 m.*,
                 (
-                    SELECT row_to_json(c) 
-                    FROM public.ml_avi_conteudo c 
+                    SELECT row_to_json(c)
+                    FROM public.ml_avi_conteudo c
                     WHERE c.id = m.conteudo_id AND c.inativo = false
                 ) as conteudo,
                 (
-                    SELECT row_to_json(a) 
-                    FROM public.ml_avi_acao a 
+                    SELECT row_to_json(a)
+                    FROM public.ml_avi_acao a
                     WHERE a.id = m.acao_id
                 ) as acao
                 FROM public.ml_avi_mensagem m
@@ -67,7 +69,7 @@ class MessagesController {
                 });
             }
         };
-        this.confirmMessage = async ({ response, request }) => {
+        this.confirmMessage = async ({ response, request, }) => {
             try {
                 const { id } = request.body();
                 if (!id) {
