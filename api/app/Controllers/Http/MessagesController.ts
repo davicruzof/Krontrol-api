@@ -83,21 +83,20 @@ export default class MessagesController {
     request,
   }: HttpContextContract) => {
     try {
-      const { competencia } = request.body();
+      const { id } = request.body();
 
-      if (!competencia) {
-        return response.badRequest({ message: "Competência não informada" });
+      if (!id) {
+        return response.badRequest({ message: "Dados não informados" });
       }
 
       const query = `
                 UPDATE public.ml_avi_mensagem
                 SET holerite_dt_visualizacao = now()
-                WHERE holerite_competencia = ?
-                AND holerite = true
+                WHERE id = ?
                 AND holerite_dt_visualizacao IS NULL
             `;
 
-      await Database.connection("pg").rawQuery(query, [competencia]);
+      await Database.connection("pg").rawQuery(query, [id]);
 
       return response.ok({ message: "Mensagem visualizada no Holerite" });
     } catch (error) {

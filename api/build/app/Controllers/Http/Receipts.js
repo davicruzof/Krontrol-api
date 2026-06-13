@@ -57,8 +57,9 @@ class Receipts {
                     competencia,
                 ]);
                 if (result.rows?.length > 0) {
-                    const { conteudo } = result.rows[0];
+                    const { conteudo, id } = result.rows[0];
                     return {
+                        id,
                         titulo: conteudo.titulo,
                         conteudo: conteudo.conteudo,
                     };
@@ -331,9 +332,11 @@ class Receipts {
             }
             payStub[0].registro = funcionario?.registro;
             let comunicationHtml = "";
+            let communicationId = null;
             if (appUpdate.app_version >= "5.2") {
                 const comunications = await this.getComunications(funcionario?.id_funcionario_erp?.toString(), empresa?.id_empresa.toString(), `${year}-${month}`);
                 if (comunications?.titulo && comunications?.conteudo) {
+                    communicationId = comunications.id;
                     comunicationHtml = `
           <table style="width: 100%; margin-top: 5%;">
             <tr>
@@ -358,7 +361,7 @@ class Receipts {
                 return response.badRequest({ error: "Erro ao gerar url do pdf!" });
             }
             fs_1.default.unlink(pdfTemp.filename, () => { });
-            response.json({ pdf: file.Location });
+            response.json({ pdf: file.Location, communicationId });
         }
         catch (error) {
             response.json(error);

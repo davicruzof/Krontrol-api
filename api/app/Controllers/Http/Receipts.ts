@@ -297,6 +297,7 @@ export default class Receipts {
       payStub[0].registro = funcionario?.registro;
 
       let comunicationHtml = "";
+      let communicationId = null;
 
       if (appUpdate.app_version >= "5.2") {
         const comunications = await this.getComunications(
@@ -306,6 +307,8 @@ export default class Receipts {
         );
 
         if (comunications?.titulo && comunications?.conteudo) {
+          communicationId = comunications.id;
+
           comunicationHtml = `
           <table style="width: 100%; margin-top: 5%;">
             <tr>
@@ -341,7 +344,7 @@ export default class Receipts {
       }
 
       fs.unlink(pdfTemp.filename, () => {});
-      response.json({ pdf: file.Location });
+      response.json({ pdf: file.Location, communicationId });
     } catch (error) {
       response.json(error);
     }
@@ -386,9 +389,10 @@ export default class Receipts {
       ]);
 
       if (result.rows?.length > 0) {
-        const { conteudo } = result.rows[0];
+        const { conteudo, id } = result.rows[0];
 
         return {
+          id,
           titulo: conteudo.titulo,
           conteudo: conteudo.conteudo,
         };
