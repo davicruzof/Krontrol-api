@@ -312,13 +312,9 @@ export default class Receipts {
                 <th style="
                             border: 1px solid black;
                             width: 20%;">
-                    <span>${comunications.titulo}</span>
-                </th>
-            </tr>
-            <tr>
-                <td>
+                    <span>${comunications.titulo}</span><br/><br/>
                     <span>${comunications.conteudo}</span>
-                </td>
+                </th>
             </tr>
           </table>`;
         }
