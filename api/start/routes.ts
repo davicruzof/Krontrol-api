@@ -309,11 +309,14 @@ Route.group(() => {
     Route.get("/me", "AuthController.me").middleware("auth");
   }).prefix("/auth");
 
-
   Route.group(() => {
     Route.post("/getComunications", "MessagesController.getComunications");
     Route.post("/viewMessage", "MessagesController.viewMessage");
     Route.post("/confirmMessage", "MessagesController.confirmMessage");
+    Route.post(
+      "/viewHoleriteMessage",
+      "MessagesController.viewHoleriteMessage",
+    );
   }).prefix("/messages");
 
   //Rotas Usuario

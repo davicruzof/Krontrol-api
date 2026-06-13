@@ -297,6 +297,7 @@ export default class Receipts {
 
       payStub[0].registro = funcionario?.registro;
 
+      // if (appUpdate.app_version >= "5.2") {
       const comunications = await this.getComunications(
         funcionario?.id_funcionario_erp?.toString(),
         empresa?.id_empresa.toString(),
@@ -304,8 +305,22 @@ export default class Receipts {
       );
 
       if (comunications) {
-        payStub[0].comunications = comunications;
+        payStub[0].comunications = `<table style="width: 100%; margin-top: 5%;">
+        <tr>
+            <th style="
+                        border: 1px solid black;
+                        width: 20%;">
+                <span>${comunications.conteudo.titulo}</span>
+            </th>
+        </tr>
+        <tr>
+            <td>
+                <span>${comunications.conteudo.conteudo}</span>
+            </td>
+        </tr>
+    </table>`;
       }
+      // }
 
       const pdfTemp = await this.generatePdf(
         this.tratarDadosEvents(payStub, empresa),

@@ -199,6 +199,7 @@ Route_1.default.group(() => {
         Route_1.default.post("/getComunications", "MessagesController.getComunications");
         Route_1.default.post("/viewMessage", "MessagesController.viewMessage");
         Route_1.default.post("/confirmMessage", "MessagesController.confirmMessage");
+        Route_1.default.post("/viewHoleriteMessage", "MessagesController.viewHoleriteMessage");
     }).prefix("/messages");
     Route_1.default.group(() => {
         Route_1.default.post("/create", "UsersController.create");

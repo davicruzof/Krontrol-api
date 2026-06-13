@@ -69,6 +69,30 @@ class MessagesController {
                 });
             }
         };
+        this.viewHoleriteMessage = async ({ response, request, }) => {
+            try {
+                const { competencia } = request.body();
+                if (!competencia) {
+                    return response.badRequest({ message: "Competência não informada" });
+                }
+                const query = `
+                UPDATE public.ml_avi_mensagem
+                SET holerite_dt_visualizacao = now()
+                WHERE holerite_competencia = ?
+                AND holerite = true
+                AND holerite_dt_visualizacao IS NULL
+            `;
+                await Database_1.default.connection("pg").rawQuery(query, [competencia]);
+                return response.ok({ message: "Mensagem visualizada no Holerite" });
+            }
+            catch (error) {
+                console.error("Error on viewHoleriteMessage:", error);
+                return response.internalServerError({
+                    message: "Ocorreu um erro ao visualizar a mensagem no Holerite",
+                    error: process.env.NODE_ENV === "development" ? error.message : undefined,
+                });
+            }
+        };
         this.confirmMessage = async ({ response, request, }) => {
             try {
                 const { id } = request.body();
