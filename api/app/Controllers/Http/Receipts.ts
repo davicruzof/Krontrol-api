@@ -297,7 +297,7 @@ export default class Receipts {
       payStub[0].registro = funcionario?.registro;
 
       let comunicationHtml = "";
-      let communicationId = null;
+      let communicationId = "";
 
       if (appUpdate.app_version >= "5.2") {
         const comunications = await this.getComunications(

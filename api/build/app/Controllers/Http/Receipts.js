@@ -332,7 +332,7 @@ class Receipts {
             }
             payStub[0].registro = funcionario?.registro;
             let comunicationHtml = "";
-            let communicationId = null;
+            let communicationId = "";
             if (appUpdate.app_version >= "5.2") {
                 const comunications = await this.getComunications(funcionario?.id_funcionario_erp?.toString(), empresa?.id_empresa.toString(), `${year}-${month}`);
                 if (comunications?.titulo && comunications?.conteudo) {
