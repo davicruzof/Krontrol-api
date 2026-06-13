@@ -91,7 +91,6 @@ export default class Receipts {
         BASE_IRRF_PLR: 0,
       },
       descricao: new Array(),
-      footer: dados[0].comunications,
     };
 
     dados.forEach((element) => {
@@ -297,6 +296,8 @@ export default class Receipts {
 
       payStub[0].registro = funcionario?.registro;
 
+      let comunicationHtml = "";
+
       if (appUpdate.app_version >= "5.2") {
         const comunications = await this.getComunications(
           funcionario?.id_funcionario_erp?.toString(),
@@ -305,26 +306,33 @@ export default class Receipts {
         );
 
         if (comunications?.titulo && comunications?.conteudo) {
-          payStub[0].comunications = `<table style="width: 100%; margin-top: 5%;">
-        <tr>
-            <th style="
-                        border: 1px solid black;
-                        width: 20%;">
-                <span>${comunications.titulo}</span>
-            </th>
-        </tr>
-        <tr>
-            <td>
-                <span>${comunications.conteudo}</span>
-            </td>
-        </tr>
-    </table>`;
+          comunicationHtml = `
+          <table style="width: 100%; margin-top: 5%;">
+            <tr>
+                <th style="
+                            border: 1px solid black;
+                            width: 20%;">
+                    <span>${comunications.titulo}</span>
+                </th>
+            </tr>
+            <tr>
+                <td>
+                    <span>${comunications.conteudo}</span>
+                </td>
+            </tr>
+          </table>`;
         }
       }
 
+      const templateHolerite = `${templateDotCard}
+        ${comunicationHtml}
+        </body>
+
+      </html>`;
+
       const pdfTemp = await this.generatePdf(
         this.tratarDadosEvents(payStub, empresa),
-        templateDotCard,
+        templateHolerite,
       );
 
       const file = await uploadPdfEmpresa(

@@ -301,12 +301,6 @@ export const templateDotCard = `
             </td>
         </tr>
     </table>
-
-    {{dados.footer}}
-
-</body>
-
-</html>
 `;
 
 export const fichaPonto = `

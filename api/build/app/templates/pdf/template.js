@@ -304,12 +304,6 @@ exports.templateDotCard = `
             </td>
         </tr>
     </table>
-
-    {{dados.footer}}
-
-</body>
-
-</html>
 `;
 exports.fichaPonto = `
 <!DOCTYPE html>
